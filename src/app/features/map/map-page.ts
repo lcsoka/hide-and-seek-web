@@ -244,11 +244,17 @@ export class MapPage {
     return c ? Math.round(area(c) / 1_000_000).toLocaleString() : null;
   });
 
+  constructor() {
+    // Default the play area to the real city border (falls back to the radius if Overpass fails).
+    void this.loadCityBorder();
+  }
+
   selectCity(slug: string): void {
     this.citySlug.set(slug);
     this.baseArea.set(null);
     this.stations.set(null);
     this.clearBorders();
+    void this.loadCityBorder();
   }
 
   setMode(m: Mode): void {
