@@ -3,23 +3,27 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiClient } from '../../core/services/api-client';
 import { LocationTracker } from '../../core/services/location';
 import { Realtime } from '../../core/services/realtime';
+import { SessionStore } from '../../core/services/session-store';
+import { MapView } from './map';
 
 @Component({
   selector: 'app-session',
-  imports: [RouterLink],
+  imports: [RouterLink, MapView],
   template: `
     <main class="mx-auto max-w-lg p-6 space-y-4">
       <a routerLink="/" class="text-sm text-rose-600">← Home</a>
 
-      @if (state.isLoading()) {
+      @if (store.loading() && !store.state()) {
         <p>Loading…</p>
-      } @else if (state.error()) {
+      } @else if (store.error()) {
         <p class="rounded bg-red-100 p-2 text-sm text-red-700">Couldn't load this session.</p>
-      } @else if (state.value(); as s) {
+      } @else if (store.state(); as s) {
         <header class="flex items-center justify-between">
           <h1 class="text-xl font-bold capitalize">{{ s.state }}</h1>
           <span class="rounded bg-gray-100 px-2 py-1 text-xs">{{ s.status }} · round {{ s.round }}</span>
         </header>
+
+        <app-map [players]="s.players" [zone]="s.hiding_zone" />
 
         <section class="rounded-lg border p-3">
           <h2 class="mb-2 text-sm font-semibold text-gray-500">Players</h2>
@@ -56,6 +60,17 @@ import { Realtime } from '../../core/services/realtime';
             <p class="text-sm text-gray-400">No actions available right now.</p>
           }
         </section>
+
+        @if (store.feed().length) {
+          <section class="rounded-lg border p-3">
+            <h2 class="mb-2 text-sm font-semibold text-gray-500">Events</h2>
+            <ul class="space-y-0.5 text-xs text-gray-500">
+              @for (e of store.feed(); track e.at) {
+                <li>{{ e.type }}</li>
+              }
+            </ul>
+          </section>
+        }
       }
     </main>
   `,
@@ -65,15 +80,16 @@ export class SessionView {
   private readonly api = inject(ApiClient);
   private readonly realtime = inject(Realtime);
   private readonly location = inject(LocationTracker);
+  readonly store = inject(SessionStore);
 
   readonly id = signal<string | undefined>(this.route.snapshot.paramMap.get('id') ?? undefined);
-  readonly state = this.api.stateResource(this.id);
   readonly acting = signal(false);
 
   constructor() {
     const sessionId = this.id();
     if (sessionId) {
-      this.realtime.connect(sessionId, null, () => this.state.reload());
+      this.store.setSession(sessionId);
+      this.realtime.connect(sessionId, null, (name) => this.store.onEvent(name));
       this.location.start(sessionId);
     }
   }
@@ -93,7 +109,7 @@ export class SessionView {
       }
     } finally {
       this.acting.set(false);
-      this.state.reload();
+      this.store.refresh();
     }
   }
 }
