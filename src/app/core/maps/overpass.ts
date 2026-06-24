@@ -20,6 +20,24 @@ export const TRANSIT_MODES: TransitMode[] = [
 
 export const DEFAULT_TRANSIT_MODES = ['metro', 'tram'];
 
+export interface PoiType {
+  id: string;
+  label: string;
+  filter: string;
+  defaultRadiusKm: number;
+}
+
+/** Tentacle POI categories (from the original game): ~15 mi for big attractions, ~1 mi for the rest. */
+export const POI_TYPES: PoiType[] = [
+  { id: 'theme_park', label: 'Theme park', filter: '[tourism=theme_park]', defaultRadiusKm: 24 },
+  { id: 'zoo', label: 'Zoo', filter: '[tourism=zoo]', defaultRadiusKm: 24 },
+  { id: 'aquarium', label: 'Aquarium', filter: '[tourism=aquarium]', defaultRadiusKm: 24 },
+  { id: 'museum', label: 'Museum', filter: '[tourism=museum]', defaultRadiusKm: 1.6 },
+  { id: 'hospital', label: 'Hospital', filter: '[amenity=hospital]', defaultRadiusKm: 1.6 },
+  { id: 'cinema', label: 'Cinema', filter: '[amenity=cinema]', defaultRadiusKm: 1.6 },
+  { id: 'library', label: 'Library', filter: '[amenity=library]', defaultRadiusKm: 1.6 },
+];
+
 /** Thin client over the public Overpass API (CORS-enabled). */
 @Injectable({ providedIn: 'root' })
 export class OverpassService {
@@ -65,6 +83,29 @@ export class OverpassService {
     const ql = `[out:json][timeout:30];(${body});out center;`;
     const geo = osmtogeojson(await this.run(ql)) as FeatureCollection;
     const features = geo.features.filter((f) => f.geometry?.type === 'Point') as Feature<Point>[];
+
+    return { type: 'FeatureCollection', features };
+  }
+
+  /** Named POIs of one tag filter within `radiusKm` of a point (deduped by name; nameless dropped). */
+  async pois(lat: number, lng: number, radiusKm: number, filter: string): Promise<FeatureCollection<Point>> {
+    const radiusM = Math.round(radiusKm * 1000);
+    const ql = `[out:json][timeout:30];(nwr${filter}(around:${radiusM},${lat},${lng}););out center;`;
+    const geo = osmtogeojson(await this.run(ql)) as FeatureCollection;
+
+    const seen = new Set<string>();
+    const features: Feature<Point>[] = [];
+    for (const f of geo.features) {
+      if (f.geometry?.type !== 'Point') {
+        continue;
+      }
+      const name = (f.properties?.['name'] ?? f.properties?.['name:en']) as string | undefined;
+      if (!name || seen.has(name)) {
+        continue;
+      }
+      seen.add(name);
+      features.push({ ...f, properties: { ...f.properties, name } } as Feature<Point>);
+    }
 
     return { type: 'FeatureCollection', features };
   }

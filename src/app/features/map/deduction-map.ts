@@ -22,6 +22,7 @@ export class DeductionMap {
   readonly candidate = input<Poly | null>(null);
   readonly questions = input<DeductionQuestion[]>([]);
   readonly stations = input<FeatureCollection<Point> | null>(null);
+  readonly points = input<FeatureCollection<Point> | null>(null); // highlighted POIs (e.g. tentacle candidates)
   readonly overlays = input<Feature[]>([]); // e.g. admin borders, drawn as outlines
   readonly autoZoom = input(true);
   readonly mapClick = output<Position>();
@@ -35,6 +36,7 @@ export class DeductionMap {
       this.candidate();
       this.questions();
       this.stations();
+      this.points();
       this.overlays();
       this.render();
     });
@@ -75,6 +77,13 @@ export class DeductionMap {
       const [lng, lat] = s.geometry.coordinates;
       L.circleMarker([lat, lng], { radius: 3, color: '#0891b2', fillColor: '#0891b2', fillOpacity: 0.9, weight: 1 })
         .bindTooltip(String(s.properties?.['name'] ?? 'stop'))
+        .addTo(this.overlay);
+    }
+
+    for (const p of this.points()?.features ?? []) {
+      const [lng, lat] = p.geometry.coordinates;
+      L.circleMarker([lat, lng], { radius: 6, color: '#f97316', fillColor: '#f97316', fillOpacity: 0.9, weight: 2 })
+        .bindTooltip(String(p.properties?.['name'] ?? 'place'), { permanent: false })
         .addTo(this.overlay);
     }
 

@@ -4,13 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Feature, FeatureCollection, Point } from 'geojson';
 import { CITIES } from '../../core/maps/cities';
-import { applyQuestions, DeductionQuestion, measuringRegionToBorder, playArea } from '../../core/maps/deduction';
+import { applyQuestions, DeductionQuestion, measuringRegionToBorder, playArea, tentacleRegion } from '../../core/maps/deduction';
 import { Poly } from '../../core/maps/operators';
-import { OverpassService, TRANSIT_MODES } from '../../core/maps/overpass';
+import { OverpassService, POI_TYPES, TRANSIT_MODES } from '../../core/maps/overpass';
 import { Position } from '../../core/models/models';
 import { DeductionMap } from './deduction-map';
 
-type Mode = 'idle' | 'radar' | 'thermo' | 'border' | 'zone';
+type Mode = 'idle' | 'radar' | 'thermo' | 'border' | 'zone' | 'tentacle';
+
+interface PendingTentacle {
+  lat: number;
+  lng: number;
+  radiusKm: number;
+  typeLabel: string;
+  pois: FeatureCollection<Point>;
+}
 
 const ZONE_LEVELS: { level: number; name: string }[] = [
   { level: 9, name: 'district' },
@@ -44,7 +52,8 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="space-y-2">
           <app-deduction-map [candidate]="candidate()" [questions]="questions()" [stations]="stations()"
-                             [overlays]="overlays()" [autoZoom]="autoZoom()" (mapClick)="onMapClick($event)" />
+                             [points]="pendingTentacle()?.pois ?? null" [overlays]="overlays()"
+                             [autoZoom]="autoZoom()" (mapClick)="onMapClick($event)" />
           <p class="text-xs text-gray-500 dark:text-gray-400">
             @switch (mode()) {
               @case ('radar') { Click the map to drop a radar centre. }
@@ -53,6 +62,7 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
               }
               @case ('border') { Click the map at the seeker's position for the border question. }
               @case ('zone') { Click the seeker's position to match its {{ zoneName() }}. }
+              @case ('tentacle') { Click the centre to find nearby {{ tentacleLabel() }}s. }
               @default { Pick a play area, then add questions and click the map. }
             }
           </p>
@@ -115,6 +125,30 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
           </section>
 
           <section class="space-y-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+            <h2 class="font-semibold">Tentacles</h2>
+            <div class="flex flex-wrap items-center gap-2">
+              <select [ngModel]="tentacleType()" (ngModelChange)="selectTentacleType($event)" [class]="sel">
+                @for (t of poiTypes; track t.id) { <option [value]="t.id">{{ t.label }}</option> }
+              </select>
+              <label class="flex items-center gap-1">within
+                <input type="number" min="1" [ngModel]="tentacleRadiusKm()" (ngModelChange)="tentacleRadiusKm.set($event)" [class]="num" /> km
+              </label>
+              <button (click)="setMode('tentacle')" [class]="mode() === 'tentacle' ? btnActive : btn">Find places</button>
+            </div>
+            @if (pendingTentacle(); as pt) {
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs">Nearest to hider:</span>
+                <select [ngModel]="tentacleChoice()" (ngModelChange)="tentacleChoice.set($event)" [class]="sel">
+                  @for (f of pt.pois.features; track f.properties!['name']) { <option [value]="f.properties!['name']">{{ f.properties!['name'] }}</option> }
+                </select>
+                <button (click)="addTentacle()" [disabled]="!tentacleChoice()" [class]="btn">Add</button>
+                <button (click)="pendingTentacle.set(null)" [class]="btnOutline">Cancel</button>
+                <span class="text-xs text-gray-500">{{ pt.pois.features.length }} found</span>
+              </div>
+            }
+          </section>
+
+          <section class="space-y-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
             <div class="flex items-center justify-between">
               <h2 class="font-semibold">Questions ({{ questions().length }})</h2>
               <label class="flex items-center gap-1 text-xs">
@@ -170,6 +204,13 @@ export class MapPage {
   readonly zoneLevels = ZONE_LEVELS;
   readonly zoneLevel = signal(6);
   readonly zoneName = computed(() => ZONE_LEVELS.find((z) => z.level === this.zoneLevel())?.name ?? 'zone');
+
+  readonly poiTypes = POI_TYPES;
+  readonly tentacleType = signal('museum');
+  readonly tentacleRadiusKm = signal(1.6);
+  readonly tentacleLabel = computed(() => POI_TYPES.find((t) => t.id === this.tentacleType())?.label ?? 'place');
+  readonly pendingTentacle = signal<PendingTentacle | null>(null);
+  readonly tentacleChoice = signal('');
 
   readonly citySlug = signal('budapest');
   readonly city = computed(() => CITIES.find((c) => c.slug === this.citySlug()) ?? CITIES[0]);
@@ -264,6 +305,28 @@ export class MapPage {
     this.selectedModes.update((ms) => (ms.includes(id) ? ms.filter((m) => m !== id) : [...ms, id]));
   }
 
+  selectTentacleType(id: string): void {
+    this.tentacleType.set(id);
+    const t = POI_TYPES.find((p) => p.id === id);
+    if (t) {
+      this.tentacleRadiusKm.set(t.defaultRadiusKm);
+    }
+  }
+
+  addTentacle(): void {
+    const pt = this.pendingTentacle();
+    const choice = this.tentacleChoice();
+    if (!pt || !choice) {
+      return;
+    }
+    const region = tentacleRegion(pt.lat, pt.lng, pt.radiusKm, pt.pois, choice);
+    if (region) {
+      this.add({ id: crypto.randomUUID(), type: 'region', label: `Nearest ${pt.typeLabel}: ${choice}`, region, within: true, yesLabel: 'Confirmed', noLabel: 'Elsewhere' });
+    }
+    this.pendingTentacle.set(null);
+    this.tentacleChoice.set('');
+  }
+
   onMapClick(p: Position): void {
     if (this.mode() === 'radar') {
       this.add({ id: crypto.randomUUID(), type: 'radar', lat: p.lat, lng: p.lng, radiusKm: 5, within: true });
@@ -293,6 +356,18 @@ export class MapPage {
           throw new Error(`No ${name} boundary here.`);
         }
         this.add({ id: crypto.randomUUID(), type: 'region', label: `Same ${name}`, region: boundary as Poly, within: true, yesLabel: 'Same', noLabel: 'Different' });
+      });
+    } else if (this.mode() === 'tentacle') {
+      const type = POI_TYPES.find((t) => t.id === this.tentacleType());
+      const radiusKm = this.tentacleRadiusKm();
+      this.setMode('idle');
+      void this.run(async () => {
+        const pois = await this.overpass.pois(p.lat, p.lng, radiusKm, type?.filter ?? '');
+        if (pois.features.length === 0) {
+          throw new Error(`No ${type?.label ?? 'places'} found within ${radiusKm} km.`);
+        }
+        this.pendingTentacle.set({ lat: p.lat, lng: p.lng, radiusKm, typeLabel: type?.label ?? 'place', pois });
+        this.tentacleChoice.set(String(pois.features[0].properties?.['name'] ?? ''));
       });
     }
   }

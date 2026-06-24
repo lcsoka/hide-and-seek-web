@@ -1,5 +1,5 @@
-import { bearing, buffer, circle, destination, difference, featureCollection, midpoint, point, pointToPolygonDistance, simplify } from '@turf/turf';
-import { Feature, MultiPolygon, Polygon } from 'geojson';
+import { bbox, bearing, buffer, circle, destination, difference, featureCollection, intersect, midpoint, point, pointToPolygonDistance, simplify, voronoi } from '@turf/turf';
+import { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from 'geojson';
 import { modifyMapData, Poly } from './operators';
 
 /**
@@ -91,6 +91,33 @@ export function thermometerHalfPlane(q: ThermometerQuestion, towardB: boolean): 
   const ring = [f1, g1, g2, f2, f1].map((p) => p.geometry.coordinates);
 
   return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } } as Feature<Polygon>;
+}
+
+/**
+ * Tentacles region: within `radiusKm` of the centre, the Voronoi cell of the POI
+ * nearest the hider — i.e. the chosen place's cell clipped to the radius circle.
+ * (Voronoi cells come back in the same order as the input points.)
+ */
+export function tentacleRegion(
+  centerLat: number,
+  centerLng: number,
+  radiusKm: number,
+  pois: FeatureCollection<Point>,
+  chosenName: string,
+): Poly | null {
+  const radiusCircle = circle([centerLng, centerLat], radiusKm, { units: 'kilometers', steps: 64 }) as Poly;
+  if (pois.features.length < 2) {
+    return radiusCircle; // only one candidate place — its cell is the whole circle
+  }
+
+  const cells = voronoi(pois, { bbox: bbox(radiusCircle) as [number, number, number, number] });
+  const idx = pois.features.findIndex((f) => f.properties?.['name'] === chosenName);
+  const cell = idx >= 0 ? cells.features[idx] : null;
+  if (!cell) {
+    return null;
+  }
+
+  return (intersect(featureCollection([cell as Poly, radiusCircle])) as Poly) ?? null;
 }
 
 function regionFor(q: DeductionQuestion): { region: Poly; within: boolean } | null {

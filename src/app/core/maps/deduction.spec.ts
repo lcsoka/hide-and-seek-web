@@ -1,6 +1,6 @@
-import { area, booleanPointInPolygon, point } from '@turf/turf';
-import { applyQuestions, measuringRegionToBorder, playArea, RadarQuestion, RegionQuestion, ThermometerQuestion } from './deduction';
-import { Feature, Polygon } from 'geojson';
+import { area, booleanPointInPolygon, featureCollection, point } from '@turf/turf';
+import { applyQuestions, measuringRegionToBorder, playArea, RadarQuestion, RegionQuestion, tentacleRegion, ThermometerQuestion } from './deduction';
+import { Feature, FeatureCollection, Point, Polygon } from 'geojson';
 
 const BUD = { lat: 47.4979, lng: 19.0402 };
 
@@ -69,6 +69,20 @@ describe('deduction engine', () => {
     };
     const region = measuringRegionToBorder(boundary, 47, 20);
     expect(area(region)).toBeGreaterThan(0);
+  });
+
+  it('builds a tentacle region = the chosen place\'s Voronoi cell within the radius', () => {
+    const pois = featureCollection([
+      point([BUD.lng - 0.05, BUD.lat], { name: 'West place' }),
+      point([BUD.lng + 0.05, BUD.lat], { name: 'East place' }),
+    ]) as FeatureCollection<Point>;
+
+    const region = tentacleRegion(BUD.lat, BUD.lng, 10, pois, 'East place')!;
+
+    expect(region).toBeTruthy();
+    // a point near the east place is in the region; near the west place is not
+    expect(booleanPointInPolygon(point([BUD.lng + 0.04, BUD.lat]), region)).toBe(true);
+    expect(booleanPointInPolygon(point([BUD.lng - 0.04, BUD.lat]), region)).toBe(false);
   });
 
   it('skips unanswered questions', () => {
