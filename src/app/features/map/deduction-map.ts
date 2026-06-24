@@ -1,6 +1,6 @@
 import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
 import { bbox } from '@turf/turf';
-import { GeoJsonObject } from 'geojson';
+import { Feature, FeatureCollection, GeoJsonObject, Point } from 'geojson';
 import * as L from 'leaflet';
 import { DeductionQuestion } from '../../core/maps/deduction';
 import { holedMask, Poly } from '../../core/maps/operators';
@@ -21,6 +21,8 @@ export class DeductionMap {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
   readonly candidate = input<Poly | null>(null);
   readonly questions = input<DeductionQuestion[]>([]);
+  readonly stations = input<FeatureCollection<Point> | null>(null);
+  readonly overlays = input<Feature[]>([]); // e.g. admin borders, drawn as outlines
   readonly autoZoom = input(true);
   readonly mapClick = output<Position>();
 
@@ -32,6 +34,8 @@ export class DeductionMap {
     effect(() => {
       this.candidate();
       this.questions();
+      this.stations();
+      this.overlays();
       this.render();
     });
   }
@@ -63,6 +67,17 @@ export class DeductionMap {
       L.geoJSON(cand as GeoJsonObject, { style: { color: '#16a34a', weight: 2, fill: false } }).addTo(this.overlay);
     }
 
+    for (const overlay of this.overlays()) {
+      L.geoJSON(overlay as GeoJsonObject, { style: { color: '#a855f7', weight: 2, dashArray: '6', fill: false }, interactive: false }).addTo(this.overlay);
+    }
+
+    for (const s of this.stations()?.features ?? []) {
+      const [lng, lat] = s.geometry.coordinates;
+      L.circleMarker([lat, lng], { radius: 3, color: '#0891b2', fillColor: '#0891b2', fillOpacity: 0.9, weight: 1 })
+        .bindTooltip(String(s.properties?.['name'] ?? 'stop'))
+        .addTo(this.overlay);
+    }
+
     for (const q of this.questions()) {
       if (q.type === 'radar') {
         L.circle([q.lat, q.lng], {
@@ -72,7 +87,7 @@ export class DeductionMap {
           fillOpacity: 0.04,
         }).addTo(this.overlay);
         L.circleMarker([q.lat, q.lng], { radius: 5, color: '#2563eb', fillOpacity: 1 }).bindTooltip('Radar').addTo(this.overlay);
-      } else {
+      } else if (q.type === 'thermometer') {
         L.circleMarker([q.aLat, q.aLng], { radius: 6, color: '#3b82f6', fillOpacity: 1 }).bindTooltip('A (cold)').addTo(this.overlay);
         L.circleMarker([q.bLat, q.bLng], { radius: 6, color: '#ef4444', fillOpacity: 1 }).bindTooltip('B (warm)').addTo(this.overlay);
         L.polyline([[q.aLat, q.aLng], [q.bLat, q.bLng]], { color: '#94a3b8', weight: 1, dashArray: '4' }).addTo(this.overlay);

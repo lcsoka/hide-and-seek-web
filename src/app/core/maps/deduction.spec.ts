@@ -1,5 +1,6 @@
 import { area, booleanPointInPolygon, point } from '@turf/turf';
-import { applyQuestions, playArea, RadarQuestion, ThermometerQuestion } from './deduction';
+import { applyQuestions, measuringRegionToBorder, playArea, RadarQuestion, RegionQuestion, ThermometerQuestion } from './deduction';
+import { Feature, Polygon } from 'geojson';
 
 const BUD = { lat: 47.4979, lng: 19.0402 };
 
@@ -44,6 +45,30 @@ describe('deduction engine', () => {
     };
 
     expect(area(applyQuestions(base, [radar, thermo])!)).toBeLessThan(area(applyQuestions(base, [radar])!));
+  });
+
+  it('applies a precomputed region question (e.g. border band)', () => {
+    const base = playArea(BUD.lat, BUD.lng, 50);
+    // a square region covering roughly the eastern half of the play area
+    const region: Feature<Polygon> = {
+      type: 'Feature', properties: {},
+      geometry: { type: 'Polygon', coordinates: [[[BUD.lng, 47], [21, 47], [21, 48], [BUD.lng, 48], [BUD.lng, 47]]] },
+    };
+    const q: RegionQuestion = { id: 'r', type: 'region', label: 'border', region, within: true };
+    const result = applyQuestions(base, [q])!;
+
+    expect(booleanPointInPolygon(point([BUD.lng + 0.1, 47.5]), result)).toBe(true);
+    expect(booleanPointInPolygon(point([BUD.lng - 0.1, 47.5]), result)).toBe(false);
+  });
+
+  it('builds a border measuring band that excludes the seeker side', () => {
+    // a triangle "country"; seeker near the centre
+    const boundary: Feature<Polygon> = {
+      type: 'Feature', properties: {},
+      geometry: { type: 'Polygon', coordinates: [[[18, 46], [22, 46], [20, 49], [18, 46]]] },
+    };
+    const region = measuringRegionToBorder(boundary, 47, 20);
+    expect(area(region)).toBeGreaterThan(0);
   });
 
   it('skips unanswered questions', () => {
