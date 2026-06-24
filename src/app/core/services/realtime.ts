@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { TokenStore } from './token-store';
 
 const SESSION_EVENTS = [

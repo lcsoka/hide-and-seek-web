@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ApiClient } from '../../core/api-client';
-import { TokenStore } from '../../core/token-store';
+import { ApiClient } from '../../core/services/api-client';
+import { TokenStore } from '../../core/services/token-store';
 
 @Component({
   selector: 'app-landing',

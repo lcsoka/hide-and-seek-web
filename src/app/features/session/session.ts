@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ApiClient } from '../../core/api-client';
-import { LocationTracker } from '../../core/location';
-import { Realtime } from '../../core/realtime';
+import { ApiClient } from '../../core/services/api-client';
+import { LocationTracker } from '../../core/services/location';
+import { Realtime } from '../../core/services/realtime';
 
 @Component({
   selector: 'app-session',

@@ -1,8 +1,8 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { GameState, GuestAuth, PlayerView, SessionSummary } from './models';
+import { environment } from '../../../environments/environment';
+import { GameState, GuestAuth, PlayerView, SessionSummary } from '../models/models';
 
 /**
  * Typed wrapper over the REST contract. Reads use `httpResource` (signals);

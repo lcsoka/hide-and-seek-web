@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { TokenStore } from './token-store';
+import { TokenStore } from '../services/token-store';
 
 /** Attaches the Sanctum bearer token to API requests. */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
