@@ -57,13 +57,13 @@ const STATES = ['lobby', 'role_assignment', 'hiding', 'seeking', 'round_review',
           <section class="space-y-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
             <h2 class="font-semibold">Quick actions</h2>
             <div class="flex flex-wrap gap-2">
-              <button (click)="quick('start')" [class]="btnOutline">start</button>
-              <button (click)="quick('assign_hider', { player_id: selectedId() })" [class]="btnOutline">assign_hider (selected)</button>
-              <button (click)="quick('choose_station', pointPayload())" [class]="btnOutline">choose_station (point)</button>
-              <button (click)="quick('confirm_hidden')" [class]="btnOutline">confirm_hidden</button>
-              <button (click)="quick('make_guess', pointPayload())" [class]="btnOutline">make_guess (point)</button>
-              <button (click)="quick('advance_round')" [class]="btnOutline">advance_round</button>
-              <button (click)="quick('end_game')" [class]="btnOutline">end_game</button>
+              <button (click)="quick('start')" [class]="btnOutline">Start game</button>
+              <button (click)="quick('assign_hider', { player_id: selectedId() })" [class]="btnOutline">Assign hider (selected)</button>
+              <button (click)="quick('choose_station', pointPayload())" [class]="btnOutline">Choose station (here)</button>
+              <button (click)="quick('confirm_hidden')" [class]="btnOutline">Confirm hidden</button>
+              <button (click)="quick('make_guess', pointPayload())" [class]="btnOutline">Make guess (here)</button>
+              <button (click)="quick('advance_round')" [class]="btnOutline">Next round</button>
+              <button (click)="quick('end_game')" [class]="btnOutline">End game</button>
             </div>
           </section>
 

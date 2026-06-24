@@ -4,6 +4,7 @@ import { ApiClient } from '../../core/services/api-client';
 import { LocationTracker } from '../../core/services/location';
 import { Realtime } from '../../core/services/realtime';
 import { SessionStore } from '../../core/services/session-store';
+import { actionLabel } from '../../core/util/labels';
 import { MapView } from './map';
 
 @Component({
@@ -65,7 +66,7 @@ import { MapView } from './map';
           @for (a of s.available_actions; track a) {
             <button (click)="act(a)" [disabled]="acting()"
                     class="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50">
-              {{ a }}
+              {{ label(a) }}
             </button>
           } @empty {
             <p class="text-sm text-gray-400">No actions available right now.</p>
@@ -96,6 +97,7 @@ export class SessionView {
   readonly id = signal<string | undefined>(this.route.snapshot.paramMap.get('id') ?? undefined);
   readonly acting = signal(false);
   readonly copied = signal(false);
+  readonly label = actionLabel;
 
   constructor() {
     const sessionId = this.id();
