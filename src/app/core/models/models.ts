@@ -56,6 +56,28 @@ export interface GameState {
   hiding_zone: HidingZone | null;
 }
 
+export interface GodPlayer {
+  id: string;
+  display_name: string;
+  role: string | null;
+  is_host: boolean;
+  team_id: string | null;
+  lat: number | null;
+  lng: number | null;
+}
+
+/** Unfiltered developer/debug view of a session (sees the hider, pending truths, etc.). */
+export interface GodView {
+  session_id: string;
+  state: string;
+  status: string;
+  round: number;
+  config: Record<string, unknown>;
+  state_data: Record<string, unknown>;
+  players: GodPlayer[];
+  teams: TeamView[];
+}
+
 export interface SessionSummary {
   id: string;
   join_code: string;
