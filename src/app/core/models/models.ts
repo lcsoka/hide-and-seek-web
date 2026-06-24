@@ -1,3 +1,8 @@
+export interface Position {
+  lat: number;
+  lng: number;
+}
+
 export interface GuestAuth {
   token: string;
   display_name: string;

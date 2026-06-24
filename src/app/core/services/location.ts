@@ -1,36 +1,34 @@
 import { inject, Injectable } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ApiClient } from './api-client';
+import { LOCATION_SOURCE } from './location-source';
 
-/** Wraps watchPosition; throttled posts to /location. */
+/** Subscribes to the active LocationSource and posts throttled pings to /location. */
 @Injectable({ providedIn: 'root' })
 export class LocationTracker {
   private readonly api = inject(ApiClient);
-  private watchId: number | null = null;
+  private readonly source = inject(LOCATION_SOURCE);
+  private subscription: Subscription | null = null;
   private lastSent = 0;
 
   start(sessionId: string): void {
-    if (!('geolocation' in navigator) || this.watchId !== null) {
+    if (this.subscription) {
       return;
     }
 
-    this.watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        const now = Date.now();
-        if (now - this.lastSent < 1000) {
-          return; // ~1 ping/sec
-        }
-        this.lastSent = now;
-        void this.api.reportLocation(sessionId, pos.coords.latitude, pos.coords.longitude);
-      },
-      (err) => console.warn('geolocation', err),
-      { enableHighAccuracy: true, maximumAge: 1000 },
-    );
+    this.subscription = this.source.positions().subscribe((pos) => {
+      const now = Date.now();
+      if (now - this.lastSent < 1000) {
+        return; // ~1 ping/sec
+      }
+      this.lastSent = now;
+      void this.api.reportLocation(sessionId, pos.lat, pos.lng);
+    });
   }
 
   stop(): void {
-    if (this.watchId !== null) {
-      navigator.geolocation.clearWatch(this.watchId);
-      this.watchId = null;
-    }
+    this.subscription?.unsubscribe();
+    this.subscription = null;
+    this.source.stop();
   }
 }
