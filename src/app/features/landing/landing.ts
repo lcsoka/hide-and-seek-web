@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ApiClient } from '../../core/services/api-client';
+import { PlayerStore } from '../../core/services/player-store';
 import { TokenStore } from '../../core/services/token-store';
 
 @Component({
@@ -58,6 +59,7 @@ import { TokenStore } from '../../core/services/token-store';
 export class Landing {
   private readonly api = inject(ApiClient);
   private readonly tokens = inject(TokenStore);
+  private readonly players = inject(PlayerStore);
   private readonly router = inject(Router);
 
   readonly busy = signal(false);
@@ -75,6 +77,9 @@ export class Landing {
     await this.run(async () => {
       await this.ensureToken();
       const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined });
+      if (session.host_player_id) {
+        this.players.set(session.id, session.host_player_id);
+      }
       await this.router.navigate(['/s', session.id]);
     });
   }
@@ -82,7 +87,8 @@ export class Landing {
   async join(): Promise<void> {
     await this.run(async () => {
       await this.ensureToken();
-      const { session } = await this.api.join(this.joinCode.trim().toUpperCase(), this.name || 'Player');
+      const { player, session } = await this.api.join(this.joinCode.trim().toUpperCase(), this.name || 'Player');
+      this.players.set(session.id, player.id);
       await this.router.navigate(['/s', session.id]);
     });
   }

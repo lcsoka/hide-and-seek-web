@@ -2,7 +2,7 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { GameState, GuestAuth, PlayerView, SessionSummary } from '../models/models';
+import { CurseCatalogItem, GameState, GuestAuth, PlayerView, QuestionCatalogItem, SessionSummary } from '../models/models';
 
 /**
  * Typed wrapper over the REST contract. Reads use `httpResource` (signals);
@@ -43,6 +43,14 @@ export class ApiClient {
 
   reportLocation(id: string, lat: number, lng: number): Promise<unknown> {
     return firstValueFrom(this.http.post(`${this.base}/sessions/${id}/location`, { lat, lng }));
+  }
+
+  questionsCatalog(): Promise<QuestionCatalogItem[]> {
+    return firstValueFrom(this.http.get<QuestionCatalogItem[]>(`${this.base}/questions`));
+  }
+
+  cursesCatalog(): Promise<CurseCatalogItem[]> {
+    return firstValueFrom(this.http.get<CurseCatalogItem[]>(`${this.base}/curses`));
   }
 
   /** Reactive, visibility-filtered game state, keyed on the session id signal. */

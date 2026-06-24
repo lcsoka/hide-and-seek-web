@@ -1,15 +1,18 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { GameState } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { LocationTracker } from '../../core/services/location';
+import { PlayerStore } from '../../core/services/player-store';
 import { Realtime } from '../../core/services/realtime';
 import { SessionStore } from '../../core/services/session-store';
 import { actionLabel } from '../../core/util/labels';
 import { MapView } from './map';
+import { SeekerPanel } from './seeker-panel';
 
 @Component({
   selector: 'app-session',
-  imports: [RouterLink, MapView],
+  imports: [RouterLink, MapView, SeekerPanel],
   template: `
     <main class="mx-auto w-full max-w-lg space-y-4 p-4 sm:p-6">
       <a routerLink="/" class="text-sm text-rose-600">← Home</a>
@@ -21,7 +24,13 @@ import { MapView } from './map';
       } @else if (store.state(); as s) {
         <header class="flex flex-wrap items-center justify-between gap-2">
           <h1 class="text-xl font-bold capitalize">{{ s.state }}</h1>
-          <span class="rounded bg-gray-200 px-2 py-1 text-xs dark:bg-gray-800">{{ s.status }} · round {{ s.round }}</span>
+          <div class="flex items-center gap-2">
+            @if (role(s); as r) {
+              <span class="rounded-full px-2 py-1 text-xs font-medium"
+                    [class]="r === 'hider' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'">{{ r }}</span>
+            }
+            <span class="rounded bg-gray-200 px-2 py-1 text-xs dark:bg-gray-800">{{ s.status }} · round {{ s.round }}</span>
+          </div>
         </header>
 
         <section class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
@@ -35,7 +44,11 @@ import { MapView } from './map';
           </button>
         </section>
 
-        <app-map [players]="s.players" [zone]="s.hiding_zone" />
+        @if (role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame')) {
+          <app-seeker-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" />
+        } @else {
+          <app-map [players]="s.players" [zone]="s.hiding_zone" />
+        }
 
         <section class="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
           <h2 class="mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">Players</h2>
@@ -92,9 +105,11 @@ export class SessionView {
   private readonly api = inject(ApiClient);
   private readonly realtime = inject(Realtime);
   private readonly location = inject(LocationTracker);
+  private readonly players = inject(PlayerStore);
   readonly store = inject(SessionStore);
 
   readonly id = signal<string | undefined>(this.route.snapshot.paramMap.get('id') ?? undefined);
+  readonly myId = signal<string | null>(null);
   readonly acting = signal(false);
   readonly copied = signal(false);
   readonly label = actionLabel;
@@ -102,10 +117,15 @@ export class SessionView {
   constructor() {
     const sessionId = this.id();
     if (sessionId) {
+      this.myId.set(this.players.get(sessionId));
       this.store.setSession(sessionId);
       this.realtime.connect(sessionId, null, (name) => this.store.onEvent(name));
       this.location.start(sessionId);
     }
+  }
+
+  role(s: GameState): string | null {
+    return s.players.find((p) => p.id === this.myId())?.role ?? null;
   }
 
   async copyCode(code: string): Promise<void> {

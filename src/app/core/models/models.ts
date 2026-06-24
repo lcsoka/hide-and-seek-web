@@ -41,6 +41,62 @@ export interface HidingZone {
   neighbors?: { id: string; lat: number; lng: number }[];
 }
 
+export interface QuestionAnswer {
+  answer: string; // yes/no, hotter/colder, closer/further, in_range/out_of_range
+  radius_m?: number;
+  feature_name?: string;
+}
+
+/** An answered question, as a seeker sees it (own positions + the answer, no hider location). */
+export interface ResolvedQuestion {
+  seq: number;
+  category: string;
+  question_id: string | null;
+  asked_by: string | null;
+  asked_at: number | null;
+  resolved_at: number | null;
+  auto: boolean;
+  answer: QuestionAnswer | null;
+  ask: { lat: number | null; lng: number | null; radius_m: number | null; start_lat: number | null; start_lng: number | null };
+  end: { lat: number | null; lng: number | null };
+}
+
+export interface ActiveCurse {
+  curse_id: string | null;
+  by: string | null;
+  at: number | null;
+  name: string | null;
+  cost: string | null;
+}
+
+export interface GameTimers {
+  now: number;
+  hiding_started_at?: number;
+  hiding_deadline?: number;
+  seeking_started_at?: number;
+  question_deadline?: number;
+}
+
+export interface QuestionCatalogItem {
+  id: string;
+  key: string;
+  category: string;
+  title: string;
+  prompt: string;
+  parameters: Record<string, unknown> | null;
+  reward_draw: number | null;
+  reward_keep: number | null;
+}
+
+export interface CurseCatalogItem {
+  id: string;
+  key: string;
+  name: string;
+  cost: string;
+  description: string;
+  parameters: Record<string, unknown> | null;
+}
+
 export interface GameState {
   session_id: string;
   join_code: string;
@@ -53,6 +109,9 @@ export interface GameState {
   teams: TeamView[];
   available_actions: string[];
   pending_question: PendingQuestion | null;
+  questions: ResolvedQuestion[];
+  curses: ActiveCurse[];
+  timers: GameTimers;
   hiding_zone: HidingZone | null;
 }
 
