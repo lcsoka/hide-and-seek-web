@@ -39,6 +39,8 @@ export interface RegionQuestion {
   label: string;
   region: Poly;
   within: boolean | null;
+  yesLabel?: string; // answer label for within=true (default "Inside")
+  noLabel?: string; //  answer label for within=false (default "Outside")
 }
 
 export type DeductionQuestion = RadarQuestion | ThermometerQuestion | RegionQuestion;

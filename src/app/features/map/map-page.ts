@@ -10,7 +10,14 @@ import { OverpassService, TRANSIT_MODES } from '../../core/maps/overpass';
 import { Position } from '../../core/models/models';
 import { DeductionMap } from './deduction-map';
 
-type Mode = 'idle' | 'radar' | 'thermo' | 'border';
+type Mode = 'idle' | 'radar' | 'thermo' | 'border' | 'zone';
+
+const ZONE_LEVELS: { level: number; name: string }[] = [
+  { level: 9, name: 'district' },
+  { level: 8, name: 'town/city' },
+  { level: 7, name: 'járás' },
+  { level: 6, name: 'county' },
+];
 
 @Component({
   selector: 'app-map-page',
@@ -45,6 +52,7 @@ type Mode = 'idle' | 'radar' | 'thermo' | 'border';
                 @if (pendingA()) { Click for point B (warm end). } @else { Click for point A (cold end). }
               }
               @case ('border') { Click the map at the seeker's position for the border question. }
+              @case ('zone') { Click the seeker's position to match its {{ zoneName() }}. }
               @default { Pick a play area, then add questions and click the map. }
             }
           </p>
@@ -96,6 +104,17 @@ type Mode = 'idle' | 'radar' | 'thermo' | 'border';
           </section>
 
           <section class="space-y-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+            <h2 class="font-semibold">Zone match</h2>
+            <div class="flex flex-wrap items-center gap-2">
+              <select [ngModel]="zoneLevel()" (ngModelChange)="zoneLevel.set($event)" [class]="sel">
+                @for (z of zoneLevels; track z.level) { <option [ngValue]="z.level">{{ z.name }}</option> }
+              </select>
+              <button (click)="setMode('zone')" [class]="mode() === 'zone' ? btnActive : btn">Add zone question</button>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">"Is the hider in the same {{ zoneName() }} as me?" — keeps the matching zone or removes it.</p>
+          </section>
+
+          <section class="space-y-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
             <div class="flex items-center justify-between">
               <h2 class="font-semibold">Questions ({{ questions().length }})</h2>
               <label class="flex items-center gap-1 text-xs">
@@ -123,7 +142,9 @@ type Mode = 'idle' | 'radar' | 'thermo' | 'border';
                 } @else {
                   <span class="font-medium">{{ q.label }}</span>
                   <select [ngModel]="q.within" (ngModelChange)="patchWithin(q.id, $event)" [class]="sel">
-                    <option [ngValue]="true">Closer</option><option [ngValue]="false">Farther</option><option [ngValue]="null">Unknown</option>
+                    <option [ngValue]="true">{{ q.yesLabel ?? 'Inside' }}</option>
+                    <option [ngValue]="false">{{ q.noLabel ?? 'Outside' }}</option>
+                    <option [ngValue]="null">Unknown</option>
                   </select>
                 }
                 <button (click)="remove(q.id)" [class]="btnOutline + ' ml-auto'">Remove</button>
@@ -146,6 +167,9 @@ export class MapPage {
 
   readonly cities = CITIES;
   readonly transitModes = TRANSIT_MODES;
+  readonly zoneLevels = ZONE_LEVELS;
+  readonly zoneLevel = signal(6);
+  readonly zoneName = computed(() => ZONE_LEVELS.find((z) => z.level === this.zoneLevel())?.name ?? 'zone');
 
   readonly citySlug = signal('budapest');
   readonly city = computed(() => CITIES.find((c) => c.slug === this.citySlug()) ?? CITIES[0]);
@@ -256,9 +280,20 @@ export class MapPage {
       const country = this.country();
       if (country) {
         const region = measuringRegionToBorder(country as never, p.lat, p.lng);
-        this.add({ id: crypto.randomUUID(), type: 'region', label: 'Country border', region, within: true });
+        this.add({ id: crypto.randomUUID(), type: 'region', label: 'Country border', region, within: true, yesLabel: 'Closer', noLabel: 'Farther' });
       }
       this.setMode('idle');
+    } else if (this.mode() === 'zone') {
+      const level = this.zoneLevel();
+      const name = this.zoneName();
+      this.setMode('idle');
+      void this.run(async () => {
+        const boundary = await this.overpass.adminBoundary(p.lat, p.lng, level);
+        if (!boundary) {
+          throw new Error(`No ${name} boundary here.`);
+        }
+        this.add({ id: crypto.randomUUID(), type: 'region', label: `Same ${name}`, region: boundary as Poly, within: true, yesLabel: 'Same', noLabel: 'Different' });
+      });
     }
   }
 
