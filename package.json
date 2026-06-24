@@ -17,6 +17,7 @@
     "@angular/forms": "^22.0.0",
     "@angular/platform-browser": "^22.0.0",
     "@angular/router": "^22.0.0",
+    "@turf/turf": "^7.3.5",
     "laravel-echo": "^2.3.7",
     "leaflet": "^1.9.4",
     "pusher-js": "^8.5.0",

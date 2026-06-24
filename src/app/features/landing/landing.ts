@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ApiClient } from '../../core/services/api-client';
 import { TokenStore } from '../../core/services/token-store';
 
 @Component({
   selector: 'app-landing',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   template: `
     <main class="mx-auto w-full max-w-md space-y-6 p-4 sm:p-6">
       <h1 class="text-center text-2xl font-bold sm:text-3xl">Jet Lag Hungary</h1>
@@ -48,6 +48,10 @@ import { TokenStore } from '../../core/services/token-store';
           Join game
         </button>
       </section>
+
+      <p class="text-center text-sm">
+        <a routerLink="/map" class="text-rose-600 hover:underline">🗺 Open the deduction map</a>
+      </p>
     </main>
   `,
 })

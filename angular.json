@@ -19,7 +19,7 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
-            "allowedCommonJsDependencies": ["pusher-js", "leaflet"],
+            "allowedCommonJsDependencies": ["pusher-js", "leaflet", "@turf/jsts", "concaveman", "earcut", "fast-deep-equal", "rbush", "skmeans"],
             "assets": [
               {
                 "glob": "**/*",
