@@ -12,12 +12,13 @@ describe('Landing', () => {
     });
   });
 
-  it('shows the guest entry before a token exists', () => {
+  it('offers both starting and joining a game up front', () => {
     const fixture = TestBed.createComponent(Landing);
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('Jet Lag Hungary');
-    expect(text).toContain('Play as guest');
+    expect(text).toContain('Start a game');
+    expect(text).toContain('Join a game');
   });
 });

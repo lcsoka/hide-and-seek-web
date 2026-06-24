@@ -10,42 +10,53 @@ import { MapView } from './map';
   selector: 'app-session',
   imports: [RouterLink, MapView],
   template: `
-    <main class="mx-auto max-w-lg p-6 space-y-4">
+    <main class="mx-auto w-full max-w-lg space-y-4 p-4 sm:p-6">
       <a routerLink="/" class="text-sm text-rose-600">← Home</a>
 
       @if (store.loading() && !store.state()) {
         <p>Loading…</p>
       } @else if (store.error()) {
-        <p class="rounded bg-red-100 p-2 text-sm text-red-700">Couldn't load this session.</p>
+        <p class="rounded-lg bg-red-100 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">Couldn't load this session.</p>
       } @else if (store.state(); as s) {
-        <header class="flex items-center justify-between">
+        <header class="flex flex-wrap items-center justify-between gap-2">
           <h1 class="text-xl font-bold capitalize">{{ s.state }}</h1>
-          <span class="rounded bg-gray-100 px-2 py-1 text-xs">{{ s.status }} · round {{ s.round }}</span>
+          <span class="rounded bg-gray-200 px-2 py-1 text-xs dark:bg-gray-800">{{ s.status }} · round {{ s.round }}</span>
         </header>
+
+        <section class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+          <div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Share this code to invite friends</p>
+            <p class="font-mono text-2xl font-bold tracking-widest">{{ s.join_code }}</p>
+          </div>
+          <button (click)="copyCode(s.join_code)"
+                  class="rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600">
+            {{ copied() ? 'Copied!' : 'Copy' }}
+          </button>
+        </section>
 
         <app-map [players]="s.players" [zone]="s.hiding_zone" />
 
-        <section class="rounded-lg border p-3">
-          <h2 class="mb-2 text-sm font-semibold text-gray-500">Players</h2>
+        <section class="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+          <h2 class="mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">Players</h2>
           <ul class="space-y-1">
             @for (p of s.players; track p.id) {
               <li class="flex justify-between text-sm">
                 <span>{{ p.display_name }}@if (p.is_host) { <span class="text-gray-400"> (host)</span> }</span>
-                <span class="text-gray-500">{{ p.role ?? '—' }}</span>
+                <span class="text-gray-500 dark:text-gray-400">{{ p.role ?? '—' }}</span>
               </li>
             }
           </ul>
         </section>
 
         @if (s.hiding_zone; as zone) {
-          <section class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
+          <section class="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm dark:border-amber-700 dark:bg-amber-950">
             <h2 class="font-semibold">Your hiding zone</h2>
             <p>{{ zone.rule }} · radius {{ zone.radius_m }} m</p>
           </section>
         }
 
         @if (s.pending_question; as q) {
-          <section class="rounded-lg border border-blue-300 bg-blue-50 p-3 text-sm">
+          <section class="rounded-xl border border-blue-300 bg-blue-50 p-3 text-sm dark:border-blue-700 dark:bg-blue-950">
             Question pending ({{ q.category }}) — awaiting the hider.
           </section>
         }
@@ -53,7 +64,7 @@ import { MapView } from './map';
         <section class="flex flex-wrap gap-2">
           @for (a of s.available_actions; track a) {
             <button (click)="act(a)" [disabled]="acting()"
-                    class="rounded bg-rose-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50">
+                    class="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50">
               {{ a }}
             </button>
           } @empty {
@@ -62,9 +73,9 @@ import { MapView } from './map';
         </section>
 
         @if (store.feed().length) {
-          <section class="rounded-lg border p-3">
-            <h2 class="mb-2 text-sm font-semibold text-gray-500">Events</h2>
-            <ul class="space-y-0.5 text-xs text-gray-500">
+          <section class="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+            <h2 class="mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">Events</h2>
+            <ul class="space-y-0.5 text-xs text-gray-500 dark:text-gray-400">
               @for (e of store.feed(); track e.at) {
                 <li>{{ e.type }}</li>
               }
@@ -84,6 +95,7 @@ export class SessionView {
 
   readonly id = signal<string | undefined>(this.route.snapshot.paramMap.get('id') ?? undefined);
   readonly acting = signal(false);
+  readonly copied = signal(false);
 
   constructor() {
     const sessionId = this.id();
@@ -91,6 +103,16 @@ export class SessionView {
       this.store.setSession(sessionId);
       this.realtime.connect(sessionId, null, (name) => this.store.onEvent(name));
       this.location.start(sessionId);
+    }
+  }
+
+  async copyCode(code: string): Promise<void> {
+    try {
+      await navigator.clipboard?.writeText(code);
+      this.copied.set(true);
+      setTimeout(() => this.copied.set(false), 1500);
+    } catch {
+      // clipboard unavailable — ignore
     }
   }
 

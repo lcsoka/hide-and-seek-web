@@ -16,13 +16,17 @@ export class LocationTracker {
       return;
     }
 
-    this.subscription = this.source.positions().subscribe((pos) => {
-      const now = Date.now();
-      if (now - this.lastSent < 1000) {
-        return; // ~1 ping/sec
-      }
-      this.lastSent = now;
-      void this.api.reportLocation(sessionId, pos.lat, pos.lng);
+    this.subscription = this.source.positions().subscribe({
+      next: (pos) => {
+        const now = Date.now();
+        if (now - this.lastSent < 1000) {
+          return; // ~1 ping/sec
+        }
+        this.lastSent = now;
+        void this.api.reportLocation(sessionId, pos.lat, pos.lng);
+      },
+      // Permission denied / unavailable — stop quietly; the game still works without GPS.
+      error: () => this.stop(),
     });
   }
 

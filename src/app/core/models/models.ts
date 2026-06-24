@@ -43,6 +43,7 @@ export interface HidingZone {
 
 export interface GameState {
   session_id: string;
+  join_code: string;
   game_mode: string;
   state: string;
   status: string;
