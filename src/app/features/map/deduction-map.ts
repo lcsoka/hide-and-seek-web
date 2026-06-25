@@ -24,6 +24,12 @@ const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
         <span class="rounded-full bg-gray-900/85 px-3 py-1.5 text-sm font-medium text-white shadow-lg">Calculating deduction…</span>
       </div>
     }
+    @if (candidate()) {
+      <button (click)="fitToCandidate()" title="Fit the deduced area on screen"
+              class="absolute bottom-3 left-3 z-[500] flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-2 text-sm font-semibold text-gray-800 shadow-lg ring-1 ring-black/10 hover:bg-white">
+        ⊕ Fit area
+      </button>
+    }
   `,
 })
 export class DeductionMap {
@@ -36,6 +42,7 @@ export class DeductionMap {
   readonly overlays = input<Feature[]>([]); // e.g. admin borders, drawn as outlines
   readonly autoZoom = input(true);
   readonly loading = input(false); // hold rendering until the deduction is fully computed
+  readonly thermoMarker = input<{ lat: number; lng: number; radiusM?: number | null; label?: string } | null>(null);
   readonly mapClick = output<Position>();
 
   private map?: L.Map;
@@ -57,6 +64,7 @@ export class DeductionMap {
       this.points();
       this.overlays();
       this.loading();
+      this.thermoMarker();
       this.render();
     });
     inject(DestroyRef).onDestroy(() => {
@@ -175,6 +183,19 @@ export class DeductionMap {
       }
     }
 
+    // A running thermometer: the seeker's start + the distance they must travel.
+    const thermo = this.thermoMarker();
+    if (thermo) {
+      if (thermo.radiusM) {
+        L.circle([thermo.lat, thermo.lng], { radius: thermo.radiusM, color: '#f59e0b', weight: 1.5, dashArray: '6', fillOpacity: 0.04 }).addTo(this.overlay);
+      }
+      L.marker([thermo.lat, thermo.lng], {
+        icon: L.divIcon({ html: `<div style="font-size:20px;line-height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">🌡️</div>`, className: '', iconSize: [20, 20], iconAnchor: [10, 10] }),
+      })
+        .bindTooltip(thermo.label ?? 'Thermometer start', { permanent: true, direction: 'top', offset: [0, -8] })
+        .addTo(this.overlay);
+    }
+
     // Auto-fit only when the deduction actually changed (a new clue), and never after
     // the user has taken control of the view — so periodic refreshes don't reset it.
     const sig = `${this.questions().length}:${this.annotations().length}:${cand ? 1 : 0}`;
@@ -188,6 +209,23 @@ export class DeductionMap {
       } catch {
         // empty / degenerate candidate — leave the view as-is
       }
+    }
+  }
+
+  /** Re-frame the map to the current candidate area (and re-enable auto-fit). */
+  fitToCandidate(): void {
+    const cand = this.candidate();
+    if (!this.map || !cand) {
+      return;
+    }
+    this.userMoved = false;
+    try {
+      const [minX, minY, maxX, maxY] = bbox(cand);
+      this.programmaticMove = true;
+      this.map.fitBounds([[minY, minX], [maxY, maxX]], { padding: [24, 24], maxZoom: 15, animate: true, duration: 0.6 });
+      setTimeout(() => (this.programmaticMove = false), 700);
+    } catch {
+      // degenerate candidate — ignore
     }
   }
 

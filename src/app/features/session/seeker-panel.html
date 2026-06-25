@@ -4,7 +4,13 @@
       <h2 class="text-lg font-bold">Questions</h2>
       <span class="text-xs text-gray-500 dark:text-gray-400">{{ deduction.narrowedCount() }} on the map</span>
     </div>
-    @if (canAsk()) {
+    @if (running(); as t) {
+      <div class="space-y-2 rounded-xl border-2 border-amber-400 bg-amber-50 p-3 dark:border-amber-600 dark:bg-amber-950">
+        <div class="flex items-center gap-2 text-sm font-semibold">🌡️ Thermometer running</div>
+        <p class="text-xs text-gray-600 dark:text-gray-300">Travel about <b>{{ t.distance_label }}</b>, then stop — the hider will see your start → end.</p>
+        <button (click)="stopThermometer()" class="w-full rounded-lg bg-amber-600 p-2.5 font-semibold text-white hover:bg-amber-700">⏹ Stop &amp; send</button>
+      </div>
+    } @else if (canAsk()) {
       <button (click)="openPicker.emit()"
               class="w-full rounded-xl bg-rose-600 p-3 text-base font-semibold text-white shadow-sm hover:bg-rose-700">
         ＋ Ask a question

@@ -27,6 +27,24 @@ export const RADAR_PRESETS: Record<Units, DistancePreset[]> = {
   ],
 };
 
+/** Thermometer travel distances — how far the seeker commits to move before stopping. */
+export const THERMO_PRESETS: Record<Units, DistancePreset[]> = {
+  metric: [
+    { label: '500 m', meters: 500 },
+    { label: '1 km', meters: 1000 },
+    { label: '3 km', meters: 3000 },
+    { label: '5 km', meters: 5000 },
+    { label: '10 km', meters: 10000 },
+  ],
+  imperial: [
+    { label: '½ mi', meters: 805 },
+    { label: '1 mi', meters: 1609 },
+    { label: '3 mi', meters: 4828 },
+    { label: '5 mi', meters: 8047 },
+    { label: '10 mi', meters: 16093 },
+  ],
+};
+
 export function unitsOf(config: Record<string, unknown> | undefined | null): Units {
   return config?.['units'] === 'imperial' ? 'imperial' : 'metric';
 }

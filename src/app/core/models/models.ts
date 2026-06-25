@@ -26,6 +26,17 @@ export interface TeamView {
   color: string | null;
 }
 
+/** A thermometer the seeker has started but not yet stopped. */
+export interface ThermometerRunning {
+  asked_by: string | null;
+  question_id: string | null;
+  start_lat: number | null;
+  start_lng: number | null;
+  distance_m: number | null;
+  distance_label: string | null;
+  started_at: number | null;
+}
+
 export interface PendingQuestion {
   seq: number;
   question_id: string | null;
@@ -164,6 +175,7 @@ export interface GameState {
   hand: HandCard[];
   pending_draw: PendingDraw | null;
   time_bonus_s: number | null;
+  thermometer: ThermometerRunning | null;
 }
 
 export interface GodPlayer {

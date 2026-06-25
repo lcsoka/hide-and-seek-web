@@ -26,7 +26,7 @@ import { QuestionPicker } from './question-picker';
 import { SeekerPanel } from './seeker-panel';
 
 // Actions with a dedicated panel — kept out of the generic button row.
-const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice'];
+const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'start_thermometer', 'stop_thermometer'];
 
 const STATUS_HINTS: Record<string, string> = {
   role_assignment: 'Waiting for the host to assign roles…',
@@ -82,7 +82,11 @@ export class SessionView {
       this.myId.set(this.players.get(sessionId));
       this.store.setSession(sessionId);
       this.realtime.connect(sessionId, this.myId(), (name) => this.store.onEvent(name));
-      this.location.start(sessionId);
+      // In a dev build the position is driven by the debug tools (map tap / presets),
+      // so don't let the browser GPS overwrite the simulated location.
+      if (!this.devMode) {
+        this.location.start(sessionId);
+      }
     }
 
     const interval = setInterval(() => this.tick.update((n) => n + 1), 1000);
@@ -190,10 +194,22 @@ export class SessionView {
     this.pickerOpen.set(true);
   }
 
-  async onAsk(s: GameState, event: { questionId: string; payload: Record<string, unknown> }): Promise<void> {
+  async onAsk(s: GameState, event: { questionId: string; category: string; payload: Record<string, unknown> }): Promise<void> {
     this.pickerOpen.set(false);
-    await this.api.submitAction(s.session_id, 'ask_question', { question_id: event.questionId, ...event.payload });
+    // A thermometer is started (then stopped) rather than asked outright.
+    const action = event.category === 'thermometer' ? 'start_thermometer' : 'ask_question';
+    await this.api.submitAction(s.session_id, action, { question_id: event.questionId, ...event.payload });
     this.store.refresh();
+  }
+
+  /** While a thermometer is running, show its target distance circle on the seeker map. */
+  thermoMarker(s: GameState): { lat: number; lng: number; radiusM?: number | null; label?: string } | null {
+    const t = s.thermometer;
+    if (!t || t.start_lat == null || t.start_lng == null) {
+      return null;
+    }
+
+    return { lat: t.start_lat, lng: t.start_lng, radiusM: t.distance_m, label: `🌡️ Travel ${t.distance_label ?? ''}` };
   }
 
   /** Dev-only: tapping the map sets this player's simulated position. */

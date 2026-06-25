@@ -35,6 +35,13 @@
                   <button (click)="askRadar(q, d.meters)" class="rounded-full bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700">{{ d.label }}</button>
                 }
               </div>
+            } @else if (q.category === 'thermometer') {
+              <p class="mb-1.5 text-xs text-gray-500 dark:text-gray-400">Pick how far you'll travel, then start — stop once you've moved that far.</p>
+              <div class="flex flex-wrap gap-1.5">
+                @for (d of thermoPresets(); track d.meters) {
+                  <button (click)="askThermo(q, d)" class="rounded-full bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700">Start · {{ d.label }}</button>
+                }
+              </div>
             } @else {
               <button (click)="askGeneric(q)" class="rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700">Ask this</button>
             }
