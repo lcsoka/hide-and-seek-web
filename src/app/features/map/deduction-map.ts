@@ -4,6 +4,7 @@ import { Feature, FeatureCollection, GeoJsonObject, Point } from 'geojson';
 import * as L from 'leaflet';
 import { MapAnnotation } from '../../core/maps/annotations';
 import { DeductionQuestion } from '../../core/maps/deduction';
+import { avatarIcon, colorFor } from '../../core/maps/avatar';
 import { holedMask, Poly } from '../../core/maps/operators';
 import { disperse } from '../../core/maps/spread';
 import { PlayerView, Position } from '../../core/models/models';
@@ -205,14 +206,8 @@ export class DeductionMap {
     const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
     for (const p of disperse(located)) {
       const isMe = p.id === this.meId();
-      L.circleMarker([p.lat, p.lng], {
-        radius: isMe ? 8 : 6,
-        color: '#fff',
-        weight: 2,
-        fillColor: isMe ? '#2563eb' : '#60a5fa',
-        fillOpacity: 1,
-      })
-        .bindTooltip(isMe ? 'You' : p.display_name, isMe ? { permanent: true, direction: 'top', offset: [0, -8] } : {})
+      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, isMe ? '#2563eb' : colorFor(p.id), isMe) })
+        .bindTooltip(isMe ? 'You' : p.display_name, isMe ? { permanent: true, direction: 'top', offset: [0, -20] } : {})
         .addTo(this.overlay);
     }
 

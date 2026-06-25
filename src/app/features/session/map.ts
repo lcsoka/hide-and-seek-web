@@ -1,5 +1,6 @@
 import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
+import { avatarIcon, colorFor } from '../../core/maps/avatar';
 import { disperse } from '../../core/maps/spread';
 import { HidingZone, PlayerView, Position } from '../../core/models/models';
 import { transitMeta } from '../../core/util/transit';
@@ -62,11 +63,8 @@ export class MapView {
 
     const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
     for (const p of disperse(located)) {
-      L.circleMarker([p.lat, p.lng], {
-        radius: 8,
-        color: p.role === 'hider' ? '#e11d48' : '#2563eb',
-        fillOpacity: 0.8,
-      })
+      const color = p.role === 'hider' ? '#e11d48' : colorFor(p.id);
+      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, color, p.role === 'hider') })
         .bindTooltip(p.display_name)
         .addTo(this.overlay);
     }
