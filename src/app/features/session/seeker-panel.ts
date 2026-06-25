@@ -5,12 +5,13 @@ import { Clock, formatCountdown } from '../../core/services/clock';
 import { DeductionState } from '../../core/services/deduction-state';
 import { SessionStore } from '../../core/services/session-store';
 import { answerLabel, answerPositive } from '../../core/util/categories';
+import { DiceRoller } from './dice-roller';
 import { ImageUpload } from './image-upload';
 
 /** Seeker side panel: an Ask button, the numbered history (with photo clues), and curses. */
 @Component({
   selector: 'app-seeker-panel',
-  imports: [ImageUpload],
+  imports: [ImageUpload, DiceRoller],
   templateUrl: './seeker-panel.html',
 })
 export class SeekerPanel {

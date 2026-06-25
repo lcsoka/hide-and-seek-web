@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { ActiveCurse, GameState, HandCard } from '../../core/models/models';
+import { ActiveCurse, GameState, HandCard, ResolvedQuestion } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
 import { SessionStore } from '../../core/services/session-store';
@@ -44,8 +44,10 @@ export class CardDeck {
 
   readonly meta = categoryMeta;
   readonly answerLabel = answerLabel;
+  readonly confirmCard = signal<HandCard | null>(null);
 
   readonly hand = computed(() => this.state().hand ?? []);
+  readonly history = computed(() => [...(this.state().questions ?? [])].reverse());
   readonly pending = computed(() => this.state().pending_question);
   readonly isPhoto = computed(() => this.pending()?.category === 'photo');
   readonly canAnswer = computed(() => this.state().available_actions.includes('answer_question'));
@@ -139,12 +141,38 @@ export class CardDeck {
     }
   }
 
+  /** Curses ask for confirmation (they're played on the seekers); powerups play directly. */
   async playCard(card: HandCard): Promise<void> {
     if (card.type === 'curse') {
-      await this.act('play_curse', { card_uid: card.uid });
+      this.confirmCard.set(card);
     } else if (card.type === 'powerup') {
       await this.act('play_powerup', { card_uid: card.uid });
     }
+  }
+
+  async confirmPlay(): Promise<void> {
+    const card = this.confirmCard();
+    this.confirmCard.set(null);
+    if (card) {
+      await this.act('play_curse', { card_uid: card.uid });
+    }
+  }
+
+  cancelPlay(): void {
+    this.confirmCard.set(null);
+  }
+
+  /** A coloured chip for an answer in the hider's past-answers list. */
+  historyChip(q: ResolvedQuestion): string {
+    const positive = answerPositive(q.answer?.answer);
+    if (positive === true) {
+      return 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300';
+    }
+    if (positive === false) {
+      return 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300';
+    }
+
+    return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
   }
 
   /** Remaining time for a timed curse the hider played, or null. */

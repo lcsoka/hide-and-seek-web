@@ -69,6 +69,19 @@ export interface ResolvedQuestion {
   end: { lat: number | null; lng: number | null };
 }
 
+export interface DiceSpec {
+  count: number;
+  sides: number;
+  target?: number | null;
+}
+
+export interface DiceRoll {
+  values: number[];
+  sum: number;
+  success: boolean | null;
+  at: number;
+}
+
 export interface ActiveCurse {
   uid: string | null;
   curse_id: string | null;
@@ -78,6 +91,8 @@ export interface ActiveCurse {
   cost: string | null;
   description: string | null;
   requires_proof: boolean;
+  dice?: DiceSpec | null;
+  last_roll?: DiceRoll | null;
   expires_at: number | null;
   status: 'active' | 'completed' | 'expired';
   proof_url: string | null;

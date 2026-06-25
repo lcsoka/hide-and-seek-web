@@ -63,6 +63,9 @@
           } @else if (c.requires_proof && c.status === 'active') {
             <app-image-upload [sessionId]="sessionId()" label="📷 Submit proof" (uploaded)="submitProof(c, $event)" />
           }
+          @if (c.dice && c.status === 'active') {
+            <app-dice-roller [sessionId]="sessionId()" [curse]="c" />
+          }
         </div>
       }
     </section>

@@ -6,6 +6,17 @@
     }
   </div>
 
+  @if (confirmCard(); as c) {
+    <div class="space-y-2 rounded-xl border-2 border-purple-400 bg-purple-50 p-3 dark:bg-purple-950">
+      <div class="text-sm">Cast <b>{{ c.name }}</b> on the seekers?</div>
+      @if (c.description) { <div class="text-xs text-gray-600 dark:text-gray-300">{{ c.description }}</div> }
+      <div class="flex gap-2">
+        <button (click)="confirmPlay()" [disabled]="busy()" class="flex-1 rounded-lg bg-purple-600 p-2 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-40">Cast it</button>
+        <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">Cancel</button>
+      </div>
+    </div>
+  }
+
   @if (pending(); as q) {
     <div class="space-y-2 rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-950">
       <div class="flex items-center gap-2">
@@ -92,5 +103,25 @@
     </div>
   } @else {
     <p class="text-sm text-gray-400">No cards yet — you draw cards as the seekers ask questions.</p>
+  }
+
+  @if (history().length) {
+    <div class="space-y-2 border-t border-gray-100 pt-3 dark:border-gray-800">
+      <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300">Your answers</h3>
+      @for (q of history(); track q.seq) {
+        <div class="flex items-center gap-2 rounded-lg border border-gray-200 p-2 dark:border-gray-700">
+          <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gray-900 text-xs font-bold text-white dark:bg-gray-700">{{ q.seq }}</span>
+          <span class="text-base">{{ meta(q.category).icon }}</span>
+          <span class="min-w-0 flex-1 truncate text-sm font-medium capitalize">{{ q.category }}</span>
+          @if (q.answer?.answer === 'photo' && q.answer?.photo_url) {
+            <a [href]="q.answer!.photo_url!" target="_blank" rel="noopener" class="shrink-0">
+              <img [src]="q.answer!.photo_url!" alt="Your photo" class="h-9 w-9 rounded object-cover ring-1 ring-black/10" />
+            </a>
+          } @else {
+            <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" [class]="historyChip(q)">{{ answerLabel(q.answer?.answer) }}</span>
+          }
+        </div>
+      }
+    </div>
   }
 </div>

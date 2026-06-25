@@ -1,7 +1,7 @@
 import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { GameState, Position, QuestionCatalogItem } from '../../core/models/models';
+import { ActiveCurse, GameState, Position, QuestionCatalogItem } from '../../core/models/models';
 import { unitsOf } from '../../core/util/units';
 import { ApiClient } from '../../core/services/api-client';
 import { DeductionState } from '../../core/services/deduction-state';
@@ -14,6 +14,7 @@ import { computeGameTimer, GameTimer } from '../../core/util/game-timer';
 import { actionLabel } from '../../core/util/labels';
 import { DeductionMap } from '../map/deduction-map';
 import { CardDeck } from './card-deck';
+import { CurseAlert } from './curse-alert';
 import { DevTools } from './dev-tools';
 import { DrawModal } from './draw-modal';
 import { GameHud } from './game-hud';
@@ -25,7 +26,7 @@ import { QuestionPicker } from './question-picker';
 import { SeekerPanel } from './seeker-panel';
 
 // Actions with a dedicated panel — kept out of the generic button row.
-const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse'];
+const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice'];
 
 const STATUS_HINTS: Record<string, string> = {
   role_assignment: 'Waiting for the host to assign roles…',
@@ -40,7 +41,7 @@ const STATUS_HINTS: Record<string, string> = {
 @Component({
   selector: 'app-session',
   host: { class: 'block h-[100dvh] w-full' },
-  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, DrawModal],
+  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, DrawModal, CurseAlert],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -61,6 +62,9 @@ export class SessionView {
   readonly devPlacing = signal(false);
   readonly pickerOpen = signal(false);
   readonly catalog = signal<QuestionCatalogItem[]>([]);
+  readonly curseAlert = signal<ActiveCurse | null>(null);
+  private readonly seenCurses = new Set<string>();
+  private cursesInit = false;
 
   private readonly tick = signal(0);
   private offset = 0;
@@ -94,6 +98,27 @@ export class SessionView {
       const now = this.store.state()?.timers?.now;
       if (now) {
         this.offset = now * 1000 - Date.now();
+      }
+    });
+
+    // Flash a "you've been cursed" alert to seekers when a NEW curse lands. Curses
+    // present at first load are marked seen silently (no retro-alert on join/reload).
+    effect(() => {
+      const s = this.store.state();
+      if (!s || this.role(s) !== 'seeker') {
+        return;
+      }
+      const active = s.curses.filter((c) => c.status === 'active' && c.uid);
+      if (!this.cursesInit) {
+        this.cursesInit = true;
+        active.forEach((c) => this.seenCurses.add(c.uid!));
+        return;
+      }
+      const fresh = active.find((c) => !this.seenCurses.has(c.uid!));
+      if (fresh) {
+        this.seenCurses.add(fresh.uid!);
+        this.curseAlert.set(fresh);
+        setTimeout(() => this.curseAlert.set(null), 4000);
       }
     });
   }

@@ -72,5 +72,9 @@
     @if (role(s) === 'hider' && s.pending_draw) {
       <app-draw-modal [sessionId]="s.session_id" [draw]="s.pending_draw" />
     }
+
+    @if (curseAlert(); as c) {
+      <app-curse-alert [curse]="c" />
+    }
   </div>
 }
