@@ -5,7 +5,7 @@ import { Poly } from './operators';
 import { OverpassService } from './overpass';
 
 /** Feature key → Overpass tag filter (mirrors config/game.php `overpass.features`). */
-const FEATURE_TAGS: Record<string, string> = {
+export const FEATURE_TAGS: Record<string, string> = {
   airport: '[aeroway=aerodrome]',
   rail_station: '[railway=station]',
   museum: '[tourism=museum]',

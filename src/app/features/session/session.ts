@@ -1,7 +1,7 @@
 import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { ActiveCurse, GameState, Position, QuestionCatalogItem } from '../../core/models/models';
+import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models/models';
 import { unitsOf } from '../../core/util/units';
 import { ApiClient } from '../../core/services/api-client';
 import { DeductionState } from '../../core/services/deduction-state';
@@ -127,8 +127,12 @@ export class SessionView {
     });
   }
 
+  me(s: GameState): PlayerView | undefined {
+    return s.players.find((p) => p.id === this.myId());
+  }
+
   role(s: GameState): string | null {
-    return s.players.find((p) => p.id === this.myId())?.role ?? null;
+    return this.me(s)?.role ?? null;
   }
 
   isHost(s: GameState): boolean {
