@@ -5,6 +5,7 @@ import * as L from 'leaflet';
 import { MapAnnotation } from '../../core/maps/annotations';
 import { DeductionQuestion } from '../../core/maps/deduction';
 import { holedMask, Poly } from '../../core/maps/operators';
+import { disperse } from '../../core/maps/spread';
 import { PlayerView, Position } from '../../core/models/models';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
@@ -201,10 +202,8 @@ export class DeductionMap {
 
     // Visible players (the seeker themselves + teammates; the hider is concealed by
     // the server). The seeker's own position gets a prominent ringed marker.
-    for (const p of this.players()) {
-      if (p.lat == null || p.lng == null) {
-        continue;
-      }
+    const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
+    for (const p of disperse(located)) {
       const isMe = p.id === this.meId();
       L.circleMarker([p.lat, p.lng], {
         radius: isMe ? 8 : 6,

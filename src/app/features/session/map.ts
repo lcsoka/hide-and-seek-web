@@ -1,5 +1,6 @@
 import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
+import { disperse } from '../../core/maps/spread';
 import { HidingZone, PlayerView, Position } from '../../core/models/models';
 import { transitMeta } from '../../core/util/transit';
 
@@ -59,16 +60,15 @@ export class MapView {
     this.overlay?.remove();
     this.overlay = L.layerGroup().addTo(this.map);
 
-    for (const p of this.players()) {
-      if (p.lat != null && p.lng != null) {
-        L.circleMarker([p.lat, p.lng], {
-          radius: 8,
-          color: p.role === 'hider' ? '#e11d48' : '#2563eb',
-          fillOpacity: 0.8,
-        })
-          .bindTooltip(p.display_name)
-          .addTo(this.overlay);
-      }
+    const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
+    for (const p of disperse(located)) {
+      L.circleMarker([p.lat, p.lng], {
+        radius: 8,
+        color: p.role === 'hider' ? '#e11d48' : '#2563eb',
+        fillOpacity: 0.8,
+      })
+        .bindTooltip(p.display_name)
+        .addTo(this.overlay);
     }
 
     const zone = this.zone();
@@ -89,7 +89,7 @@ export class MapView {
     if (preview) {
       L.circle([preview.lat, preview.lng], { radius: preview.radiusM, color: '#f59e0b', weight: 1, fillOpacity: 0.08 }).addTo(this.overlay);
     }
-    for (const st of this.stations()) {
+    for (const st of disperse(this.stations())) {
       const meta = transitMeta(st.modes?.[0] ?? 'stop');
       L.circleMarker([st.lat, st.lng], { radius: 5, color: meta.color, fillColor: meta.color, fillOpacity: 0.9, weight: 1 })
         .bindTooltip(`${meta.icon} ${st.name ?? 'stop'}`)

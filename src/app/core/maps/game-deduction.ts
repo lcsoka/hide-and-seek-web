@@ -27,7 +27,9 @@ export function resolvedQuestionsToDeduction(questions: ResolvedQuestion[]): Ded
       q.ask.start_lat != null &&
       q.ask.start_lng != null &&
       q.end.lat != null &&
-      q.end.lng != null
+      q.end.lng != null &&
+      // Skip a degenerate segment (seeker barely moved) — its bisector is meaningless.
+      Math.hypot(q.end.lat - q.ask.start_lat, q.end.lng - q.ask.start_lng) > 0.0003
     ) {
       out.push({
         id: `q${q.seq}`,
