@@ -26,9 +26,10 @@
         </div>
       } @else {
         <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">{{ meta(selected()!).hint }}</p>
-        @for (q of categoryQuestions(); track q.id) {
-          <div class="mb-2 rounded-xl border border-gray-200 p-3 dark:border-gray-700">
-            <div class="mb-2 text-sm font-medium">{{ q.title }}</div>
+
+        @if (isParametric()) {
+          <!-- Radar / thermometer: one question with distance options. -->
+          @for (q of categoryQuestions(); track q.id) {
             @if (q.category === 'radar') {
               <div class="flex flex-wrap gap-1.5">
                 @for (d of radarPresets(); track d.meters) {
@@ -41,7 +42,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ unitLabel() }}</span>
                 <button (click)="askCustomRadar(q)" class="rounded-lg border border-rose-400 px-3 py-1 text-sm font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-950">Ask custom</button>
               </div>
-            } @else if (q.category === 'thermometer') {
+            } @else {
               <p class="mb-1.5 text-xs text-gray-500 dark:text-gray-400">Pick how far you'll travel, then start — stop once you've moved that far.</p>
               <div class="flex flex-wrap gap-1.5">
                 @for (d of thermoPresets(); track d.meters) {
@@ -54,12 +55,21 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ unitLabel() }}</span>
                 <button (click)="askCustomThermo(q)" class="rounded-lg border border-rose-400 px-3 py-1 text-sm font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-950">Start custom</button>
               </div>
-            } @else {
-              <button (click)="askGeneric(q)" class="rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700">Ask this</button>
+            }
+          }
+        } @else {
+          <!-- Subject questions as icon tiles. -->
+          <div class="grid grid-cols-3 gap-2 sm:grid-cols-4">
+            @for (q of categoryQuestions(); track q.id) {
+              <button (click)="askGeneric(q)"
+                      class="flex flex-col items-center gap-1 rounded-2xl border border-gray-200 p-2.5 text-center transition hover:border-rose-400 hover:bg-rose-50 dark:border-gray-700 dark:hover:border-rose-600 dark:hover:bg-rose-950">
+                <span class="text-2xl">{{ qIcon(q) }}</span>
+                <span class="text-[11px] leading-tight text-gray-600 dark:text-gray-300">{{ qLabel(q.title) }}</span>
+              </button>
+            } @empty {
+              <p class="col-span-full text-sm text-gray-400">No questions in this category.</p>
             }
           </div>
-        } @empty {
-          <p class="text-sm text-gray-400">No questions in this category.</p>
         }
       }
     </div>

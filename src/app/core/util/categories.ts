@@ -18,6 +18,36 @@ export function categoryMeta(category: string): CategoryMeta {
   return CATEGORY_META[category] ?? { icon: '❓', label: category, hint: '' };
 }
 
+/** Subject keyword → emoji, most-specific first. Used to give each question an icon. */
+const QUESTION_ICONS: [string, string][] = [
+  ['museum', '🏛️'], ['library', '📚'], ['hospital', '🏥'], ['zoo', '🦁'], ['aquarium', '🐠'],
+  ['amusement', '🎢'], ['theme', '🎢'], ['movie', '🎬'], ['cinema', '🎬'], ['theater', '🎬'],
+  ['metro', '🚇'], ['subway', '🚇'], ['platform', '🚉'], ['rail', '🚉'], ['train', '🚉'], ['station', '🚉'],
+  // 'street' before 'tree' — "s·tree·t" contains "tree" as a substring.
+  ['street', '🛣️'], ['park', '🌳'], ['tree', '🌳'], ['selfie', '🤳'], ['sky', '☁️'], ['worship', '⛪'], ['church', '⛪'],
+  ['grocery', '🛒'], ['restaurant', '🍽️'], ['water', '🌊'], ['structure', '🗼'], ['tower', '🗼'],
+  ['golf', '⛳'], ['airport', '✈️'], ['bridge', '🌉'], ['building', '🏢'], ['sea', '🌊'],
+];
+
+/** An icon for a specific question (by its subject), falling back to the category icon. */
+export function questionIcon(text: string, category: string): string {
+  const haystack = text.toLowerCase();
+  for (const [keyword, icon] of QUESTION_ICONS) {
+    if (haystack.includes(keyword)) {
+      return icon;
+    }
+  }
+
+  return categoryMeta(category).icon;
+}
+
+/** The subject part of a question title ("Photo — Tree" → "Tree"). */
+export function questionShortLabel(title: string): string {
+  const parts = title.split('—');
+
+  return (parts.length > 1 ? parts[parts.length - 1] : title).trim();
+}
+
 /** Human label for an answer value (used in history + map markers). */
 export function answerLabel(answer: string | undefined): string {
   const labels: Record<string, string> = {

@@ -1,6 +1,6 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { QuestionCatalogItem } from '../../core/models/models';
-import { categoryMeta } from '../../core/util/categories';
+import { categoryMeta, questionIcon, questionShortLabel } from '../../core/util/categories';
 import { DistancePreset, RADAR_PRESETS, THERMO_PRESETS, Units } from '../../core/util/units';
 
 /** Icon-tile question chooser shown as a modal / bottom sheet — pick a category, then a question. */
@@ -18,6 +18,10 @@ export class QuestionPicker {
   readonly selected = signal<string | null>(null);
   readonly custom = signal('');
   readonly meta = categoryMeta;
+  readonly qIcon = (q: QuestionCatalogItem) => questionIcon(`${q.title} ${q.key}`, q.category);
+  readonly qLabel = questionShortLabel;
+  /** Distance-based categories get inline chips; the rest get a grid of subject tiles. */
+  readonly isParametric = computed(() => this.selected() === 'radar' || this.selected() === 'thermometer');
 
   readonly categories = computed(() => [...new Set(this.catalog().map((q) => q.category))]);
   readonly categoryQuestions = computed(() => this.catalog().filter((q) => q.category === this.selected()));
