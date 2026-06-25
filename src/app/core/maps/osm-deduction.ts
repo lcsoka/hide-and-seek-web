@@ -35,6 +35,8 @@ export async function osmRegion(overpass: OverpassService, q: ResolvedQuestion):
     return null;
   }
 
+  const askPoint = point([lng, lat]);
+
   if (q.category === 'tentacles') {
     const radiusKm = (radius_m ?? 1609) / 1000;
     if (answer === 'out_of_range') {
@@ -46,13 +48,23 @@ export async function osmRegion(overpass: OverpassService, q: ResolvedQuestion):
     return region ? { region, within: true } : null;
   }
 
-  const features = await overpass.around(lat, lng, SEARCH_KM, tag);
-  if (features.features.length < 2) {
-    return null;
+  if (q.category === 'measuring') {
+    // Reference = the seeker's nearest feature; keep within the seeker's distance to it
+    // (closer) or outside it (further) — a single circle around that one feature. The
+    // server already computed that reference, so reuse it — no Overpass call needed.
+    const reference = serverReference(q) ?? nearestPoint(askPoint, await overpass.around(lat, lng, SEARCH_KM, tag));
+    const d = Math.max(distance(askPoint, reference, { units: 'kilometers' }), 0.05);
+
+    return { region: circle(reference, d, { units: 'kilometers', steps: 64 }) as Poly, within: answer === 'closer' };
   }
-  const askPoint = point([lng, lat]);
 
   if (q.category === 'matching') {
+    // The Voronoi cell of the seeker's nearest feature needs the full local feature
+    // set, so this one still fetches (cached client-side until a self-hosted backend).
+    const features = await overpass.around(lat, lng, SEARCH_KM, tag);
+    if (features.features.length < 2) {
+      return null;
+    }
     const box = bbox(circle([lng, lat], SEARCH_KM, { units: 'kilometers' })) as [number, number, number, number];
     const cells = voronoi(features, { bbox: box });
     const cell = cells.features.find((c) => c && booleanPointInPolygon(askPoint, c));
@@ -60,16 +72,14 @@ export async function osmRegion(overpass: OverpassService, q: ResolvedQuestion):
     return cell ? { region: cell as Poly, within: answer === 'yes' } : null;
   }
 
-  if (q.category === 'measuring') {
-    // Reference = the seeker's nearest feature; keep within the seeker's distance to it
-    // (closer) or outside it (further) — a single circle around that one feature.
-    const reference = nearestPoint(askPoint, features);
-    const d = Math.max(distance(askPoint, reference, { units: 'kilometers' }), 0.05);
-
-    return { region: circle(reference, d, { units: 'kilometers', steps: 64 }) as Poly, within: answer === 'closer' };
-  }
-
   return null;
+}
+
+/** The reference feature the server already resolved (the seeker's nearest place), as a turf point. */
+function serverReference(q: ResolvedQuestion): ReturnType<typeof point> | null {
+  const { feature_lat, feature_lng } = q.answer ?? {};
+
+  return feature_lat != null && feature_lng != null ? point([feature_lng, feature_lat]) : null;
 }
 
 export function isOsmCategory(category: string): boolean {
