@@ -162,13 +162,22 @@ export class SessionView {
     return p ? { lat: p.lat, lng: p.lng, radiusM: Number(s.config?.['hiding_zone_radius_m'] ?? 400) || 400 } : null;
   }
 
-  /** The hider sees the seeker's pending question on their map (ask point + radar radius). */
+  /** The hider sees the seeker's pending question on their map. For a place question
+   *  this is the seeker's closest object; otherwise the ask point (+ radar radius). */
   hiderQuestionMarker(s: GameState): { lat: number; lng: number; radiusM?: number | null; label?: string } | null {
     if (this.role(s) !== 'hider') {
       return null;
     }
     const q = s.pending_question;
-    if (!q?.ask || q.ask.lat == null || q.ask.lng == null) {
+    if (!q) {
+      return null;
+    }
+    // Matching/measuring: show WHERE the seeker's closest object is, not just their spot.
+    if (q.reference) {
+      const feat = (q.params?.feature ?? 'place').replace(/_/g, ' ');
+      return { lat: q.reference.lat, lng: q.reference.lng, label: `Seeker's closest ${feat}${q.reference.name ? ': ' + q.reference.name : ''}` };
+    }
+    if (q.ask?.lat == null || q.ask.lng == null) {
       return null;
     }
 

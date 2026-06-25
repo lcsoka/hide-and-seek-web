@@ -47,6 +47,7 @@ export interface PendingQuestion {
   prompt?: string | null;
   params?: { radius_m: number | null; feature: string | null };
   ask?: { lat: number | null; lng: number | null };
+  reference?: { name: string | null; lat: number; lng: number } | null; // the seeker's closest place
   preview_answer?: QuestionAnswer | null; // hider-only: the answer they're about to give
 }
 

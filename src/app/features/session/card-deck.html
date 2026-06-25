@@ -26,6 +26,12 @@
       @if (q.prompt) { <p class="text-sm text-gray-700 dark:text-gray-200">{{ q.prompt }}</p> }
       @if (questionParams(); as p) { <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ p }}</p> }
 
+      @if (q.reference; as ref) {
+        <div class="rounded-lg bg-white/70 p-2 text-sm dark:bg-gray-900/60">
+          <span class="text-gray-500 dark:text-gray-400">📍 Seeker's closest:</span> <b>{{ ref.name || 'an unnamed place' }}</b>
+        </div>
+      }
+
       @if (canAnswer()) {
         @if (isPhoto()) {
           <p class="text-xs text-gray-600 dark:text-gray-300">Take or pick a photo to send back.</p>
