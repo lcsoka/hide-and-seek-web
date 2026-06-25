@@ -66,8 +66,12 @@ export class DeductionMap {
   }
 
   private init(): void {
-    this.map = L.map(this.el().nativeElement).setView(BUDAPEST, 11);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(this.map);
+    this.map = L.map(this.el().nativeElement, { zoomAnimation: true, fadeAnimation: true }).setView(BUDAPEST, 11);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap, © CARTO',
+      subdomains: 'abcd',
+      maxZoom: 20,
+    }).addTo(this.map);
     this.map.on('click', (e: L.LeafletMouseEvent) => this.mapClick.emit({ lat: e.latlng.lat, lng: e.latlng.lng }));
     // A move the app didn't initiate is the user panning/zooming — stop auto-fitting.
     this.map.on('movestart', () => {
@@ -105,7 +109,7 @@ export class DeductionMap {
           interactive: false,
         }).addTo(this.overlay);
       }
-      L.geoJSON(cand as GeoJsonObject, { style: { color: '#16a34a', weight: 2, fill: false } }).addTo(this.overlay);
+      L.geoJSON(cand as GeoJsonObject, { style: { color: '#16a34a', weight: 2.5, fill: false, className: 'jl-candidate' } }).addTo(this.overlay);
     }
 
     for (const overlay of this.overlays()) {
@@ -179,8 +183,8 @@ export class DeductionMap {
       try {
         const [minX, minY, maxX, maxY] = bbox(cand);
         this.programmaticMove = true;
-        this.map.fitBounds([[minY, minX], [maxY, maxX]], { padding: [24, 24], maxZoom: 15, animate: false });
-        setTimeout(() => (this.programmaticMove = false), 0);
+        this.map.fitBounds([[minY, minX], [maxY, maxX]], { padding: [24, 24], maxZoom: 15, animate: true, duration: 0.6 });
+        setTimeout(() => (this.programmaticMove = false), 700);
       } catch {
         // empty / degenerate candidate — leave the view as-is
       }

@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+/* Map polish — gently pulse the candidate-area outline so the live deduction reads
+   as "alive". (Leaflet renders its SVG outside Angular's view encapsulation, so this
+   lives in the global sheet.) */
+@keyframes jl-candidate-pulse {
+  0%, 100% { stroke-opacity: 0.9; }
+  50% { stroke-opacity: 0.35; }
+}
+.jl-candidate {
+  animation: jl-candidate-pulse 2.6s ease-in-out infinite;
+}

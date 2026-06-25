@@ -27,7 +27,8 @@ export class SeekerPanel {
   readonly label = answerLabel;
   readonly canAsk = computed(() => this.state().available_actions.includes('ask_question'));
   readonly history = computed(() => [...this.deduction.annotations()].reverse());
-  readonly curses = computed(() => this.state().curses.filter((c) => c.status !== 'expired' || c.requires_proof));
+  // Done curses (time ran out / task completed) disappear — only show active ones.
+  readonly curses = computed(() => this.state().curses.filter((c) => c.status === 'active'));
 
   chipClass(answer: string): string {
     const positive = answerPositive(answer);

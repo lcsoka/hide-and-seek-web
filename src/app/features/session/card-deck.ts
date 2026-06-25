@@ -53,7 +53,7 @@ export class CardDeck {
   readonly canAnswer = computed(() => this.state().available_actions.includes('answer_question'));
   readonly preview = computed(() => this.pending()?.preview_answer ?? null);
   readonly timeBonusMin = computed(() => Math.round((this.state().time_bonus_s ?? 0) / 60));
-  readonly playedCurses = computed(() => this.state().curses);
+  readonly playedCurses = computed(() => this.state().curses.filter((c) => c.status === 'active'));
   readonly vetoCard = computed(() => this.hand().find((c) => c.type === 'powerup' && c.power === 'veto') ?? null);
 
   private readonly units = computed(() => unitsOf(this.state().config));
@@ -160,6 +160,19 @@ export class CardDeck {
 
   cancelPlay(): void {
     this.confirmCard.set(null);
+  }
+
+  /** The question's range / feature, so the hider sees the full question (not just "radar"). */
+  questionInfo(q: ResolvedQuestion): string | null {
+    const parts: string[] = [];
+    if (q.ask?.radius_m) {
+      parts.push(formatDistance(q.ask.radius_m, this.units()));
+    }
+    if (q.ask?.feature) {
+      parts.push(q.ask.feature.replace(/_/g, ' '));
+    }
+
+    return parts.join(' · ') || null;
   }
 
   /** A coloured chip for an answer in the hider's past-answers list. */
