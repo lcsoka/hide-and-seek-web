@@ -75,7 +75,13 @@ export class SessionView {
     }
 
     const interval = setInterval(() => this.tick.update((n) => n + 1), 1000);
-    inject(DestroyRef).onDestroy(() => clearInterval(interval));
+    // Poll /state as a safety net so the view never gets stuck on stale state if a
+    // realtime event is delayed or missed (Reverb is best-effort).
+    const poll = setInterval(() => this.store.refresh(), 4000);
+    inject(DestroyRef).onDestroy(() => {
+      clearInterval(interval);
+      clearInterval(poll);
+    });
 
     effect(() => {
       const now = this.store.state()?.timers?.now;
