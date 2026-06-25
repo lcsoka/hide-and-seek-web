@@ -18,7 +18,7 @@
       } @else {
         <app-map class="block h-full" [players]="s.players" [zone]="s.hiding_zone"
                  [stations]="hidingStations(s)" [highlight]="hidingHighlight(s)" [previewZone]="hidingPreviewZone(s)"
-                 [questionMarker]="hiderQuestionMarker(s)" (mapClick)="onMapClick($event)" />
+                 [questionMarker]="hiderQuestionMarker(s)" [reveal]="revealMarker(s)" (mapClick)="onMapClick($event)" />
       }
     </div>
 
@@ -51,6 +51,8 @@
             </div>
           }
           <app-card-deck [state]="s" [sessionId]="s.session_id" />
+        } @else if (s.state === 'round_end' || s.state === 'finished') {
+          <app-round-results [state]="s" [isHost]="isHost(s)" />
         } @else {
           <div class="space-y-1">
             <h2 class="text-lg font-bold">{{ prettyState(s.state) }}</h2>

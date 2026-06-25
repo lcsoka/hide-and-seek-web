@@ -23,10 +23,11 @@ import { HostPanel } from './host-panel';
 import { LobbyPanel } from './lobby-panel';
 import { MapView } from './map';
 import { QuestionPicker } from './question-picker';
+import { RoundResults } from './round-results';
 import { SeekerPanel } from './seeker-panel';
 
 // Actions with a dedicated panel — kept out of the generic button row.
-const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'start_thermometer', 'stop_thermometer'];
+const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'start_thermometer', 'stop_thermometer', 'confirm_found'];
 
 const STATUS_HINTS: Record<string, string> = {
   role_assignment: 'Waiting for the host to assign roles…',
@@ -41,7 +42,7 @@ const STATUS_HINTS: Record<string, string> = {
 @Component({
   selector: 'app-session',
   host: { class: 'block h-[100dvh] w-full' },
-  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, DrawModal, CurseAlert],
+  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, DrawModal, CurseAlert, RoundResults],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -209,6 +210,17 @@ export class SessionView {
     const action = event.category === 'thermometer' ? 'start_thermometer' : 'ask_question';
     await this.api.submitAction(s.session_id, action, { question_id: event.questionId, ...event.payload });
     this.store.refresh();
+  }
+
+  /** Once a round is over, reveal where the hider was actually hiding. */
+  revealMarker(s: GameState): { lat: number; lng: number; label?: string } | null {
+    if (s.state !== 'round_end' && s.state !== 'finished') {
+      return null;
+    }
+    const p = s.last_round?.hider_position;
+    const name = s.last_round?.hider_name;
+
+    return p ? { lat: p.lat, lng: p.lng, label: name ? `🫥 ${name} hid here` : '🫥 Hider was here' } : null;
   }
 
   /** While a thermometer is running, show its target distance circle on the seeker map. */

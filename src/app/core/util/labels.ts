@@ -8,7 +8,7 @@ const ACTION_LABELS: Record<string, string> = {
   answer_question: 'Answer question',
   play_curse: 'Play curse',
   declare_endgame: 'Declare endgame',
-  make_guess: 'Make guess',
+  confirm_found: 'I found them!',
   surrender: 'Surrender',
   advance_round: 'Next round',
   end_game: 'End game',

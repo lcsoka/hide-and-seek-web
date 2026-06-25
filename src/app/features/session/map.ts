@@ -21,6 +21,8 @@ export class MapView {
   readonly previewZone = input<{ lat: number; lng: number; radiusM: number } | null>(null);
   // The seeker's current question, drawn so the hider sees what's being asked.
   readonly questionMarker = input<{ lat: number; lng: number; radiusM?: number | null; label?: string } | null>(null);
+  // Round-over reveal of where the hider was hiding.
+  readonly reveal = input<{ lat: number; lng: number; label?: string } | null>(null);
   readonly mapClick = output<Position>();
 
   private map?: L.Map;
@@ -37,6 +39,7 @@ export class MapView {
       this.highlight();
       this.previewZone();
       this.questionMarker();
+      this.reveal();
       this.render();
     });
   }
@@ -113,6 +116,15 @@ export class MapView {
         this.centred = true;
         this.map.setView([hl.lat, hl.lng], 14, { animate: false });
       }
+    }
+
+    // Round-over: reveal the hider's actual spot and centre on it.
+    const reveal = this.reveal();
+    if (reveal) {
+      L.marker([reveal.lat, reveal.lng], { icon: markerIcon('🫥', { color: '#7c3aed', emphasis: true }) })
+        .bindTooltip(reveal.label ?? 'Hider was here', { permanent: true, direction: 'top', offset: [0, -22] })
+        .addTo(this.overlay);
+      this.map.setView([reveal.lat, reveal.lng], 15, { animate: true });
     }
   }
 }

@@ -61,7 +61,7 @@ const STATES = ['lobby', 'role_assignment', 'hiding', 'seeking', 'round_review',
               <button (click)="quick('assign_hider', { player_id: selectedId() })" [class]="btnOutline">Assign hider (selected)</button>
               <button (click)="quick('choose_station', pointPayload())" [class]="btnOutline">Choose station (here)</button>
               <button (click)="quick('confirm_hidden')" [class]="btnOutline">Confirm hidden</button>
-              <button (click)="quick('make_guess', pointPayload())" [class]="btnOutline">Make guess (here)</button>
+              <button (click)="quick('confirm_found')" [class]="btnOutline">Catch hider (selected, in range)</button>
               <button (click)="quick('advance_round')" [class]="btnOutline">Next round</button>
               <button (click)="quick('end_game')" [class]="btnOutline">End game</button>
             </div>

@@ -174,10 +174,32 @@ export interface GameState {
   hiding_zone: HidingZone | null;
   zone_locked: boolean;
   relocating: boolean; // hider played 'move' and must re-confirm a new spot
+  standings: Standing[];
+  last_round: RoundReveal | null;
   hand: HandCard[];
   pending_draw: PendingDraw | null;
   time_bonus_s: number | null;
   thermometer: ThermometerRunning | null;
+}
+
+export interface Standing {
+  player_id: string;
+  display_name: string | null;
+  total_hiding_time_s: number;
+  rank: number;
+}
+
+/** The just-ended round's reveal + recap (present at round_end / finished). */
+export interface RoundReveal {
+  hider_id: string | null;
+  hider_name: string | null;
+  found_by: string | null;
+  found_by_name: string | null;
+  surrendered: boolean;
+  seconds: number;
+  hider_position: { lat: number; lng: number } | null;
+  questions_count: number;
+  curses_played: number;
 }
 
 export interface GodPlayer {

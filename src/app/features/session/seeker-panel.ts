@@ -27,6 +27,8 @@ export class SeekerPanel {
   readonly label = answerLabel;
   readonly voided = this.store.voided;
   readonly canAsk = computed(() => this.state().available_actions.includes('ask_question'));
+  readonly canCatch = computed(() => this.state().available_actions.includes('confirm_found'));
+  readonly closingIn = computed(() => this.state().state === 'endgame' && !this.canCatch());
   readonly running = computed(() => this.state().thermometer);
   readonly history = computed(() => [...this.deduction.annotations()].reverse());
   // Done curses (time ran out / task completed) disappear — only show active ones.
@@ -60,6 +62,11 @@ export class SeekerPanel {
 
   async stopThermometer(): Promise<void> {
     await this.api.submitAction(this.sessionId(), 'stop_thermometer', {});
+    this.store.refresh();
+  }
+
+  async confirmFound(): Promise<void> {
+    await this.api.submitAction(this.sessionId(), 'confirm_found', {});
     this.store.refresh();
   }
 }
