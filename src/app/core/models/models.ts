@@ -173,6 +173,7 @@ export interface GameState {
   timers: GameTimers;
   hiding_zone: HidingZone | null;
   zone_locked: boolean;
+  relocating: boolean; // hider played 'move' and must re-confirm a new spot
   hand: HandCard[];
   pending_draw: PendingDraw | null;
   time_bonus_s: number | null;
