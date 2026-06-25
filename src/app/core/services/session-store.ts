@@ -32,9 +32,14 @@ export class SessionStore {
   readonly loading = this.resource.isLoading;
   readonly error = this.resource.error;
   readonly feed = signal<FeedEntry[]>([]);
-  // Flips true briefly when a question is voided (couldn't be answered) so the seeker
-  // knows to ask again; auto-clears.
-  readonly voided = signal(false);
+  // A brief notice to the seeker about their last question's fate (voided / vetoed) so
+  // they know to ask again rather than waiting on a vanished question. Auto-clears.
+  readonly questionNotice = signal<string | null>(null);
+
+  private notify(message: string): void {
+    this.questionNotice.set(message);
+    setTimeout(() => this.questionNotice.set(null), 6000);
+  }
 
   setSession(id: string): void {
     this.sessionId.set(id);
@@ -58,8 +63,9 @@ export class SessionStore {
     }
 
     if (type === 'QuestionVoided') {
-      this.voided.set(true);
-      setTimeout(() => this.voided.set(false), 6000);
+      this.notify("Your last question couldn't be answered — ask again.");
+    } else if (type === 'QuestionVetoed') {
+      this.notify('The hider vetoed your question — ask another.');
     }
 
     this.refresh();

@@ -1,6 +1,7 @@
 import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
+import { hidingZone } from '../../core/maps/deduction';
 import { disperse } from '../../core/maps/spread';
 import { HidingZone, PlayerView, Position } from '../../core/models/models';
 import { transitMeta } from '../../core/util/transit';
@@ -74,11 +75,14 @@ export class MapView {
 
     const zone = this.zone();
     if (zone) {
-      L.circle([zone.center.lat, zone.center.lng], {
-        radius: zone.radius_m,
-        color: '#f59e0b',
-        fillOpacity: 0.1,
-      }).addTo(this.overlay);
+      // Draw the true (carved) zone: the radius circle minus areas closer to another
+      // station, so the hider sees exactly where their station stays the nearest.
+      if (zone.neighbors?.length) {
+        const carved = hidingZone(zone.center, zone.radius_m, zone.neighbors);
+        L.geoJSON(carved, { style: { color: '#f59e0b', weight: 2, fillOpacity: 0.12 } }).addTo(this.overlay);
+      } else {
+        L.circle([zone.center.lat, zone.center.lng], { radius: zone.radius_m, color: '#f59e0b', fillOpacity: 0.1 }).addTo(this.overlay);
+      }
 
       for (const n of zone.neighbors ?? []) {
         L.circleMarker([n.lat, n.lng], { radius: 4, color: '#9ca3af' }).addTo(this.overlay);

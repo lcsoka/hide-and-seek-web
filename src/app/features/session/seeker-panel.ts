@@ -25,7 +25,7 @@ export class SeekerPanel {
   readonly openPicker = output<void>();
 
   readonly label = answerLabel;
-  readonly voided = this.store.voided;
+  readonly questionNotice = this.store.questionNotice;
   readonly canAsk = computed(() => this.state().available_actions.includes('ask_question'));
   readonly canCatch = computed(() => this.state().available_actions.includes('confirm_found'));
   readonly closingIn = computed(() => this.state().state === 'endgame' && !this.canCatch());

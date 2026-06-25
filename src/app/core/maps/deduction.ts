@@ -66,6 +66,30 @@ export function playArea(lat: number, lng: number, radiusKm: number): Poly {
   return circle([lng, lat], radiusKm, { units: 'kilometers', steps: 128 }) as Poly;
 }
 
+/**
+ * The hider's true hiding zone: the radius circle around the chosen station, carved by
+ * the perpendicular bisector toward every neighbouring station — so the chosen station
+ * is the nearest everywhere in the zone and no other station falls inside it. Falls back
+ * to the plain circle when there are no neighbours.
+ */
+export function hidingZone(center: { lat: number; lng: number }, radiusM: number, neighbors: { lat: number; lng: number }[]): Poly {
+  let zone = circle([center.lng, center.lat], radiusM / 1000, { units: 'kilometers', steps: 96 }) as Poly;
+
+  for (const n of neighbors) {
+    if (n.lat === center.lat && n.lng === center.lng) {
+      continue;
+    }
+    // Keep the side closer to the chosen station than to this neighbour.
+    const half = thermometerHalfPlane({ id: '', type: 'thermometer', aLat: n.lat, aLng: n.lng, bLat: center.lat, bLng: center.lng, warmer: null }, true);
+    const clipped = intersect(featureCollection([zone, half])) as Poly | null;
+    if (clipped) {
+      zone = clipped;
+    }
+  }
+
+  return zone;
+}
+
 export function radarCircle(q: RadarQuestion): Poly {
   return circle([q.lng, q.lat], q.radiusKm, { units: 'kilometers', steps: 128 }) as Poly;
 }

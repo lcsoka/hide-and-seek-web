@@ -15,8 +15,8 @@
       <h2 class="text-lg font-bold">Questions</h2>
       <span class="text-xs text-gray-500 dark:text-gray-400">{{ deduction.narrowedCount() }} on the map</span>
     </div>
-    @if (voided()) {
-      <p class="rounded-lg bg-amber-100 p-2 text-center text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">Your last question couldn't be answered — ask again.</p>
+    @if (questionNotice(); as notice) {
+      <p class="rounded-lg bg-amber-100 p-2 text-center text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">{{ notice }}</p>
     }
 
     @if (running(); as t) {

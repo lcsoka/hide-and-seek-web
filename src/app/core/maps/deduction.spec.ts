@@ -1,8 +1,28 @@
 import { area, booleanPointInPolygon, featureCollection, point } from '@turf/turf';
-import { applyQuestions, measuringRegionToBorder, playArea, RadarQuestion, RegionQuestion, tentacleRegion, ThermometerQuestion } from './deduction';
+import { applyQuestions, hidingZone, measuringRegionToBorder, playArea, RadarQuestion, RegionQuestion, tentacleRegion, ThermometerQuestion } from './deduction';
 import { Feature, FeatureCollection, Point, Polygon } from 'geojson';
 
 const BUD = { lat: 47.4979, lng: 19.0402 };
+
+describe('hidingZone carve', () => {
+  // A neighbour ~0.006° east (~450 m). The bisector sits ~halfway between them.
+  const center = { lat: 47.5, lng: 19.05 };
+  const neighbor = { lat: 47.5, lng: 19.056 };
+  const zone = hidingZone(center, 800, [neighbor]);
+
+  it('keeps the side toward the chosen station', () => {
+    expect(booleanPointInPolygon(point([19.047, 47.5]), zone)).toBe(true); // west of centre
+  });
+
+  it('carves out the area toward (and past) the neighbour', () => {
+    expect(booleanPointInPolygon(point([neighbor.lng, neighbor.lat]), zone)).toBe(false); // the neighbour itself
+    expect(booleanPointInPolygon(point([19.054, 47.5]), zone)).toBe(false); // past the bisector
+  });
+
+  it('is smaller than the plain radius circle', () => {
+    expect(area(zone)).toBeLessThan(area(hidingZone(center, 800, [])));
+  });
+});
 
 describe('deduction engine', () => {
   it('radar within=true shrinks the area to the circle', () => {
