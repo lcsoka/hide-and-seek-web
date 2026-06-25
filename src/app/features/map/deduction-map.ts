@@ -41,6 +41,11 @@ export class DeductionMap {
   private map?: L.Map;
   private overlay?: L.LayerGroup;
   private resize?: ResizeObserver;
+  // View preservation: only auto-fit when the deduction changes, and never once the
+  // user has panned/zoomed — so background /state refreshes don't reset their view.
+  private lastFitSig = '';
+  private userMoved = false;
+  private programmaticMove = false;
 
   constructor() {
     afterNextRender(() => this.init());
@@ -64,10 +69,17 @@ export class DeductionMap {
     this.map = L.map(this.el().nativeElement).setView(BUDAPEST, 11);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(this.map);
     this.map.on('click', (e: L.LeafletMouseEvent) => this.mapClick.emit({ lat: e.latlng.lat, lng: e.latlng.lng }));
-    // Full-bleed/flex containers settle their size after init — re-fit whenever the
-    // container resizes so auto-zoom always uses the final dimensions.
+    // A move the app didn't initiate is the user panning/zooming — stop auto-fitting.
+    this.map.on('movestart', () => {
+      if (!this.programmaticMove) {
+        this.userMoved = true;
+      }
+    });
+    // Full-bleed/flex containers settle their size after init — re-fit once the
+    // container resizes so the initial framing uses the final dimensions.
     this.resize = new ResizeObserver(() => {
       this.map?.invalidateSize();
+      this.lastFitSig = ''; // allow one re-fit at the new size (unless the user moved)
       this.render();
     });
     this.resize.observe(this.el().nativeElement);
@@ -159,10 +171,16 @@ export class DeductionMap {
       }
     }
 
-    if (this.autoZoom() && cand) {
+    // Auto-fit only when the deduction actually changed (a new clue), and never after
+    // the user has taken control of the view — so periodic refreshes don't reset it.
+    const sig = `${this.questions().length}:${this.annotations().length}:${cand ? 1 : 0}`;
+    if (this.autoZoom() && cand && sig !== this.lastFitSig && !this.userMoved) {
+      this.lastFitSig = sig;
       try {
         const [minX, minY, maxX, maxY] = bbox(cand);
+        this.programmaticMove = true;
         this.map.fitBounds([[minY, minX], [maxY, maxX]], { padding: [24, 24], maxZoom: 15, animate: false });
+        setTimeout(() => (this.programmaticMove = false), 0);
       } catch {
         // empty / degenerate candidate — leave the view as-is
       }
