@@ -5,7 +5,7 @@ import * as L from 'leaflet';
 import { MapAnnotation } from '../../core/maps/annotations';
 import { DeductionQuestion } from '../../core/maps/deduction';
 import { holedMask, Poly } from '../../core/maps/operators';
-import { Position } from '../../core/models/models';
+import { PlayerView, Position } from '../../core/models/models';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
 
@@ -43,6 +43,8 @@ export class DeductionMap {
   readonly autoZoom = input(true);
   readonly loading = input(false); // hold rendering until the deduction is fully computed
   readonly thermoMarker = input<{ lat: number; lng: number; radiusM?: number | null; label?: string } | null>(null);
+  readonly players = input<PlayerView[]>([]); // visible players (seekers see themselves + teammates)
+  readonly meId = input<string | null>(null);
   readonly mapClick = output<Position>();
 
   private map?: L.Map;
@@ -65,6 +67,7 @@ export class DeductionMap {
       this.overlays();
       this.loading();
       this.thermoMarker();
+      this.players();
       this.render();
     });
     inject(DestroyRef).onDestroy(() => {
@@ -193,6 +196,24 @@ export class DeductionMap {
         icon: L.divIcon({ html: `<div style="font-size:20px;line-height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">🌡️</div>`, className: '', iconSize: [20, 20], iconAnchor: [10, 10] }),
       })
         .bindTooltip(thermo.label ?? 'Thermometer start', { permanent: true, direction: 'top', offset: [0, -8] })
+        .addTo(this.overlay);
+    }
+
+    // Visible players (the seeker themselves + teammates; the hider is concealed by
+    // the server). The seeker's own position gets a prominent ringed marker.
+    for (const p of this.players()) {
+      if (p.lat == null || p.lng == null) {
+        continue;
+      }
+      const isMe = p.id === this.meId();
+      L.circleMarker([p.lat, p.lng], {
+        radius: isMe ? 8 : 6,
+        color: '#fff',
+        weight: 2,
+        fillColor: isMe ? '#2563eb' : '#60a5fa',
+        fillOpacity: 1,
+      })
+        .bindTooltip(isMe ? 'You' : p.display_name, isMe ? { permanent: true, direction: 'top', offset: [0, -8] } : {})
         .addTo(this.overlay);
     }
 

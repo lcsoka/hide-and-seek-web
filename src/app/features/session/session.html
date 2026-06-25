@@ -13,7 +13,8 @@
     <div class="absolute inset-0">
       @if (showDeductionMap(s)) {
         <app-deduction-map class="block h-full" [candidate]="deduction.candidate()" [annotations]="deduction.annotations()"
-                           [loading]="deduction.computing()" [thermoMarker]="thermoMarker(s)" [autoZoom]="!devPlacing()" (mapClick)="onMapClick($event)" />
+                           [loading]="deduction.computing()" [thermoMarker]="thermoMarker(s)" [players]="s.players" [meId]="myId()"
+                           [autoZoom]="!devPlacing()" (mapClick)="onMapClick($event)" />
       } @else {
         <app-map class="block h-full" [players]="s.players" [zone]="s.hiding_zone"
                  [stations]="hidingStations(s)" [highlight]="hidingHighlight(s)" [previewZone]="hidingPreviewZone(s)"
