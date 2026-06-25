@@ -3,12 +3,14 @@ import { distance, point } from '@turf/turf';
 import { Feature, Point } from 'geojson';
 import { OverpassService } from '../maps/overpass';
 import { Position } from '../models/models';
+import { classifyStop } from '../util/transit';
 
 export interface NearbyStation {
   name: string;
   lat: number;
   lng: number;
   distM: number;
+  modes: string[]; // transit modes serving the stop (metro/tram/bus/…), most-specific first
 }
 
 /**
@@ -48,10 +50,11 @@ export class HidingState {
             lat: flat,
             lng: flng,
             distM: Math.round(distance(here, f as Feature<Point>, { units: 'kilometers' }) * 1000),
+            modes: classifyStop(f.properties ?? {}),
           };
         })
         .sort((a, b) => a.distM - b.distM)
-        .slice(0, 6);
+        .slice(0, 8);
       this.stations.set(list);
       this.selected.set(list[0] ?? null);
     } catch {

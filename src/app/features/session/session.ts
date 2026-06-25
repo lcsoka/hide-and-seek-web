@@ -144,7 +144,7 @@ export class SessionView {
     return this.role(s) === 'hider' && s.state === 'hiding';
   }
 
-  hidingStations(s: GameState): { lat: number; lng: number; name?: string }[] {
+  hidingStations(s: GameState): { lat: number; lng: number; name?: string; modes?: string[] }[] {
     return this.picking(s) ? (this.hiding.stations() ?? []) : [];
   }
 

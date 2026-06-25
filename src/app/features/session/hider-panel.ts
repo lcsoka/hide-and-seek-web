@@ -3,6 +3,7 @@ import { GameState } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { HidingState } from '../../core/services/hiding-state';
 import { SessionStore } from '../../core/services/session-store';
+import { transitMeta } from '../../core/util/transit';
 
 /** Smart hiding: auto-find the nearest station (shared with the map) and confirm in one tap. */
 @Component({
@@ -20,6 +21,7 @@ export class HiderPanel {
 
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
+  readonly mode = transitMeta;
 
   readonly stations = this.hiding.stations;
   readonly selected = this.hiding.selected;

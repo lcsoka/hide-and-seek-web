@@ -1,6 +1,7 @@
 import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { HidingZone, PlayerView, Position } from '../../core/models/models';
+import { transitMeta } from '../../core/util/transit';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
 
@@ -13,7 +14,7 @@ export class MapView {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
   readonly players = input<PlayerView[]>([]);
   readonly zone = input<HidingZone | null>(null);
-  readonly stations = input<{ lat: number; lng: number; name?: string }[]>([]); // nearby stops to pick from
+  readonly stations = input<{ lat: number; lng: number; name?: string; modes?: string[] }[]>([]); // nearby stops to pick from
   readonly highlight = input<Position | null>(null); // the chosen/nearest station
   readonly previewZone = input<{ lat: number; lng: number; radiusM: number } | null>(null);
   // The seeker's current question, drawn so the hider sees what's being asked.
@@ -89,8 +90,9 @@ export class MapView {
       L.circle([preview.lat, preview.lng], { radius: preview.radiusM, color: '#f59e0b', weight: 1, fillOpacity: 0.08 }).addTo(this.overlay);
     }
     for (const st of this.stations()) {
-      L.circleMarker([st.lat, st.lng], { radius: 4, color: '#0891b2', fillColor: '#0891b2', fillOpacity: 0.9, weight: 1 })
-        .bindTooltip(st.name ?? 'stop')
+      const meta = transitMeta(st.modes?.[0] ?? 'stop');
+      L.circleMarker([st.lat, st.lng], { radius: 5, color: meta.color, fillColor: meta.color, fillOpacity: 0.9, weight: 1 })
+        .bindTooltip(`${meta.icon} ${st.name ?? 'stop'}`)
         .addTo(this.overlay);
     }
     // The seeker's current question: where it was asked (+ radar radius), so the hider
