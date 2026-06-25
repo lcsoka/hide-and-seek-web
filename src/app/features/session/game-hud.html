@@ -1,0 +1,27 @@
+<div class="pointer-events-none absolute inset-x-0 top-0 z-[600] flex items-start justify-between gap-2 p-3 sm:p-4">
+  <div class="pointer-events-auto flex items-center gap-2">
+    <a routerLink="/" aria-label="Leave"
+       class="grid h-9 w-9 place-items-center rounded-full bg-white/85 text-lg text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">←</a>
+    <button (click)="copy()" class="flex items-center gap-2 rounded-full bg-white/85 px-3 py-1.5 shadow-lg backdrop-blur dark:bg-gray-900/80">
+      <span class="text-[10px] font-semibold uppercase tracking-widest text-gray-400">{{ copied() ? 'Copied!' : 'Code' }}</span>
+      <span class="font-mono text-sm font-bold tracking-[0.2em] text-gray-900 dark:text-white">{{ joinCode() }}</span>
+    </button>
+  </div>
+
+  @if (timer(); as t) {
+    <div class="pointer-events-auto rounded-2xl px-5 py-1.5 text-center shadow-xl backdrop-blur transition-colors"
+         [class]="t.urgent ? 'bg-red-600 text-white' : 'bg-gray-900/85 text-white'">
+      <div class="text-[10px] font-semibold uppercase tracking-widest opacity-70">{{ t.label }}</div>
+      <div class="font-mono text-2xl font-bold leading-none tabular-nums">{{ t.text }}</div>
+    </div>
+  }
+
+  <div class="pointer-events-auto">
+    @if (role(); as r) {
+      <span class="rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-lg backdrop-blur"
+            [class]="r === 'hider' ? 'bg-rose-600' : 'bg-blue-600'">{{ r }}</span>
+    } @else {
+      <span class="rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium capitalize text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">{{ stateLabel() }}</span>
+    }
+  </div>
+</div>

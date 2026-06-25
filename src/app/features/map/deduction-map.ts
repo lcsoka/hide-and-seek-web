@@ -1,4 +1,4 @@
-import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, input, output, viewChild } from '@angular/core';
 import { bbox } from '@turf/turf';
 import { Feature, FeatureCollection, GeoJsonObject, Point } from 'geojson';
 import * as L from 'leaflet';
@@ -15,7 +15,8 @@ const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
  */
 @Component({
   selector: 'app-deduction-map',
-  template: `<div #el class="h-[28rem] w-full overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700"></div>`,
+  host: { class: 'block h-full' },
+  template: `<div #el class="h-full min-h-72 w-full overflow-hidden"></div>`,
 })
 export class DeductionMap {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
@@ -29,6 +30,7 @@ export class DeductionMap {
 
   private map?: L.Map;
   private overlay?: L.LayerGroup;
+  private resize?: ResizeObserver;
 
   constructor() {
     afterNextRender(() => this.init());
@@ -40,12 +42,23 @@ export class DeductionMap {
       this.overlays();
       this.render();
     });
+    inject(DestroyRef).onDestroy(() => {
+      this.resize?.disconnect();
+      this.map?.remove();
+    });
   }
 
   private init(): void {
     this.map = L.map(this.el().nativeElement).setView(BUDAPEST, 11);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(this.map);
     this.map.on('click', (e: L.LeafletMouseEvent) => this.mapClick.emit({ lat: e.latlng.lat, lng: e.latlng.lng }));
+    // Full-bleed/flex containers settle their size after init — re-fit whenever the
+    // container resizes so auto-zoom always uses the final dimensions.
+    this.resize = new ResizeObserver(() => {
+      this.map?.invalidateSize();
+      this.render();
+    });
+    this.resize.observe(this.el().nativeElement);
     this.render();
   }
 

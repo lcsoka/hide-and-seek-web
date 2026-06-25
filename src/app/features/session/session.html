@@ -1,0 +1,60 @@
+@if (store.loading() && !store.state()) {
+  <div class="grid h-[100dvh] place-items-center text-gray-400">Loading…</div>
+} @else if (store.error()) {
+  <div class="grid h-[100dvh] place-items-center p-6 text-center">
+    <div class="space-y-3">
+      <p class="rounded-lg bg-red-100 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">Couldn't load this session.</p>
+      <a routerLink="/" class="inline-block text-sm text-rose-600">← Home</a>
+    </div>
+  </div>
+} @else if (store.state(); as s) {
+  <div class="relative h-full w-full overflow-hidden bg-gray-200 dark:bg-gray-950">
+    <!-- Full-bleed map -->
+    <div class="absolute inset-0">
+      @if (showDeductionMap(s)) {
+        <app-deduction-map class="block h-full" [candidate]="deduction.candidate()" [questions]="deduction.markerQuestions()" [autoZoom]="true" />
+      } @else {
+        <app-map class="block h-full" [players]="s.players" [zone]="s.hiding_zone" />
+      }
+    </div>
+
+    <!-- Scrim so the HUD stays legible over bright map tiles -->
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 to-transparent"></div>
+
+    <app-game-hud [joinCode]="s.join_code" [timer]="timer()" [role]="role(s)" [stateLabel]="prettyState(s.state)" />
+
+    <!-- Side panel: desktop right column / mobile bottom sheet -->
+    <aside class="pointer-events-none absolute inset-x-0 bottom-0 z-[600] flex max-h-[62%] flex-col
+                  lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[400px] lg:pt-16">
+      <div class="pointer-events-auto m-2 flex-1 overflow-y-auto rounded-2xl bg-white/95 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3">
+        @if (s.state === 'lobby') {
+          <app-lobby-panel [state]="s" [sessionId]="s.session_id" [isHost]="isHost(s)" />
+        } @else if (s.state === 'role_assignment' && isHost(s)) {
+          <app-host-panel [state]="s" [sessionId]="s.session_id" />
+        } @else if (s.state === 'hiding' && role(s) === 'hider') {
+          <app-hider-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" />
+        } @else if (role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame')) {
+          <app-seeker-panel [state]="s" [sessionId]="s.session_id" />
+        } @else {
+          <div class="space-y-1">
+            <h2 class="text-lg font-bold">{{ prettyState(s.state) }}</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ statusHint(s) }}</p>
+          </div>
+        }
+
+        @if (visibleActions(s); as actions) {
+          @if (actions.length) {
+            <div class="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+              @for (a of actions; track a) {
+                <button (click)="act(a)" [disabled]="acting()"
+                        class="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50">
+                  {{ label(a) }}
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+    </aside>
+  </div>
+}

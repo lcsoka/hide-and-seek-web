@@ -16,48 +16,7 @@ interface NearbyStation {
 /** Smart hiding: auto-find the nearest station to the hider and confirm in one tap. */
 @Component({
   selector: 'app-hider-panel',
-  template: `
-    <section class="space-y-3 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950">
-      <h2 class="font-semibold">Find your hiding spot</h2>
-
-      @if (error(); as e) {
-        <p class="rounded-lg bg-red-100 p-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">{{ e }}</p>
-      }
-
-      @if (!hasLocation()) {
-        <p class="text-sm text-gray-600 dark:text-gray-300">Waiting for your GPS location — enable location to find the nearest station.</p>
-      } @else if (stations() === null) {
-        <p class="text-sm text-gray-600 dark:text-gray-300">Finding stations near you…</p>
-      } @else if (selected(); as sel) {
-        <div class="rounded-lg border border-amber-300 bg-white p-3 dark:border-amber-700 dark:bg-gray-900">
-          <p class="text-xs text-gray-500 dark:text-gray-400">Hide near</p>
-          <p class="text-lg font-bold">{{ sel.name }}</p>
-          <p class="text-sm text-gray-500 dark:text-gray-400">{{ sel.distM }} m away</p>
-        </div>
-        <button (click)="hideHere()" [disabled]="busy()"
-                class="w-full rounded-lg bg-rose-600 p-3 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
-          {{ busy() ? 'Hiding…' : "I'm hidden here" }}
-        </button>
-
-        @if (others().length) {
-          <details class="text-sm">
-            <summary class="cursor-pointer text-gray-600 dark:text-gray-300">Pick a different stop</summary>
-            <ul class="mt-2 space-y-1">
-              @for (st of others(); track st.name + st.distM) {
-                <li>
-                  <button (click)="selected.set(st)" class="flex w-full justify-between rounded px-2 py-1 hover:bg-amber-100 dark:hover:bg-amber-900">
-                    <span>{{ st.name }}</span><span class="text-gray-500">{{ st.distM }} m</span>
-                  </button>
-                </li>
-              }
-            </ul>
-          </details>
-        }
-      } @else {
-        <p class="text-sm text-gray-600 dark:text-gray-300">No stations found nearby. Move closer to a station.</p>
-      }
-    </section>
-  `,
+  templateUrl: './hider-panel.html',
 })
 export class HiderPanel {
   private readonly api = inject(ApiClient);

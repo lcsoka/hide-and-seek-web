@@ -51,7 +51,7 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
 
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="space-y-2">
-          <app-deduction-map [candidate]="candidate()" [questions]="questions()" [stations]="stations()"
+          <app-deduction-map class="block h-[26rem]" [candidate]="candidate()" [questions]="questions()" [stations]="stations()"
                              [points]="pendingTentacle()?.pois ?? null" [overlays]="overlays()"
                              [autoZoom]="autoZoom()" (mapClick)="onMapClick($event)" />
           <p class="text-xs text-gray-500 dark:text-gray-400">

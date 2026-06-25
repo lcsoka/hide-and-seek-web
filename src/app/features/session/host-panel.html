@@ -1,0 +1,24 @@
+<div class="space-y-3">
+  <div>
+    <h2 class="text-lg font-bold">Choose the hider</h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Tap a player, or roll a random one.</p>
+  </div>
+  <ul class="space-y-2">
+    @for (p of state().players; track p.id) {
+      <li class="flex items-center justify-between gap-2">
+        <span class="flex items-center gap-2">
+          <span class="grid h-7 w-7 place-items-center rounded-full bg-gray-300 text-xs font-bold text-gray-700 dark:bg-gray-700 dark:text-gray-200">{{ p.display_name.charAt(0) }}</span>
+          {{ p.display_name }}@if (p.is_host) { <span class="text-gray-400"> (you)</span> }
+        </span>
+        <button (click)="assign(p.id)" [disabled]="busy()"
+                class="rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-40">
+          Make hider
+        </button>
+      </li>
+    }
+  </ul>
+  <button (click)="assign(null)" [disabled]="busy()"
+          class="w-full rounded-lg border border-gray-300 p-2 text-sm hover:bg-gray-100 disabled:opacity-40 dark:border-gray-600 dark:hover:bg-gray-800">
+    🎲 Pick a random hider
+  </button>
+</div>

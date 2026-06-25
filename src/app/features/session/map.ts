@@ -6,7 +6,8 @@ const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
 
 @Component({
   selector: 'app-map',
-  template: `<div #el class="h-80 w-full overflow-hidden rounded-lg border"></div>`,
+  host: { class: 'block h-full' },
+  template: `<div #el class="h-full min-h-72 w-full overflow-hidden"></div>`,
 })
 export class MapView {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
@@ -32,6 +33,7 @@ export class MapView {
       attribution: '© OpenStreetMap',
       maxZoom: 19,
     }).addTo(this.map);
+    setTimeout(() => this.map?.invalidateSize(), 100);
     this.render();
   }
 

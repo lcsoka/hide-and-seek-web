@@ -39,7 +39,7 @@ interface TimelineEntry {
 
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="space-y-2">
-          <app-deduction-map [candidate]="candidate()" [questions]="markerQuestions()" [points]="playerPoints()" [autoZoom]="true" />
+          <app-deduction-map class="block h-[60vh] min-h-80" [candidate]="candidate()" [questions]="markerQuestions()" [points]="playerPoints()" [autoZoom]="true" />
           <p class="text-xs text-gray-500 dark:text-gray-400">
             Shaded = ruled out by the questions. Markers show every player's last position (god view).
           </p>
