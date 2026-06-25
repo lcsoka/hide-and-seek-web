@@ -134,7 +134,25 @@ export class CardDeck {
     await this.act('answer_question', { photo_url: url });
   }
 
-  /** The hider answers manually (e.g. matching) when the auto-truth couldn't be computed. */
+  /** Manual answer options when there's no auto-truth (matching / measuring). */
+  readonly manualOptions = computed<{ value: string; label: string }[] | null>(() => {
+    switch (this.pending()?.category) {
+      case 'matching':
+        return [{ value: 'yes', label: 'Yes — same' }, { value: 'no', label: 'No — different' }];
+      case 'measuring':
+        return [{ value: 'closer', label: 'Closer' }, { value: 'further', label: 'Further' }];
+      default:
+        return null;
+    }
+  });
+
+  readonly manualPrompt = computed(() =>
+    this.pending()?.category === 'measuring'
+      ? 'Compared to the seeker, are you closer to or further from it?'
+      : "Is the seeker's closest place also your nearest?",
+  );
+
+  /** The hider answers manually (matching/measuring) when the auto-truth couldn't be computed. */
   async answerManual(answer: string): Promise<void> {
     await this.act('answer_question', { answer });
   }
@@ -149,9 +167,13 @@ export class CardDeck {
     return qs[qs.length - 1] ?? null;
   });
 
-  /** The answer values a manual answer can be flipped between (matching is yes/no). */
+  /** The answer values a manual answer can be flipped between (matching / measuring). */
   amendOptions(category: string | null | undefined): string[] {
-    return category === 'matching' ? ['yes', 'no'] : [];
+    if (category === 'matching') {
+      return ['yes', 'no'];
+    }
+
+    return category === 'measuring' ? ['closer', 'further'] : [];
   }
 
   async amend(answer: string): Promise<void> {

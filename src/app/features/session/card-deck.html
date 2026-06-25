@@ -54,12 +54,18 @@
                     class="w-full rounded-lg bg-rose-600 p-2 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
               Confirm answer
             </button>
-          } @else if (pending()?.category === 'matching') {
-            <!-- Couldn't auto-detect (slow map data) — the hider answers using the shown place. -->
-            <p class="text-xs text-gray-600 dark:text-gray-300">Is the seeker's closest place also your nearest?</p>
+          } @else if (manualOptions(); as opts) {
+            <!-- No auto-truth (slow map data, or a subject with no point feature like a
+                 border / coastline) — the hider answers it themselves. -->
+            <p class="text-xs text-gray-600 dark:text-gray-300">{{ manualPrompt() }}</p>
             <div class="flex gap-2">
-              <button (click)="answerManual('yes')" [disabled]="busy()" class="flex-1 rounded-lg bg-green-600 p-2 font-semibold text-white hover:bg-green-700 disabled:opacity-40">Yes — same</button>
-              <button (click)="answerManual('no')" [disabled]="busy()" class="flex-1 rounded-lg bg-rose-600 p-2 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">No — different</button>
+              @for (o of opts; track o.value) {
+                <button (click)="answerManual(o.value)" [disabled]="busy()"
+                        class="flex-1 rounded-lg p-2 font-semibold text-white disabled:opacity-40"
+                        [class]="o.value === 'no' || o.value === 'further' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-green-600 hover:bg-green-700'">
+                  {{ o.label }}
+                </button>
+              }
             </div>
           } @else {
             <div class="rounded-lg bg-white p-2 text-center text-sm text-gray-400 dark:bg-gray-900">Computing the answer…</div>
