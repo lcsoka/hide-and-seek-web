@@ -110,6 +110,16 @@ export class OverpassService {
     return { type: 'FeatureCollection', features };
   }
 
+  /** All point features of one tag filter within `radiusKm` of a point (no name filtering). */
+  async around(lat: number, lng: number, radiusKm: number, filter: string): Promise<FeatureCollection<Point>> {
+    const radiusM = Math.round(radiusKm * 1000);
+    const ql = `[out:json][timeout:30];(nwr${filter}(around:${radiusM},${lat},${lng}););out center;`;
+    const geo = osmtogeojson(await this.run(ql)) as FeatureCollection;
+    const features = geo.features.filter((f) => f.geometry?.type === 'Point') as Feature<Point>[];
+
+    return { type: 'FeatureCollection', features };
+  }
+
   /** Resolve the Overpass tag filters for a set of selected mode ids. */
   static filtersFor(modeIds: string[]): string[] {
     return TRANSIT_MODES.filter((m) => modeIds.includes(m.id)).flatMap((m) => m.filters);

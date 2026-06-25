@@ -33,6 +33,11 @@ import { TokenStore } from '../../core/services/token-store';
                   class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
             @for (s of sizes; track s) { <option [value]="s">{{ s }}</option> }
           </select>
+          <select [(ngModel)]="units" aria-label="Units"
+                  class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
+            <option value="metric">Metric (km)</option>
+            <option value="imperial">Imperial (mi)</option>
+          </select>
         </div>
         <button (click)="create()" [disabled]="busy()"
                 class="w-full rounded-lg bg-rose-600 p-3 font-medium text-white hover:bg-rose-700 disabled:opacity-50">
@@ -71,12 +76,13 @@ export class Landing {
   name = '';
   city = 'budapest';
   size = 'medium';
+  units = 'metric';
   joinCode = '';
 
   async create(): Promise<void> {
     await this.run(async () => {
       await this.ensureToken();
-      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined });
+      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined, config: { units: this.units } });
       if (session.host_player_id) {
         this.players.set(session.id, session.host_player_id);
       }

@@ -57,7 +57,7 @@ export interface ResolvedQuestion {
   resolved_at: number | null;
   auto: boolean;
   answer: QuestionAnswer | null;
-  ask: { lat: number | null; lng: number | null; radius_m: number | null; start_lat: number | null; start_lng: number | null };
+  ask: { lat: number | null; lng: number | null; radius_m: number | null; feature: string | null; start_lat: number | null; start_lng: number | null };
   end: { lat: number | null; lng: number | null };
 }
 
