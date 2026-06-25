@@ -1,4 +1,4 @@
-import { bbox, bearing, buffer, circle, destination, difference, featureCollection, intersect, midpoint, point, pointToPolygonDistance, simplify, voronoi } from '@turf/turf';
+import { bbox, buffer, circle, difference, featureCollection, intersect, point, pointToPolygonDistance, simplify, voronoi } from '@turf/turf';
 import { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from 'geojson';
 import { modifyMapData, Poly } from './operators';
 
@@ -72,23 +72,44 @@ export function radarCircle(q: RadarQuestion): Poly {
 
 /**
  * Half-plane of points closer to B than A (the perpendicular bisector of A–B).
- * `towardB = true` returns B's side (warmer), `false` returns A's side. Built as a
- * large rectangle straddling the bisector — far larger than any city play area.
+ * `towardB = true` returns B's side (warmer), `false` returns A's side.
+ *
+ * Built as a large PLANAR quad in lng/lat (lng scaled by cos(lat) so the bisector is
+ * truly perpendicular). A planar quad stays simple at any bearing — the earlier
+ * geodesic-`destination` version could self-intersect over its 600 km reach, which
+ * silently left the candidate uncut.
  */
 export function thermometerHalfPlane(q: ThermometerQuestion, towardB: boolean): Poly {
-  const a = point([q.aLng, q.aLat]);
-  const b = point([q.bLng, q.bLat]);
-  const brng = bearing(a, b);
-  const mid = midpoint(a, b);
-  const reach = 600; // km — comfortably beyond any city-scale play area
-  const side = towardB ? brng : brng + 180;
+  const midLat = (q.aLat + q.bLat) / 2;
+  const k = Math.cos((midLat * Math.PI) / 180) || 1; // lng→x scale at this latitude
 
-  const f1 = destination(mid, reach, brng + 90, { units: 'kilometers' });
-  const f2 = destination(mid, reach, brng - 90, { units: 'kilometers' });
-  const g1 = destination(f1, 2 * reach, side, { units: 'kilometers' });
-  const g2 = destination(f2, 2 * reach, side, { units: 'kilometers' });
+  // Unit vector A→B in the scaled plane.
+  let ux = (q.bLng - q.aLng) * k;
+  let uy = q.bLat - q.aLat;
+  const len = Math.hypot(ux, uy) || 1;
+  ux /= len;
+  uy /= len;
+  if (!towardB) {
+    ux = -ux;
+    uy = -uy;
+  }
+  // Perpendicular (along the bisector) in the scaled plane.
+  const px = -uy;
+  const py = ux;
 
-  const ring = [f1, g1, g2, f2, f1].map((p) => p.geometry.coordinates);
+  const mx = (q.aLng + q.bLng) / 2;
+  const my = midLat;
+  const reach = 8; // scaled degrees (~800 km) — beyond any play area, keeps the quad simple
+  // Back to lng/lat from scaled (x, y) offsets at the midpoint.
+  const at = (sx: number, sy: number): [number, number] => [mx + sx / k, my + sy];
+
+  const ring = [
+    at(px * reach, py * reach), // bisector, one end
+    at(px * reach + ux * 2 * reach, py * reach + uy * 2 * reach), // pushed toward B
+    at(-px * reach + ux * 2 * reach, -py * reach + uy * 2 * reach),
+    at(-px * reach, -py * reach), // bisector, other end
+    at(px * reach, py * reach),
+  ];
 
   return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } } as Feature<Polygon>;
 }

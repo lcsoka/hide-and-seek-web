@@ -36,6 +36,21 @@ describe('deduction engine', () => {
     expect(booleanPointInPolygon(point([BUD.lng - 0.15, BUD.lat]), result)).toBe(false); // toward A
   });
 
+  it('cuts a SHORT, NE-bearing thermometer (regression: geodesic build self-intersected → no cut)', () => {
+    const base = playArea(47.4825, 19.068, 10);
+    const q: ThermometerQuestion = {
+      id: 't', type: 'thermometer',
+      aLat: 47.480436, aLng: 19.066858, bLat: 47.484613, bLng: 19.069562, warmer: true,
+    };
+    const result = applyQuestions(base, [q])!;
+
+    const ratio = area(result) / area(base);
+    expect(ratio).toBeGreaterThan(0.2);
+    expect(ratio).toBeLessThan(0.8); // it genuinely halved the area, not left it whole
+    expect(booleanPointInPolygon(point([19.0739, 47.4917]), result)).toBe(true); // warmer (B) side kept
+    expect(booleanPointInPolygon(point([19.0621, 47.4733]), result)).toBe(false); // colder (A) side dropped
+  });
+
   it('combines questions by intersection', () => {
     const base = playArea(BUD.lat, BUD.lng, 50);
     const radar: RadarQuestion = { id: '1', type: 'radar', lat: BUD.lat, lng: BUD.lng, radiusKm: 20, within: true };
