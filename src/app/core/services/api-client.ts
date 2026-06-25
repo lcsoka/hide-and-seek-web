@@ -45,6 +45,14 @@ export class ApiClient {
     return firstValueFrom(this.http.post(`${this.base}/sessions/${id}/location`, { lat, lng }));
   }
 
+  /** Upload an in-game image (photo answer, curse proof); returns its public URL. */
+  uploadMedia(id: string, file: File): Promise<{ path: string; url: string }> {
+    const form = new FormData();
+    form.append('image', file);
+
+    return firstValueFrom(this.http.post<{ path: string; url: string }>(`${this.base}/sessions/${id}/media`, form));
+  }
+
   questionsCatalog(): Promise<QuestionCatalogItem[]> {
     return firstValueFrom(this.http.get<QuestionCatalogItem[]>(`${this.base}/questions`));
   }

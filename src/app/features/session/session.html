@@ -37,7 +37,7 @@
         } @else if (s.state === 'hiding' && role(s) === 'hider') {
           <app-hider-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" />
         } @else if (role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame')) {
-          <app-seeker-panel [state]="s" (openPicker)="openAsk()" />
+          <app-seeker-panel [state]="s" [sessionId]="s.session_id" (openPicker)="openAsk()" />
         } @else if (role(s) === 'hider' && (s.state === 'seeking' || s.state === 'endgame')) {
           <app-card-deck [state]="s" [sessionId]="s.session_id" />
         } @else {

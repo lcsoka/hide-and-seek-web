@@ -42,9 +42,10 @@ export interface HidingZone {
 }
 
 export interface QuestionAnswer {
-  answer: string; // yes/no, hotter/colder, closer/further, in_range/out_of_range
+  answer: string; // yes/no, hotter/colder, closer/further, in_range/out_of_range, photo
   radius_m?: number;
   feature_name?: string;
+  photo_url?: string; // photo questions
 }
 
 /** An answered question, as a seeker sees it (own positions + the answer, no hider location). */
@@ -62,11 +63,17 @@ export interface ResolvedQuestion {
 }
 
 export interface ActiveCurse {
+  uid: string | null;
   curse_id: string | null;
   by: string | null;
   at: number | null;
   name: string | null;
   cost: string | null;
+  description: string | null;
+  requires_proof: boolean;
+  expires_at: number | null;
+  status: 'active' | 'completed' | 'expired';
+  proof_url: string | null;
 }
 
 export interface GameTimers {

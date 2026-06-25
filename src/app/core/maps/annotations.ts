@@ -14,6 +14,7 @@ export interface MapAnnotation {
   radarKm?: number;
   within?: boolean;
   thermo?: { a: Position; b: Position };
+  photoUrl?: string;
 }
 
 function midpoint(a: Position, b: Position): Position {
@@ -44,6 +45,15 @@ export function buildAnnotations(questions: ResolvedQuestion[], units: Units): M
       const b: Position = { lat: q.end.lat, lng: q.end.lng };
 
       return { ...base, point: midpoint(a, b), thermo: { a, b }, effect: answer === 'hotter' ? 'Got warmer this way' : 'Got colder this way' };
+    }
+
+    if (q.category === 'photo') {
+      return {
+        ...base,
+        point: q.ask.lat != null && q.ask.lng != null ? { lat: q.ask.lat, lng: q.ask.lng } : null,
+        effect: 'Photo clue',
+        photoUrl: q.answer?.photo_url,
+      };
     }
 
     const effect = answer === 'in_range' && q.answer?.feature_name

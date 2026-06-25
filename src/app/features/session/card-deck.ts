@@ -1,12 +1,15 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { GameState } from '../../core/models/models';
+import { ActiveCurse, GameState } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
+import { Clock, formatCountdown } from '../../core/services/clock';
 import { HidingState } from '../../core/services/hiding-state';
 import { SessionStore } from '../../core/services/session-store';
+import { ImageUpload } from './image-upload';
 
 /** The hider's hand of curse cards: answer pending questions and play curses, with a draw animation. */
 @Component({
   selector: 'app-card-deck',
+  imports: [ImageUpload],
   templateUrl: './card-deck.html',
   styles: [
     `
@@ -29,6 +32,7 @@ import { SessionStore } from '../../core/services/session-store';
 export class CardDeck {
   private readonly api = inject(ApiClient);
   private readonly store = inject(SessionStore);
+  private readonly clock = inject(Clock);
   private readonly hiding = inject(HidingState);
 
   readonly state = input.required<GameState>();
@@ -40,8 +44,10 @@ export class CardDeck {
 
   readonly hand = computed(() => this.state().hand ?? []);
   readonly pending = computed(() => this.state().pending_question);
+  readonly isPhoto = computed(() => this.pending()?.category === 'photo');
   readonly canAnswer = computed(() => this.state().available_actions.includes('answer_question'));
   readonly canRelocate = computed(() => this.state().available_actions.includes('choose_station'));
+  readonly playedCurses = computed(() => this.state().curses);
 
   constructor() {
     // When the hand grows (a draw), animate the newly added cards in.
@@ -62,6 +68,20 @@ export class CardDeck {
 
   async answer(): Promise<void> {
     await this.act('answer_question', {});
+  }
+
+  /** Answer a photo question with the uploaded image. */
+  async answerPhoto(url: string): Promise<void> {
+    await this.act('answer_question', { photo_url: url });
+  }
+
+  /** Remaining time for a timed curse the hider played, or null. */
+  countdown(curse: ActiveCurse): string | null {
+    if (curse.status !== 'active' || curse.expires_at == null) {
+      return null;
+    }
+
+    return formatCountdown(curse.expires_at - this.clock.nowMs() / 1000);
   }
 
   /** Re-hide at the station nearest the hider's current position (allowed only while unlocked). */

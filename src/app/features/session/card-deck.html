@@ -19,10 +19,41 @@
     <div class="rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-950">
       <p class="text-sm">Seekers asked a <b class="capitalize">{{ q.category }}</b> question.</p>
       @if (canAnswer()) {
-        <button (click)="answer()" [disabled]="busy()"
-                class="mt-2 w-full rounded-lg bg-rose-600 p-2 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
-          Answer
-        </button>
+        @if (isPhoto()) {
+          <p class="mt-1 text-xs text-gray-600 dark:text-gray-300">Take or pick a photo to send back.</p>
+          <app-image-upload class="mt-2 block" [sessionId]="sessionId()" label="📷 Send a photo"
+                            cssClass="block w-full cursor-pointer rounded-lg bg-rose-600 p-2 text-center font-semibold text-white hover:bg-rose-700"
+                            (uploaded)="answerPhoto($event)" />
+        } @else {
+          <button (click)="answer()" [disabled]="busy()"
+                  class="mt-2 w-full rounded-lg bg-rose-600 p-2 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
+            Answer
+          </button>
+        }
+      }
+    </div>
+  }
+
+  @if (playedCurses().length) {
+    <div class="space-y-2">
+      <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300">Curses in play</h3>
+      @for (c of playedCurses(); track c.uid) {
+        <div class="flex items-center justify-between gap-2 rounded-lg border border-purple-300 bg-purple-50 p-2 text-xs dark:border-purple-700 dark:bg-purple-950">
+          <span class="min-w-0 flex-1 truncate font-medium">{{ c.name ?? 'Curse' }}</span>
+          @if (countdown(c); as left) {
+            <span class="shrink-0 font-mono font-bold text-purple-700 dark:text-purple-300">⏳ {{ left }}</span>
+          } @else if (c.status === 'completed') {
+            @if (c.proof_url) {
+              <a [href]="c.proof_url" target="_blank" rel="noopener" class="shrink-0">
+                <img [src]="c.proof_url" alt="Proof" class="h-9 w-9 rounded object-cover ring-1 ring-black/10" />
+              </a>
+            } @else {
+              <span class="shrink-0 text-green-600 dark:text-green-400">✓ done</span>
+            }
+          } @else if (c.requires_proof) {
+            <span class="shrink-0 text-gray-500 dark:text-gray-400">awaiting proof…</span>
+          }
+        </div>
       }
     </div>
   }
