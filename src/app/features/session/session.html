@@ -12,7 +12,7 @@
     <!-- Full-bleed map -->
     <div class="absolute inset-0">
       @if (showDeductionMap(s)) {
-        <app-deduction-map class="block h-full" [candidate]="deduction.candidate()" [questions]="deduction.markerQuestions()"
+        <app-deduction-map class="block h-full" [candidate]="deduction.candidate()" [annotations]="deduction.annotations()"
                            [autoZoom]="!devPlacing()" (mapClick)="onMapClick($event)" />
       } @else {
         <app-map class="block h-full" [players]="s.players" [zone]="s.hiding_zone"
@@ -37,7 +37,7 @@
         } @else if (s.state === 'hiding' && role(s) === 'hider') {
           <app-hider-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" />
         } @else if (role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame')) {
-          <app-seeker-panel [state]="s" [sessionId]="s.session_id" />
+          <app-seeker-panel [state]="s" (openPicker)="openAsk()" />
         } @else if (role(s) === 'hider' && (s.state === 'seeking' || s.state === 'endgame')) {
           <app-card-deck [state]="s" [sessionId]="s.session_id" />
         } @else {
@@ -65,5 +65,8 @@
     @if (devMode) {
       <app-dev-tools [state]="s" [sessionId]="s.session_id" [placing]="devPlacing()" (placingChange)="devPlacing.set($event)" />
     }
+
+    <app-question-picker [catalog]="catalog()" [units]="askUnits(s)" [open]="pickerOpen()"
+                         (ask)="onAsk(s, $event)" (closeChange)="pickerOpen.set($event)" />
   </div>
 }

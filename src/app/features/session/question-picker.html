@@ -1,0 +1,48 @@
+@if (open()) {
+  <div class="fixed inset-0 z-[800] flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center" (click)="close()">
+    <div class="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-4 shadow-2xl dark:bg-gray-900 sm:rounded-3xl" (click)="$event.stopPropagation()">
+      <div class="mb-3 flex items-center justify-between">
+        <h2 class="flex items-center gap-1 text-lg font-bold">
+          @if (selected(); as c) {
+            <button (click)="back()" class="text-gray-400 hover:text-gray-600">‹</button>
+            <span>{{ meta(c).icon }} {{ meta(c).label }}</span>
+          } @else {
+            Ask a question
+          }
+        </h2>
+        <button (click)="close()" class="text-xl text-gray-400 hover:text-gray-600">✕</button>
+      </div>
+
+      @if (!selected()) {
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          @for (c of categories(); track c) {
+            <button (click)="pick(c)"
+                    class="flex flex-col items-start gap-1 rounded-2xl border border-gray-200 p-3 text-left transition hover:border-rose-400 hover:bg-rose-50 dark:border-gray-700 dark:hover:border-rose-600 dark:hover:bg-rose-950">
+              <span class="text-2xl">{{ meta(c).icon }}</span>
+              <span class="font-semibold">{{ meta(c).label }}</span>
+              <span class="text-xs leading-snug text-gray-500 dark:text-gray-400">{{ meta(c).hint }}</span>
+            </button>
+          }
+        </div>
+      } @else {
+        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">{{ meta(selected()!).hint }}</p>
+        @for (q of categoryQuestions(); track q.id) {
+          <div class="mb-2 rounded-xl border border-gray-200 p-3 dark:border-gray-700">
+            <div class="mb-2 text-sm font-medium">{{ q.title }}</div>
+            @if (q.category === 'radar') {
+              <div class="flex flex-wrap gap-1.5">
+                @for (d of radarPresets(); track d.meters) {
+                  <button (click)="askRadar(q, d.meters)" class="rounded-full bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700">{{ d.label }}</button>
+                }
+              </div>
+            } @else {
+              <button (click)="askGeneric(q)" class="rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700">Ask this</button>
+            }
+          </div>
+        } @empty {
+          <p class="text-sm text-gray-400">No questions in this category.</p>
+        }
+      }
+    </div>
+  </div>
+}

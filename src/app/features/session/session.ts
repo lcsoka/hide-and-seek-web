@@ -1,7 +1,8 @@
 import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { GameState, Position } from '../../core/models/models';
+import { GameState, Position, QuestionCatalogItem } from '../../core/models/models';
+import { unitsOf } from '../../core/util/units';
 import { ApiClient } from '../../core/services/api-client';
 import { DeductionState } from '../../core/services/deduction-state';
 import { HidingState } from '../../core/services/hiding-state';
@@ -19,6 +20,7 @@ import { HiderPanel } from './hider-panel';
 import { HostPanel } from './host-panel';
 import { LobbyPanel } from './lobby-panel';
 import { MapView } from './map';
+import { QuestionPicker } from './question-picker';
 import { SeekerPanel } from './seeker-panel';
 
 // Actions with a dedicated panel — kept out of the generic button row.
@@ -37,7 +39,7 @@ const STATUS_HINTS: Record<string, string> = {
 @Component({
   selector: 'app-session',
   host: { class: 'block h-[100dvh] w-full' },
-  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools],
+  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -56,6 +58,8 @@ export class SessionView {
   readonly label = actionLabel;
   readonly devMode = !!environment.developerToken;
   readonly devPlacing = signal(false);
+  readonly pickerOpen = signal(false);
+  readonly catalog = signal<QuestionCatalogItem[]>([]);
 
   private readonly tick = signal(0);
   private offset = 0;
@@ -134,6 +138,23 @@ export class SessionView {
 
   visibleActions(s: GameState): string[] {
     return s.available_actions.filter((a) => !PANEL_ACTIONS.includes(a));
+  }
+
+  askUnits(s: GameState): 'metric' | 'imperial' {
+    return unitsOf(s.config);
+  }
+
+  openAsk(): void {
+    if (!this.catalog().length) {
+      void this.api.questionsCatalog().then((c) => this.catalog.set(c));
+    }
+    this.pickerOpen.set(true);
+  }
+
+  async onAsk(s: GameState, event: { questionId: string; payload: Record<string, unknown> }): Promise<void> {
+    this.pickerOpen.set(false);
+    await this.api.submitAction(s.session_id, 'ask_question', { question_id: event.questionId, ...event.payload });
+    this.store.refresh();
   }
 
   /** Dev-only: tapping the map sets this player's simulated position. */

@@ -2,6 +2,7 @@ import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, inp
 import { bbox } from '@turf/turf';
 import { Feature, FeatureCollection, GeoJsonObject, Point } from 'geojson';
 import * as L from 'leaflet';
+import { MapAnnotation } from '../../core/maps/annotations';
 import { DeductionQuestion } from '../../core/maps/deduction';
 import { holedMask, Poly } from '../../core/maps/operators';
 import { Position } from '../../core/models/models';
@@ -22,6 +23,7 @@ export class DeductionMap {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
   readonly candidate = input<Poly | null>(null);
   readonly questions = input<DeductionQuestion[]>([]);
+  readonly annotations = input<MapAnnotation[]>([]); // numbered, explained question markers
   readonly stations = input<FeatureCollection<Point> | null>(null);
   readonly points = input<FeatureCollection<Point> | null>(null); // highlighted POIs (e.g. tentacle candidates)
   readonly overlays = input<Feature[]>([]); // e.g. admin borders, drawn as outlines
@@ -37,6 +39,7 @@ export class DeductionMap {
     effect(() => {
       this.candidate();
       this.questions();
+      this.annotations();
       this.stations();
       this.points();
       this.overlays();
@@ -116,6 +119,29 @@ export class DeductionMap {
       }
     }
 
+    // Numbered, explained markers per answered question — show WHICH question cut the map and HOW.
+    for (const a of this.annotations()) {
+      if (a.radarKm != null && a.point) {
+        L.circle([a.point.lat, a.point.lng], {
+          radius: a.radarKm * 1000,
+          color: a.within ? '#2563eb' : '#ef4444',
+          weight: 1.5,
+          dashArray: a.within ? undefined : '5',
+          fillOpacity: 0.05,
+        }).addTo(this.overlay);
+      }
+      if (a.thermo) {
+        L.polyline([[a.thermo.a.lat, a.thermo.a.lng], [a.thermo.b.lat, a.thermo.b.lng]], { color: '#f59e0b', weight: 2, dashArray: '4' }).addTo(this.overlay);
+        L.circleMarker([a.thermo.a.lat, a.thermo.a.lng], { radius: 4, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 1 }).addTo(this.overlay);
+        L.circleMarker([a.thermo.b.lat, a.thermo.b.lng], { radius: 4, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 1 }).addTo(this.overlay);
+      }
+      if (a.point) {
+        L.marker([a.point.lat, a.point.lng], { icon: this.badge(a.n) })
+          .bindTooltip(`#${a.n} ${a.icon} ${a.effect}`, { permanent: true, direction: 'top', offset: [0, -12], opacity: 0.95 })
+          .addTo(this.overlay);
+      }
+    }
+
     if (this.autoZoom() && cand) {
       try {
         const [minX, minY, maxX, maxY] = bbox(cand);
@@ -124,5 +150,15 @@ export class DeductionMap {
         // empty / degenerate candidate — leave the view as-is
       }
     }
+  }
+
+  /** A small numbered pin (matches the history list numbering). */
+  private badge(n: number): L.DivIcon {
+    return L.divIcon({
+      html: `<div style="background:#0f172a;color:#fff;min-width:22px;height:22px;padding:0 5px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font:700 12px system-ui;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)">${n}</div>`,
+      className: '',
+      iconSize: [22, 22],
+      iconAnchor: [11, 11],
+    });
   }
 }

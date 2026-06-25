@@ -1,9 +1,11 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { buildAnnotations } from '../maps/annotations';
 import { applyQuestions, DeductionQuestion, playArea, RegionQuestion } from '../maps/deduction';
 import { resolvedQuestionsToDeduction } from '../maps/game-deduction';
 import { isOsmCategory, osmRegion } from '../maps/osm-deduction';
 import { OverpassService } from '../maps/overpass';
 import { Poly } from '../maps/operators';
+import { unitsOf } from '../util/units';
 import { SessionStore } from './session-store';
 
 /**
@@ -24,6 +26,8 @@ export class DeductionState {
 
   readonly markerQuestions = computed(() => resolvedQuestionsToDeduction(this.store.state()?.questions ?? []));
   readonly narrowedCount = computed(() => this.markerQuestions().length + this.osmRegions().size);
+  /** Numbered, explained markers for every answered question (shared by the map + history). */
+  readonly annotations = computed(() => buildAnnotations(this.store.state()?.questions ?? [], unitsOf(this.store.state()?.config)));
 
   readonly candidate = computed(() => {
     const s = this.store.state();
