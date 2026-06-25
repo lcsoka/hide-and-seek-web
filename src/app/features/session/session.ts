@@ -7,12 +7,17 @@ import { PlayerStore } from '../../core/services/player-store';
 import { Realtime } from '../../core/services/realtime';
 import { SessionStore } from '../../core/services/session-store';
 import { actionLabel } from '../../core/util/labels';
+import { HiderPanel } from './hider-panel';
+import { HostPanel } from './host-panel';
 import { MapView } from './map';
 import { SeekerPanel } from './seeker-panel';
 
+// Actions that have their own dedicated panel — hidden from the generic button row.
+const PANEL_ACTIONS = ['assign_hider', 'choose_station', 'confirm_hidden', 'ask_question'];
+
 @Component({
   selector: 'app-session',
-  imports: [RouterLink, MapView, SeekerPanel],
+  imports: [RouterLink, MapView, SeekerPanel, HostPanel, HiderPanel],
   template: `
     <main class="mx-auto w-full max-w-lg space-y-4 p-4 sm:p-6">
       <a routerLink="/" class="text-sm text-rose-600">← Home</a>
@@ -46,6 +51,10 @@ import { SeekerPanel } from './seeker-panel';
 
         @if (role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame')) {
           <app-seeker-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" />
+        } @else if (s.state === 'role_assignment' && isHost(s)) {
+          <app-host-panel [state]="s" [sessionId]="s.session_id" />
+        } @else if (s.state === 'hiding' && role(s) === 'hider') {
+          <app-hider-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" />
         } @else {
           <app-map [players]="s.players" [zone]="s.hiding_zone" />
         }
@@ -75,16 +84,18 @@ import { SeekerPanel } from './seeker-panel';
           </section>
         }
 
-        <section class="flex flex-wrap gap-2">
-          @for (a of s.available_actions; track a) {
-            <button (click)="act(a)" [disabled]="acting()"
-                    class="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50">
-              {{ label(a) }}
-            </button>
-          } @empty {
-            <p class="text-sm text-gray-400">No actions available right now.</p>
+        @if (visibleActions(s); as actions) {
+          @if (actions.length) {
+            <section class="flex flex-wrap gap-2">
+              @for (a of actions; track a) {
+                <button (click)="act(a)" [disabled]="acting()"
+                        class="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50">
+                  {{ label(a) }}
+                </button>
+              }
+            </section>
           }
-        </section>
+        }
 
         @if (store.feed().length) {
           <section class="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
@@ -119,13 +130,22 @@ export class SessionView {
     if (sessionId) {
       this.myId.set(this.players.get(sessionId));
       this.store.setSession(sessionId);
-      this.realtime.connect(sessionId, null, (name) => this.store.onEvent(name));
+      this.realtime.connect(sessionId, this.myId(), (name) => this.store.onEvent(name));
       this.location.start(sessionId);
     }
   }
 
   role(s: GameState): string | null {
     return s.players.find((p) => p.id === this.myId())?.role ?? null;
+  }
+
+  isHost(s: GameState): boolean {
+    return s.players.find((p) => p.id === this.myId())?.is_host ?? false;
+  }
+
+  /** Available actions minus the ones handled by a dedicated panel. */
+  visibleActions(s: GameState): string[] {
+    return s.available_actions.filter((a) => !PANEL_ACTIONS.includes(a));
   }
 
   async copyCode(code: string): Promise<void> {

@@ -4,21 +4,18 @@ import Pusher from 'pusher-js';
 import { environment } from '../../../environments/environment';
 import { TokenStore } from './token-store';
 
-const SESSION_EVENTS = [
-  'RoundStarted', 'HidingStarted', 'SeekingStarted', 'QuestionAsked', 'QuestionAnswered',
-  'CursePlayed', 'EndgameTriggered', 'HiderFound', 'GuessMissed', 'RoundEnded', 'GameEnded', 'LocationUpdated',
-];
-
 /**
- * Laravel Echo + pusher-js pointed at Reverb. Subscribes to the session presence
- * channel (everyone events) and the player's private channel (player-scoped events).
- * Typed loosely (`any`) to avoid laravel-echo v2 generic friction; behaviour is
- * verified against a running Reverb server.
+ * Laravel Echo + pusher-js pointed at Reverb. Joins the session presence channel
+ * (everyone events) and the player's private channel (player-scoped events), and
+ * listens to ALL events so every server-authoritative change re-hydrates the store
+ * — no event allowlist to keep in sync. Typed loosely (`any`) to avoid laravel-echo
+ * v2 generic friction.
  */
 @Injectable({ providedIn: 'root' })
 export class Realtime {
   private readonly tokens = inject(TokenStore);
   private echo: any = null;
+  private joined: string | null = null;
 
   connect(sessionId: string, playerId: string | null, onEvent: (name: string) => void): void {
     if (!this.echo) {
@@ -36,18 +33,27 @@ export class Realtime {
       });
     }
 
-    const presence = this.echo.join(`session.${sessionId}`);
-    for (const name of SESSION_EVENTS) {
-      presence.listen(`.${name}`, () => onEvent(name));
+    // The store is a singleton; don't double-subscribe to the same session.
+    if (this.joined === sessionId) {
+      return;
     }
+    this.joined = sessionId;
+
+    const fire = (event: string) => {
+      if (!event.startsWith('pusher:')) {
+        onEvent(event.replace(/^\./, ''));
+      }
+    };
+
+    this.echo.join(`session.${sessionId}`).listenToAll((event: string) => fire(event));
 
     if (playerId) {
-      this.echo.private(`session.${sessionId}.player.${playerId}`)
-        .listen('.HidingZoneChosen', () => onEvent('HidingZoneChosen'));
+      this.echo.private(`session.${sessionId}.player.${playerId}`).listenToAll((event: string) => fire(event));
     }
   }
 
   disconnect(): void {
     this.echo?.leaveAllChannels?.();
+    this.joined = null;
   }
 }
