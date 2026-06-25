@@ -1,0 +1,60 @@
+<button (click)="open.set(!open())"
+        class="fixed bottom-3 left-3 z-[700] grid h-11 w-11 place-items-center rounded-full bg-gray-900/90 text-lg text-white shadow-xl ring-1 ring-white/20 backdrop-blur">🛠</button>
+
+@if (open()) {
+  <div class="fixed bottom-16 left-3 z-[700] w-80 max-w-[calc(100vw-1.5rem)] space-y-3 overflow-y-auto rounded-2xl bg-gray-900/95 p-3 text-sm text-gray-100 shadow-2xl ring-1 ring-white/15 backdrop-blur"
+       style="max-height: 70vh">
+    <div class="flex items-center justify-between">
+      <h3 class="font-bold">Debug tools</h3>
+      <button (click)="open.set(false)" class="text-gray-400 hover:text-white">✕</button>
+    </div>
+
+    <section class="space-y-2 rounded-lg bg-white/5 p-2">
+      <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">My position</p>
+      <button (click)="togglePlacing()" [class]="placing() ? activeBtn : btn">
+        {{ placing() ? 'Tap the map to move…' : 'Set by tapping the map' }}
+      </button>
+      <div class="flex flex-wrap gap-1">
+        <button (click)="preset('city')" [class]="ghost">City centre</button>
+        <button (click)="preset('north')" [class]="ghost">+3 km N</button>
+        <button (click)="preset('east')" [class]="ghost">+5 km E</button>
+      </div>
+    </section>
+
+    <section class="space-y-2 rounded-lg bg-white/5 p-2">
+      <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Players</p>
+      <div class="flex items-center gap-2">
+        <input type="number" min="1" max="10" [(ngModel)]="seedCount" class="w-16 rounded bg-white/10 px-2 py-1" />
+        <button (click)="seed()" [class]="btn">Seed bots</button>
+      </div>
+    </section>
+
+    <section class="space-y-2 rounded-lg bg-white/5 p-2">
+      <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Flow</p>
+      <div class="flex items-center gap-2">
+        <select [(ngModel)]="forceStateValue" class="flex-1 rounded bg-white/10 px-2 py-1">
+          @for (s of states; track s) { <option class="text-black" [value]="s">{{ s }}</option> }
+        </select>
+        <button (click)="force()" [class]="btn">Force</button>
+      </div>
+      <div class="flex flex-wrap gap-1">
+        <button (click)="expire('question_answer')" [class]="ghost">Expire question</button>
+        <button (click)="expire('hiding_deadline')" [class]="ghost">Expire hiding</button>
+      </div>
+    </section>
+
+    <section class="space-y-2 rounded-lg bg-white/5 p-2">
+      <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Act as player</p>
+      <select [(ngModel)]="actPlayer" class="w-full rounded bg-white/10 px-2 py-1">
+        <option class="text-black" value="">— player —</option>
+        @for (p of state().players; track p.id) {
+          <option class="text-black" [value]="p.id">{{ p.display_name }}{{ p.role ? ' (' + p.role + ')' : '' }}</option>
+        }
+      </select>
+      <input [(ngModel)]="actType" placeholder="action type (e.g. confirm_hidden)" class="w-full rounded bg-white/10 px-2 py-1" />
+      <button (click)="actAs()" [disabled]="!actPlayer" [class]="btn">Submit as player</button>
+    </section>
+
+    @if (error(); as e) { <p class="text-xs text-red-400">{{ e }}</p> }
+  </div>
+}

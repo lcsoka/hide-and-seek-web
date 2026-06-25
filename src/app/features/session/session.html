@@ -12,9 +12,10 @@
     <!-- Full-bleed map -->
     <div class="absolute inset-0">
       @if (showDeductionMap(s)) {
-        <app-deduction-map class="block h-full" [candidate]="deduction.candidate()" [questions]="deduction.markerQuestions()" [autoZoom]="true" />
+        <app-deduction-map class="block h-full" [candidate]="deduction.candidate()" [questions]="deduction.markerQuestions()"
+                           [autoZoom]="!devPlacing()" (mapClick)="onMapClick($event)" />
       } @else {
-        <app-map class="block h-full" [players]="s.players" [zone]="s.hiding_zone" />
+        <app-map class="block h-full" [players]="s.players" [zone]="s.hiding_zone" (mapClick)="onMapClick($event)" />
       }
     </div>
 
@@ -56,5 +57,9 @@
         }
       </div>
     </aside>
+
+    @if (devMode) {
+      <app-dev-tools [state]="s" [sessionId]="s.session_id" [placing]="devPlacing()" (placingChange)="devPlacing.set($event)" />
+    }
   </div>
 }

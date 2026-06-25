@@ -1,6 +1,7 @@
 import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { GameState } from '../../core/models/models';
+import { environment } from '../../../environments/environment';
+import { GameState, Position } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { DeductionState } from '../../core/services/deduction-state';
 import { LocationTracker } from '../../core/services/location';
@@ -10,6 +11,7 @@ import { SessionStore } from '../../core/services/session-store';
 import { computeGameTimer, GameTimer } from '../../core/util/game-timer';
 import { actionLabel } from '../../core/util/labels';
 import { DeductionMap } from '../map/deduction-map';
+import { DevTools } from './dev-tools';
 import { GameHud } from './game-hud';
 import { HiderPanel } from './hider-panel';
 import { HostPanel } from './host-panel';
@@ -33,7 +35,7 @@ const STATUS_HINTS: Record<string, string> = {
 @Component({
   selector: 'app-session',
   host: { class: 'block h-[100dvh] w-full' },
-  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel],
+  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, DevTools],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -49,6 +51,8 @@ export class SessionView {
   readonly myId = signal<string | null>(null);
   readonly acting = signal(false);
   readonly label = actionLabel;
+  readonly devMode = !!environment.developerToken;
+  readonly devPlacing = signal(false);
 
   private readonly tick = signal(0);
   private offset = 0;
@@ -102,6 +106,14 @@ export class SessionView {
 
   visibleActions(s: GameState): string[] {
     return s.available_actions.filter((a) => !PANEL_ACTIONS.includes(a));
+  }
+
+  /** Dev-only: tapping the map sets this player's simulated position. */
+  onMapClick(p: Position): void {
+    const sessionId = this.id();
+    if (this.devMode && this.devPlacing() && sessionId) {
+      void this.api.reportLocation(sessionId, p.lat, p.lng).then(() => this.store.refresh());
+    }
   }
 
   async act(type: string): Promise<void> {

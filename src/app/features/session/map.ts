@@ -1,6 +1,6 @@
-import { afterNextRender, Component, effect, ElementRef, input, viewChild } from '@angular/core';
+import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
-import { HidingZone, PlayerView } from '../../core/models/models';
+import { HidingZone, PlayerView, Position } from '../../core/models/models';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
 
@@ -13,6 +13,7 @@ export class MapView {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
   readonly players = input<PlayerView[]>([]);
   readonly zone = input<HidingZone | null>(null);
+  readonly mapClick = output<Position>();
 
   private map?: L.Map;
   private overlay?: L.LayerGroup;
@@ -33,6 +34,7 @@ export class MapView {
       attribution: '© OpenStreetMap',
       maxZoom: 19,
     }).addTo(this.map);
+    this.map.on('click', (e: L.LeafletMouseEvent) => this.mapClick.emit({ lat: e.latlng.lat, lng: e.latlng.lng }));
     setTimeout(() => this.map?.invalidateSize(), 100);
     this.render();
   }
