@@ -11,6 +11,7 @@ import { SessionStore } from '../../core/services/session-store';
 import { computeGameTimer, GameTimer } from '../../core/util/game-timer';
 import { actionLabel } from '../../core/util/labels';
 import { DeductionMap } from '../map/deduction-map';
+import { CardDeck } from './card-deck';
 import { DevTools } from './dev-tools';
 import { GameHud } from './game-hud';
 import { HiderPanel } from './hider-panel';
@@ -20,7 +21,7 @@ import { MapView } from './map';
 import { SeekerPanel } from './seeker-panel';
 
 // Actions with a dedicated panel — kept out of the generic button row.
-const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question'];
+const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse'];
 
 const STATUS_HINTS: Record<string, string> = {
   role_assignment: 'Waiting for the host to assign roles…',
@@ -35,7 +36,7 @@ const STATUS_HINTS: Record<string, string> = {
 @Component({
   selector: 'app-session',
   host: { class: 'block h-[100dvh] w-full' },
-  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, DevTools],
+  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools],
   templateUrl: './session.html',
 })
 export class SessionView {

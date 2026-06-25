@@ -97,6 +97,14 @@ export interface CurseCatalogItem {
   parameters: Record<string, unknown> | null;
 }
 
+/** A curse card in the hider's hand. */
+export interface HandCard {
+  curse_id: string;
+  name: string | null;
+  cost: string | null;
+  description: string | null;
+}
+
 export interface GameState {
   session_id: string;
   join_code: string;
@@ -113,6 +121,7 @@ export interface GameState {
   curses: ActiveCurse[];
   timers: GameTimers;
   hiding_zone: HidingZone | null;
+  hand: HandCard[];
 }
 
 export interface GodPlayer {

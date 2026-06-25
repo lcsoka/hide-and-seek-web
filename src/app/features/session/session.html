@@ -36,6 +36,8 @@
           <app-hider-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" />
         } @else if (role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame')) {
           <app-seeker-panel [state]="s" [sessionId]="s.session_id" />
+        } @else if (role(s) === 'hider' && (s.state === 'seeking' || s.state === 'endgame')) {
+          <app-card-deck [state]="s" [sessionId]="s.session_id" />
         } @else {
           <div class="space-y-1">
             <h2 class="text-lg font-bold">{{ prettyState(s.state) }}</h2>
