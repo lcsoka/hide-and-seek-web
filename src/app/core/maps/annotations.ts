@@ -48,7 +48,7 @@ export function buildAnnotations(questions: ResolvedQuestion[], units: Units): M
 
     const effect = answer === 'in_range' && q.answer?.feature_name
       ? `Nearest: ${q.answer.feature_name}`
-      : { yes: 'Same place', no: 'Different place', closer: 'Closer to it', further: 'Further from it', out_of_range: 'Out of range' }[answer] ?? answerLabel(answer);
+      : { yes: 'Same place as me', no: 'Different place', closer: 'Closer than me', further: 'Further than me', out_of_range: 'Out of range' }[answer] ?? answerLabel(answer);
 
     return { ...base, point: q.ask.lat != null && q.ask.lng != null ? { lat: q.ask.lat, lng: q.ask.lng } : null, effect };
   });

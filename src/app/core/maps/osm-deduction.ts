@@ -1,5 +1,4 @@
-import { bbox, booleanPointInPolygon, buffer, circle, distance, featureCollection, nearestPoint, point, union, voronoi } from '@turf/turf';
-import { Feature, FeatureCollection, Point, Polygon } from 'geojson';
+import { bbox, booleanPointInPolygon, circle, distance, nearestPoint, point, voronoi } from '@turf/turf';
 import { ResolvedQuestion } from '../models/models';
 import { tentacleRegion } from './deduction';
 import { Poly } from './operators';
@@ -61,26 +60,15 @@ export async function osmRegion(overpass: OverpassService, q: ResolvedQuestion):
   }
 
   if (q.category === 'measuring') {
-    const nearest = nearestPoint(askPoint, features);
-    const d = Math.max(distance(askPoint, nearest, { units: 'kilometers' }), 0.05);
-    const buffered = buffer(features, d, { units: 'kilometers' }) as FeatureCollection<Polygon>;
-    const merged = mergePolys(buffered);
+    // Reference = the seeker's nearest feature; keep within the seeker's distance to it
+    // (closer) or outside it (further) — a single circle around that one feature.
+    const reference = nearestPoint(askPoint, features);
+    const d = Math.max(distance(askPoint, reference, { units: 'kilometers' }), 0.05);
 
-    return merged ? { region: merged, within: answer === 'closer' } : null;
+    return { region: circle(reference, d, { units: 'kilometers', steps: 64 }) as Poly, within: answer === 'closer' };
   }
 
   return null;
-}
-
-function mergePolys(fc: FeatureCollection<Polygon>): Poly | null {
-  if (fc.features.length === 0) {
-    return null;
-  }
-  if (fc.features.length === 1) {
-    return fc.features[0] as Poly;
-  }
-
-  return (union(featureCollection(fc.features)) as Poly) ?? null;
 }
 
 export function isOsmCategory(category: string): boolean {
