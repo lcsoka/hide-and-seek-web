@@ -16,8 +16,15 @@ const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
  */
 @Component({
   selector: 'app-deduction-map',
-  host: { class: 'block h-full' },
-  template: `<div #el class="h-full min-h-72 w-full overflow-hidden"></div>`,
+  host: { class: 'relative block h-full' },
+  template: `
+    <div #el class="h-full min-h-72 w-full overflow-hidden"></div>
+    @if (loading()) {
+      <div class="pointer-events-none absolute inset-0 z-[500] flex items-center justify-center">
+        <span class="rounded-full bg-gray-900/85 px-3 py-1.5 text-sm font-medium text-white shadow-lg">Calculating deduction…</span>
+      </div>
+    }
+  `,
 })
 export class DeductionMap {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
@@ -28,6 +35,7 @@ export class DeductionMap {
   readonly points = input<FeatureCollection<Point> | null>(null); // highlighted POIs (e.g. tentacle candidates)
   readonly overlays = input<Feature[]>([]); // e.g. admin borders, drawn as outlines
   readonly autoZoom = input(true);
+  readonly loading = input(false); // hold rendering until the deduction is fully computed
   readonly mapClick = output<Position>();
 
   private map?: L.Map;
@@ -43,6 +51,7 @@ export class DeductionMap {
       this.stations();
       this.points();
       this.overlays();
+      this.loading();
       this.render();
     });
     inject(DestroyRef).onDestroy(() => {
@@ -66,7 +75,9 @@ export class DeductionMap {
   }
 
   private render(): void {
-    if (!this.map) {
+    // Hold the last-rendered view until the deduction settles, so it's drawn once
+    // (not visibly re-cut per clue) when the page reloads with many questions.
+    if (!this.map || this.loading()) {
       return;
     }
 
@@ -135,6 +146,12 @@ export class DeductionMap {
         L.circleMarker([a.thermo.a.lat, a.thermo.a.lng], { radius: 4, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 1 }).addTo(this.overlay);
         L.circleMarker([a.thermo.b.lat, a.thermo.b.lng], { radius: 4, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 1 }).addTo(this.overlay);
       }
+      if (a.feature) {
+        // The reference place (closest airport, matched place, nearest tentacle target).
+        L.marker([a.feature.lat, a.feature.lng], { icon: this.featurePin() })
+          .bindTooltip(a.feature.name ? `📍 ${a.feature.name}` : '📍 reference place', { permanent: true, direction: 'right', offset: [6, 0], opacity: 0.95 })
+          .addTo(this.overlay);
+      }
       if (a.point) {
         L.marker([a.point.lat, a.point.lng], { icon: this.badge(a.n) })
           .bindTooltip(`#${a.n} ${a.icon} ${a.effect}`, { permanent: true, direction: 'top', offset: [0, -12], opacity: 0.95 })
@@ -150,6 +167,16 @@ export class DeductionMap {
         // empty / degenerate candidate — leave the view as-is
       }
     }
+  }
+
+  /** A pin marking a reference OSM feature (the place a question compared against). */
+  private featurePin(): L.DivIcon {
+    return L.divIcon({
+      html: `<div style="font-size:20px;line-height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">📍</div>`,
+      className: '',
+      iconSize: [20, 20],
+      iconAnchor: [10, 18],
+    });
   }
 
   /** A small numbered pin (matches the history list numbering). */

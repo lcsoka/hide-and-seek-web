@@ -16,6 +16,8 @@ export class MapView {
   readonly stations = input<{ lat: number; lng: number; name?: string }[]>([]); // nearby stops to pick from
   readonly highlight = input<Position | null>(null); // the chosen/nearest station
   readonly previewZone = input<{ lat: number; lng: number; radiusM: number } | null>(null);
+  // The seeker's current question, drawn so the hider sees what's being asked.
+  readonly questionMarker = input<{ lat: number; lng: number; radiusM?: number | null; label?: string } | null>(null);
   readonly mapClick = output<Position>();
 
   private map?: L.Map;
@@ -31,6 +33,7 @@ export class MapView {
       this.stations();
       this.highlight();
       this.previewZone();
+      this.questionMarker();
       this.render();
     });
   }
@@ -89,6 +92,25 @@ export class MapView {
         .bindTooltip(st.name ?? 'stop')
         .addTo(this.overlay);
     }
+    // The seeker's current question: where it was asked (+ radar radius), so the hider
+    // can see exactly what's being measured against them.
+    const qm = this.questionMarker();
+    if (qm) {
+      if (qm.radiusM) {
+        L.circle([qm.lat, qm.lng], { radius: qm.radiusM, color: '#2563eb', weight: 1.5, dashArray: '5', fillOpacity: 0.05 }).addTo(this.overlay);
+      }
+      L.marker([qm.lat, qm.lng], {
+        icon: L.divIcon({
+          html: `<div style="font-size:20px;line-height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">❓</div>`,
+          className: '',
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
+        }),
+      })
+        .bindTooltip(qm.label ?? 'Question asked here', { permanent: true, direction: 'top', offset: [0, -8] })
+        .addTo(this.overlay);
+    }
+
     const hl = this.highlight();
     if (hl) {
       L.circleMarker([hl.lat, hl.lng], { radius: 9, color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.9, weight: 3 }).addTo(this.overlay);

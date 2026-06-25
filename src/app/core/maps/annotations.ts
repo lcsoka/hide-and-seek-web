@@ -15,6 +15,8 @@ export interface MapAnnotation {
   within?: boolean;
   thermo?: { a: Position; b: Position };
   photoUrl?: string;
+  /** The reference OSM feature (matching/measuring/tentacles) — shown as a labelled pin. */
+  feature?: { lat: number; lng: number; name: string | null };
 }
 
 function midpoint(a: Position, b: Position): Position {
@@ -60,6 +62,10 @@ export function buildAnnotations(questions: ResolvedQuestion[], units: Units): M
       ? `Nearest: ${q.answer.feature_name}`
       : { yes: 'Same place as me', no: 'Different place', closer: 'Closer than me', further: 'Further than me', out_of_range: 'Out of range' }[answer] ?? answerLabel(answer);
 
-    return { ...base, point: q.ask.lat != null && q.ask.lng != null ? { lat: q.ask.lat, lng: q.ask.lng } : null, effect };
+    const feature = q.answer?.feature_lat != null && q.answer?.feature_lng != null
+      ? { lat: q.answer.feature_lat, lng: q.answer.feature_lng, name: q.answer.feature_name ?? null }
+      : undefined;
+
+    return { ...base, point: q.ask.lat != null && q.ask.lng != null ? { lat: q.ask.lat, lng: q.ask.lng } : null, effect, feature };
   });
 }

@@ -32,6 +32,11 @@ export interface PendingQuestion {
   category: string | null;
   asked_by: string | null;
   deadline: number | null;
+  title?: string | null;
+  prompt?: string | null;
+  params?: { radius_m: number | null; feature: string | null };
+  ask?: { lat: number | null; lng: number | null };
+  preview_answer?: QuestionAnswer | null; // hider-only: the answer they're about to give
 }
 
 export interface HidingZone {
@@ -44,7 +49,9 @@ export interface HidingZone {
 export interface QuestionAnswer {
   answer: string; // yes/no, hotter/colder, closer/further, in_range/out_of_range, photo
   radius_m?: number;
-  feature_name?: string;
+  feature_name?: string | null;
+  feature_lat?: number | null; // the reference feature (matching/measuring/tentacles)
+  feature_lng?: number | null;
   photo_url?: string; // photo questions
 }
 
@@ -104,12 +111,22 @@ export interface CurseCatalogItem {
   parameters: Record<string, unknown> | null;
 }
 
-/** A curse card in the hider's hand. */
+/** A card in the hider's hand or draw (curse, time bonus, or powerup). */
 export interface HandCard {
-  curse_id: string;
+  uid: string;
+  type: 'curse' | 'time_bonus' | 'powerup';
+  curse_id?: string | null;
+  minutes?: number;
+  power?: string;
   name: string | null;
-  cost: string | null;
+  cost?: string | null;
   description: string | null;
+}
+
+/** Cards the hider just drew and must choose `keep` of. */
+export interface PendingDraw {
+  keep: number;
+  cards: HandCard[];
 }
 
 export interface GameState {
@@ -130,6 +147,8 @@ export interface GameState {
   hiding_zone: HidingZone | null;
   zone_locked: boolean;
   hand: HandCard[];
+  pending_draw: PendingDraw | null;
+  time_bonus_s: number | null;
 }
 
 export interface GodPlayer {

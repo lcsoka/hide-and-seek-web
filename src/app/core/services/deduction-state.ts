@@ -23,6 +23,11 @@ export class DeductionState {
   // The play area defaults to the city's real admin boundary (fetched once), not a circle.
   private readonly cityBoundary = signal<Poly | null>(null);
   private boundaryCity: string | null = null;
+  // In-flight OSM fetch batches. The map holds rendering until they settle, so on
+  // reload the deduction is computed once (not visibly clue-by-clue). A watchdog caps
+  // the hold so a slow/rate-limited Overpass can never block the map indefinitely.
+  private readonly pending = signal(0);
+  readonly computing = computed(() => this.pending() > 0);
 
   readonly markerQuestions = computed(() => resolvedQuestionsToDeduction(this.store.state()?.questions ?? []));
   readonly narrowedCount = computed(() => this.markerQuestions().length + this.osmRegions().size);
@@ -54,6 +59,8 @@ export class DeductionState {
       const city = this.store.state()?.config?.['city'] as { key?: string; lat?: number; lng?: number } | undefined;
       if (city?.lat != null && city?.lng != null && (city.key ?? '') !== this.boundaryCity) {
         this.boundaryCity = city.key ?? `${city.lat},${city.lng}`;
+        // The boundary is just the play-area base (falls back to a circle), so it
+        // doesn't block rendering — it swaps in whenever it lands.
         void this.overpass.adminBoundary(city.lat, city.lng, 8).then((b) => {
           if (b) {
             this.cityBoundary.set(b as Poly);
@@ -67,16 +74,36 @@ export class DeductionState {
       if (!s) {
         return;
       }
-      for (const q of s.questions) {
-        if (isOsmCategory(q.category) && q.ask.lat != null && q.ask.feature && !this.osmSeen.has(q.seq)) {
-          this.osmSeen.add(q.seq);
-          void osmRegion(this.overpass, q).then((r) => {
-            if (r) {
-              this.osmRegions.update((m) => new Map(m).set(q.seq, { id: `q${q.seq}`, type: 'region', label: q.category, region: r.region, within: r.within }));
-            }
-          });
-        }
+      // Fetch every newly-seen OSM question concurrently and commit them in ONE update,
+      // so the candidate isn't recomputed once per clue as each fetch trickles in.
+      const fresh = s.questions.filter((q) => isOsmCategory(q.category) && q.ask.lat != null && q.ask.feature && !this.osmSeen.has(q.seq));
+      if (!fresh.length) {
+        return;
       }
+      fresh.forEach((q) => this.osmSeen.add(q.seq));
+      this.pending.update((n) => n + 1);
+      let settled = false;
+      const settle = () => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(watchdog);
+          this.pending.update((n) => n - 1);
+        }
+      };
+      // Cap the hold: if Overpass is slow, stop blocking and let regions trickle in.
+      const watchdog = setTimeout(settle, 10000);
+      void Promise.all(
+        fresh.map((q) =>
+          osmRegion(this.overpass, q)
+            .then((r) => {
+              // Commit each region as it lands so a late one (post-watchdog) still applies.
+              if (r) {
+                this.osmRegions.update((m) => new Map(m).set(q.seq, { id: `q${q.seq}`, type: 'region', label: q.category, region: r.region, within: r.within }));
+              }
+            })
+            .catch(() => undefined),
+        ),
+      ).finally(settle);
     });
   }
 }

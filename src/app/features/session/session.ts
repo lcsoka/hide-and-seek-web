@@ -15,6 +15,7 @@ import { actionLabel } from '../../core/util/labels';
 import { DeductionMap } from '../map/deduction-map';
 import { CardDeck } from './card-deck';
 import { DevTools } from './dev-tools';
+import { DrawModal } from './draw-modal';
 import { GameHud } from './game-hud';
 import { HiderPanel } from './hider-panel';
 import { HostPanel } from './host-panel';
@@ -24,7 +25,7 @@ import { QuestionPicker } from './question-picker';
 import { SeekerPanel } from './seeker-panel';
 
 // Actions with a dedicated panel — kept out of the generic button row.
-const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse'];
+const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse'];
 
 const STATUS_HINTS: Record<string, string> = {
   role_assignment: 'Waiting for the host to assign roles…',
@@ -39,7 +40,7 @@ const STATUS_HINTS: Record<string, string> = {
 @Component({
   selector: 'app-session',
   host: { class: 'block h-[100dvh] w-full' },
-  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker],
+  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, DrawModal],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -126,6 +127,19 @@ export class SessionView {
     const p = this.hidingHighlight(s);
 
     return p ? { lat: p.lat, lng: p.lng, radiusM: Number(s.config?.['hiding_zone_radius_m'] ?? 400) || 400 } : null;
+  }
+
+  /** The hider sees the seeker's pending question on their map (ask point + radar radius). */
+  hiderQuestionMarker(s: GameState): { lat: number; lng: number; radiusM?: number | null; label?: string } | null {
+    if (this.role(s) !== 'hider') {
+      return null;
+    }
+    const q = s.pending_question;
+    if (!q?.ask || q.ask.lat == null || q.ask.lng == null) {
+      return null;
+    }
+
+    return { lat: q.ask.lat, lng: q.ask.lng, radiusM: q.params?.radius_m ?? null, label: q.title ?? 'Question asked here' };
   }
 
   prettyState(state: string): string {

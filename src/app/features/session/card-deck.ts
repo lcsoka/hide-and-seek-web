@@ -1,12 +1,13 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { ActiveCurse, GameState } from '../../core/models/models';
+import { ActiveCurse, GameState, HandCard } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
-import { HidingState } from '../../core/services/hiding-state';
 import { SessionStore } from '../../core/services/session-store';
+import { answerLabel, answerPositive, categoryMeta } from '../../core/util/categories';
+import { formatDistance, unitsOf } from '../../core/util/units';
 import { ImageUpload } from './image-upload';
 
-/** The hider's hand of curse cards: answer pending questions and play curses, with a draw animation. */
+/** The hider's hand: see the full pending question, confirm the answer, play cards. */
 @Component({
   selector: 'app-card-deck',
   imports: [ImageUpload],
@@ -33,7 +34,6 @@ export class CardDeck {
   private readonly api = inject(ApiClient);
   private readonly store = inject(SessionStore);
   private readonly clock = inject(Clock);
-  private readonly hiding = inject(HidingState);
 
   readonly state = input.required<GameState>();
   readonly sessionId = input.required<string>();
@@ -42,15 +42,51 @@ export class CardDeck {
   readonly animatingFrom = signal(Number.MAX_SAFE_INTEGER);
   private prevLen = 0;
 
+  readonly meta = categoryMeta;
+  readonly answerLabel = answerLabel;
+
   readonly hand = computed(() => this.state().hand ?? []);
   readonly pending = computed(() => this.state().pending_question);
   readonly isPhoto = computed(() => this.pending()?.category === 'photo');
   readonly canAnswer = computed(() => this.state().available_actions.includes('answer_question'));
-  readonly canRelocate = computed(() => this.state().available_actions.includes('choose_station'));
+  readonly preview = computed(() => this.pending()?.preview_answer ?? null);
+  readonly timeBonusMin = computed(() => Math.round((this.state().time_bonus_s ?? 0) / 60));
   readonly playedCurses = computed(() => this.state().curses);
+  readonly vetoCard = computed(() => this.hand().find((c) => c.type === 'powerup' && c.power === 'veto') ?? null);
+
+  private readonly units = computed(() => unitsOf(this.state().config));
+
+  /** A short human summary of the question's parameters (radius / feature). */
+  readonly questionParams = computed(() => {
+    const p = this.pending()?.params;
+    if (!p) {
+      return null;
+    }
+    const parts: string[] = [];
+    if (p.radius_m) {
+      parts.push(`within ${formatDistance(p.radius_m, this.units())}`);
+    }
+    if (p.feature) {
+      parts.push(`nearest ${p.feature.replace(/_/g, ' ')}`);
+    }
+
+    return parts.join(' · ') || null;
+  });
+
+  readonly previewColor = computed(() => {
+    const positive = answerPositive(this.preview()?.answer);
+    if (positive === true) {
+      return 'text-green-600 dark:text-green-400';
+    }
+    if (positive === false) {
+      return 'text-red-600 dark:text-red-400';
+    }
+
+    return 'text-gray-800 dark:text-gray-100';
+  });
 
   constructor() {
-    // When the hand grows (a draw), animate the newly added cards in.
+    // When the hand grows, animate the newly added cards in.
     effect(() => {
       const len = this.hand().length;
       if (len > this.prevLen) {
@@ -66,13 +102,49 @@ export class CardDeck {
     });
   }
 
+  cardClass(card: HandCard): string {
+    if (card.type === 'time_bonus') {
+      return 'bg-gradient-to-br from-emerald-600 to-green-800';
+    }
+    if (card.type === 'powerup') {
+      return 'bg-gradient-to-br from-sky-600 to-blue-800';
+    }
+
+    return 'bg-gradient-to-br from-purple-600 to-indigo-800';
+  }
+
+  cardTitle(card: HandCard): string {
+    if (card.name) {
+      return card.name;
+    }
+    if (card.type === 'time_bonus') {
+      return `+${card.minutes ?? 0} min`;
+    }
+
+    return card.power ?? 'Card';
+  }
+
   async answer(): Promise<void> {
     await this.act('answer_question', {});
   }
 
-  /** Answer a photo question with the uploaded image. */
   async answerPhoto(url: string): Promise<void> {
     await this.act('answer_question', { photo_url: url });
+  }
+
+  async veto(): Promise<void> {
+    const card = this.vetoCard();
+    if (card) {
+      await this.act('play_powerup', { card_uid: card.uid });
+    }
+  }
+
+  async playCard(card: HandCard): Promise<void> {
+    if (card.type === 'curse') {
+      await this.act('play_curse', { card_uid: card.uid });
+    } else if (card.type === 'powerup') {
+      await this.act('play_powerup', { card_uid: card.uid });
+    }
   }
 
   /** Remaining time for a timed curse the hider played, or null. */
@@ -82,23 +154,6 @@ export class CardDeck {
     }
 
     return formatCountdown(curse.expires_at - this.clock.nowMs() / 1000);
-  }
-
-  /** Re-hide at the station nearest the hider's current position (allowed only while unlocked). */
-  async relocate(): Promise<void> {
-    const me = this.state().players.find((p) => p.role === 'hider');
-    if (me?.lat == null || me?.lng == null) {
-      return;
-    }
-    await this.hiding.loadFor(me.lat, me.lng);
-    const station = this.hiding.selected();
-    if (station) {
-      await this.act('choose_station', { lat: station.lat, lng: station.lng });
-    }
-  }
-
-  async play(curseId: string): Promise<void> {
-    await this.act('play_curse', { curse_id: curseId });
   }
 
   private async act(type: string, payload: Record<string, unknown>): Promise<void> {

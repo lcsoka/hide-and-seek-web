@@ -13,11 +13,11 @@
     <div class="absolute inset-0">
       @if (showDeductionMap(s)) {
         <app-deduction-map class="block h-full" [candidate]="deduction.candidate()" [annotations]="deduction.annotations()"
-                           [autoZoom]="!devPlacing()" (mapClick)="onMapClick($event)" />
+                           [loading]="deduction.computing()" [autoZoom]="!devPlacing()" (mapClick)="onMapClick($event)" />
       } @else {
         <app-map class="block h-full" [players]="s.players" [zone]="s.hiding_zone"
                  [stations]="hidingStations(s)" [highlight]="hidingHighlight(s)" [previewZone]="hidingPreviewZone(s)"
-                 (mapClick)="onMapClick($event)" />
+                 [questionMarker]="hiderQuestionMarker(s)" (mapClick)="onMapClick($event)" />
       }
     </div>
 
@@ -68,5 +68,9 @@
 
     <app-question-picker [catalog]="catalog()" [units]="askUnits(s)" [open]="pickerOpen()"
                          (ask)="onAsk(s, $event)" (closeChange)="pickerOpen.set($event)" />
+
+    @if (role(s) === 'hider' && s.pending_draw) {
+      <app-draw-modal [sessionId]="s.session_id" [draw]="s.pending_draw" />
+    }
   </div>
 }
