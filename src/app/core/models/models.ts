@@ -125,6 +125,13 @@ export interface GodPlayer {
   lng: number | null;
 }
 
+export interface ActionLogEntry {
+  type: string;
+  player_id: string | null;
+  payload: Record<string, unknown> | null;
+  at: number | null;
+}
+
 /** Unfiltered developer/debug view of a session (sees the hider, pending truths, etc.). */
 export interface GodView {
   session_id: string;
@@ -135,6 +142,9 @@ export interface GodView {
   state_data: Record<string, unknown>;
   players: GodPlayer[];
   teams: TeamView[];
+  questions: ResolvedQuestion[];
+  curses: ActiveCurse[];
+  action_logs: ActionLogEntry[];
 }
 
 export interface SessionSummary {
