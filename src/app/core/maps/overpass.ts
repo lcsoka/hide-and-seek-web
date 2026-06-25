@@ -48,7 +48,42 @@ export class OverpassService {
     'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
   ];
 
+  // Cache successful responses — OSM data is stable, and the hiding flow, picker, and
+  // deduction otherwise re-fetch the same queries (and on every reload). In-memory for
+  // the session + sessionStorage so reloads are free. Until a self-hosted OSM backend.
+  private static readonly TTL_MS = 6 * 60 * 60 * 1000; // 6h, mirrors the server cache
+  private readonly mem = new Map<string, unknown>();
+  private inflight = new Map<string, Promise<unknown>>();
+
   async run(ql: string): Promise<unknown> {
+    const key = `ovp:${ql}`;
+    const cached = this.mem.get(key) ?? this.readStored(key);
+    if (cached !== undefined) {
+      this.mem.set(key, cached);
+      return cached;
+    }
+    // De-dupe concurrent identical queries (e.g. the same feature fetched twice).
+    const pending = this.inflight.get(key);
+    if (pending) {
+      return pending;
+    }
+
+    const promise = this.fetchFromEndpoints(ql).then((result) => {
+      this.mem.set(key, result);
+      this.writeStored(key, result);
+
+      return result;
+    });
+    this.inflight.set(key, promise);
+
+    try {
+      return await promise;
+    } finally {
+      this.inflight.delete(key);
+    }
+  }
+
+  private async fetchFromEndpoints(ql: string): Promise<unknown> {
     const data = encodeURIComponent(ql);
     let lastError: unknown;
 
@@ -56,7 +91,7 @@ export class OverpassService {
       try {
         const res = await fetch(`${endpoint}?data=${data}`);
         if (res.ok) {
-          return res.json();
+          return await res.json();
         }
         lastError = new Error(`Overpass request failed (${res.status})`);
       } catch (e) {
@@ -65,6 +100,32 @@ export class OverpassService {
     }
 
     throw lastError instanceof Error ? lastError : new Error('Overpass request failed');
+  }
+
+  private readStored(key: string): unknown {
+    try {
+      const raw = sessionStorage.getItem(key);
+      if (!raw) {
+        return undefined;
+      }
+      const { at, value } = JSON.parse(raw) as { at: number; value: unknown };
+      if (Date.now() - at > OverpassService.TTL_MS) {
+        sessionStorage.removeItem(key);
+        return undefined;
+      }
+
+      return value;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private writeStored(key: string, value: unknown): void {
+    try {
+      sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), value }));
+    } catch {
+      // storage full / unavailable — the in-memory cache still applies
+    }
   }
 
   /** The administrative boundary at `adminLevel` containing the point (8 = city, 6 = county, 2 = country). */

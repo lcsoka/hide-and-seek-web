@@ -89,14 +89,10 @@ export class SessionView {
       }
     }
 
+    // 1s local tick for countdowns (no server hit). State updates come from realtime
+    // (Reverb) events + the refresh after each of this player's own actions — no poll.
     const interval = setInterval(() => this.tick.update((n) => n + 1), 1000);
-    // Realtime (Reverb) drives timely updates; this is only a slow safety net for a
-    // missed/delayed event, so it doesn't hammer the server.
-    const poll = setInterval(() => this.store.refresh(), 20000);
-    inject(DestroyRef).onDestroy(() => {
-      clearInterval(interval);
-      clearInterval(poll);
-    });
+    inject(DestroyRef).onDestroy(() => clearInterval(interval));
 
     effect(() => {
       const now = this.store.state()?.timers?.now;

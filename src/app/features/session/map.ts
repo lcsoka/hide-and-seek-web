@@ -1,6 +1,6 @@
 import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
-import { avatarIcon, colorFor } from '../../core/maps/avatar';
+import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
 import { disperse } from '../../core/maps/spread';
 import { HidingZone, PlayerView, Position } from '../../core/models/models';
 import { transitMeta } from '../../core/util/transit';
@@ -89,7 +89,7 @@ export class MapView {
     }
     for (const st of disperse(this.stations())) {
       const meta = transitMeta(st.modes?.[0] ?? 'stop');
-      L.circleMarker([st.lat, st.lng], { radius: 5, color: meta.color, fillColor: meta.color, fillOpacity: 0.9, weight: 1 })
+      L.marker([st.lat, st.lng], { icon: markerIcon(meta.icon, { color: meta.color, size: 22 }) })
         .bindTooltip(`${meta.icon} ${st.name ?? 'stop'}`)
         .addTo(this.overlay);
     }
@@ -100,15 +100,8 @@ export class MapView {
       if (qm.radiusM) {
         L.circle([qm.lat, qm.lng], { radius: qm.radiusM, color: '#2563eb', weight: 1.5, dashArray: '5', fillOpacity: 0.05 }).addTo(this.overlay);
       }
-      L.marker([qm.lat, qm.lng], {
-        icon: L.divIcon({
-          html: `<div style="font-size:20px;line-height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">❓</div>`,
-          className: '',
-          iconSize: [20, 20],
-          iconAnchor: [10, 10],
-        }),
-      })
-        .bindTooltip(qm.label ?? 'Question asked here', { permanent: true, direction: 'top', offset: [0, -8] })
+      L.marker([qm.lat, qm.lng], { icon: markerIcon('❓', { color: '#2563eb', size: 28 }) })
+        .bindTooltip(qm.label ?? 'Question asked here', { permanent: true, direction: 'top', offset: [0, -18] })
         .addTo(this.overlay);
     }
 

@@ -4,7 +4,7 @@ import { Feature, FeatureCollection, GeoJsonObject, Point } from 'geojson';
 import * as L from 'leaflet';
 import { MapAnnotation } from '../../core/maps/annotations';
 import { DeductionQuestion } from '../../core/maps/deduction';
-import { avatarIcon, colorFor } from '../../core/maps/avatar';
+import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
 import { holedMask, Poly } from '../../core/maps/operators';
 import { disperse } from '../../core/maps/spread';
 import { PlayerView, Position } from '../../core/models/models';
@@ -177,12 +177,12 @@ export class DeductionMap {
       }
       if (a.feature) {
         // The reference place (closest airport, matched place, nearest tentacle target).
-        L.marker([a.feature.lat, a.feature.lng], { icon: this.featurePin() })
+        L.marker([a.feature.lat, a.feature.lng], { icon: markerIcon('📍', { color: '#0891b2', size: 26 }) })
           .bindTooltip(a.feature.name ? `📍 ${a.feature.name}` : '📍 reference place', { permanent: true, direction: 'right', offset: [6, 0], opacity: 0.95 })
           .addTo(this.overlay);
       }
       if (a.point) {
-        L.marker([a.point.lat, a.point.lng], { icon: this.badge(a.n) })
+        L.marker([a.point.lat, a.point.lng], { icon: markerIcon(String(a.n), { color: '#0f172a', size: 24 }) })
           .bindTooltip(`#${a.n} ${a.icon} ${a.effect}`, { permanent: true, direction: 'top', offset: [0, -12], opacity: 0.95 })
           .addTo(this.overlay);
       }
@@ -194,10 +194,8 @@ export class DeductionMap {
       if (thermo.radiusM) {
         L.circle([thermo.lat, thermo.lng], { radius: thermo.radiusM, color: '#f59e0b', weight: 1.5, dashArray: '6', fillOpacity: 0.04 }).addTo(this.overlay);
       }
-      L.marker([thermo.lat, thermo.lng], {
-        icon: L.divIcon({ html: `<div style="font-size:20px;line-height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">🌡️</div>`, className: '', iconSize: [20, 20], iconAnchor: [10, 10] }),
-      })
-        .bindTooltip(thermo.label ?? 'Thermometer start', { permanent: true, direction: 'top', offset: [0, -8] })
+      L.marker([thermo.lat, thermo.lng], { icon: markerIcon('🌡️', { color: '#f59e0b', size: 28 }) })
+        .bindTooltip(thermo.label ?? 'Thermometer start', { permanent: true, direction: 'top', offset: [0, -18] })
         .addTo(this.overlay);
     }
 
@@ -242,25 +240,5 @@ export class DeductionMap {
     } catch {
       // degenerate candidate — ignore
     }
-  }
-
-  /** A pin marking a reference OSM feature (the place a question compared against). */
-  private featurePin(): L.DivIcon {
-    return L.divIcon({
-      html: `<div style="font-size:20px;line-height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">📍</div>`,
-      className: '',
-      iconSize: [20, 20],
-      iconAnchor: [10, 18],
-    });
-  }
-
-  /** A small numbered pin (matches the history list numbering). */
-  private badge(n: number): L.DivIcon {
-    return L.divIcon({
-      html: `<div style="background:#0f172a;color:#fff;min-width:22px;height:22px;padding:0 5px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font:700 12px system-ui;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)">${n}</div>`,
-      className: '',
-      iconSize: [22, 22],
-      iconAnchor: [11, 11],
-    });
   }
 }
