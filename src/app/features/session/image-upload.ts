@@ -30,11 +30,42 @@ export class ImageUpload {
 
     this.busy.set(true);
     try {
-      const { url } = await this.api.uploadMedia(this.sessionId(), file);
+      const image = await this.downscale(file);
+      const { url } = await this.api.uploadMedia(this.sessionId(), image);
       this.uploaded.emit(url);
     } finally {
       this.busy.set(false);
       input.value = '';
+    }
+  }
+
+  /**
+   * Phone photos are 3–12 MB and trip the server's upload limit. Downscale to a sane
+   * max dimension + JPEG quality in the browser first (usually <500 KB). Falls back to
+   * the original file if anything goes wrong.
+   */
+  private async downscale(file: File, maxDim = 1600, quality = 0.8): Promise<File> {
+    try {
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+      const width = Math.round(bitmap.width * scale);
+      const height = Math.round(bitmap.height * scale);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        return file;
+      }
+      ctx.drawImage(bitmap, 0, 0, width, height);
+      bitmap.close();
+
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+
+      return blob ? new File([blob], 'photo.jpg', { type: 'image/jpeg' }) : file;
+    } catch {
+      return file;
     }
   }
 }

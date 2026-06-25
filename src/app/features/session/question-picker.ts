@@ -16,12 +16,14 @@ export class QuestionPicker {
   readonly closeChange = output<boolean>();
 
   readonly selected = signal<string | null>(null);
+  readonly custom = signal('');
   readonly meta = categoryMeta;
 
   readonly categories = computed(() => [...new Set(this.catalog().map((q) => q.category))]);
   readonly categoryQuestions = computed(() => this.catalog().filter((q) => q.category === this.selected()));
   readonly radarPresets = computed(() => RADAR_PRESETS[this.units()]);
   readonly thermoPresets = computed(() => THERMO_PRESETS[this.units()]);
+  readonly unitLabel = computed(() => (this.units() === 'imperial' ? 'mi' : 'km'));
 
   pick(category: string): void {
     this.selected.set(category);
@@ -33,6 +35,7 @@ export class QuestionPicker {
 
   close(): void {
     this.selected.set(null);
+    this.custom.set('');
     this.closeChange.emit(false);
   }
 
@@ -42,6 +45,30 @@ export class QuestionPicker {
 
   askThermo(q: QuestionCatalogItem, preset: DistancePreset): void {
     this.emit(q, { distance_m: preset.meters, distance_label: preset.label });
+  }
+
+  /** A custom distance the seeker typed (in km / mi), converted to metres. */
+  private customMeters(): number | null {
+    const value = parseFloat(this.custom());
+    if (!isFinite(value) || value <= 0) {
+      return null;
+    }
+
+    return Math.round(value * (this.units() === 'imperial' ? 1609.34 : 1000));
+  }
+
+  askCustomRadar(q: QuestionCatalogItem): void {
+    const meters = this.customMeters();
+    if (meters) {
+      this.emit(q, { radius_m: meters });
+    }
+  }
+
+  askCustomThermo(q: QuestionCatalogItem): void {
+    const meters = this.customMeters();
+    if (meters) {
+      this.emit(q, { distance_m: meters, distance_label: `${parseFloat(this.custom())} ${this.unitLabel()}` });
+    }
   }
 
   askGeneric(q: QuestionCatalogItem): void {

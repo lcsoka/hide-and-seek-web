@@ -35,12 +35,24 @@
                   <button (click)="askRadar(q, d.meters)" class="rounded-full bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700">{{ d.label }}</button>
                 }
               </div>
+              <div class="mt-2 flex items-center gap-1.5">
+                <input type="number" min="0.1" step="0.1" placeholder="custom" [value]="custom()" (input)="custom.set($any($event.target).value)"
+                       class="w-20 rounded-lg border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-800" />
+                <span class="text-xs text-gray-500 dark:text-gray-400">{{ unitLabel() }}</span>
+                <button (click)="askCustomRadar(q)" class="rounded-lg border border-rose-400 px-3 py-1 text-sm font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-950">Ask custom</button>
+              </div>
             } @else if (q.category === 'thermometer') {
               <p class="mb-1.5 text-xs text-gray-500 dark:text-gray-400">Pick how far you'll travel, then start — stop once you've moved that far.</p>
               <div class="flex flex-wrap gap-1.5">
                 @for (d of thermoPresets(); track d.meters) {
                   <button (click)="askThermo(q, d)" class="rounded-full bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700">Start · {{ d.label }}</button>
                 }
+              </div>
+              <div class="mt-2 flex items-center gap-1.5">
+                <input type="number" min="0.1" step="0.1" placeholder="custom" [value]="custom()" (input)="custom.set($any($event.target).value)"
+                       class="w-20 rounded-lg border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-800" />
+                <span class="text-xs text-gray-500 dark:text-gray-400">{{ unitLabel() }}</span>
+                <button (click)="askCustomThermo(q)" class="rounded-lg border border-rose-400 px-3 py-1 text-sm font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-950">Start custom</button>
               </div>
             } @else {
               <button (click)="askGeneric(q)" class="rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700">Ask this</button>

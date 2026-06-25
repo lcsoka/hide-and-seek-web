@@ -81,7 +81,7 @@ export class SessionView {
     if (sessionId) {
       this.myId.set(this.players.get(sessionId));
       this.store.setSession(sessionId);
-      this.realtime.connect(sessionId, this.myId(), (name) => this.store.onEvent(name));
+      this.realtime.connect(sessionId, this.myId(), (name, data) => this.store.onEvent(name, data));
       // In a dev build the position is driven by the debug tools (map tap / presets),
       // so don't let the browser GPS overwrite the simulated location.
       if (!this.devMode) {

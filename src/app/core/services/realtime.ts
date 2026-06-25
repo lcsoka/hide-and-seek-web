@@ -17,7 +17,7 @@ export class Realtime {
   private echo: any = null;
   private joined: string | null = null;
 
-  connect(sessionId: string, playerId: string | null, onEvent: (name: string) => void): void {
+  connect(sessionId: string, playerId: string | null, onEvent: (name: string, data?: unknown) => void): void {
     if (!this.echo) {
       (window as any).Pusher = Pusher;
       this.echo = new (Echo as any)({
@@ -39,16 +39,16 @@ export class Realtime {
     }
     this.joined = sessionId;
 
-    const fire = (event: string) => {
+    const fire = (event: string, data?: unknown) => {
       if (!event.startsWith('pusher:')) {
-        onEvent(event.replace(/^\./, ''));
+        onEvent(event.replace(/^\./, ''), data);
       }
     };
 
-    this.echo.join(`session.${sessionId}`).listenToAll((event: string) => fire(event));
+    this.echo.join(`session.${sessionId}`).listenToAll((event: string, data: unknown) => fire(event, data));
 
     if (playerId) {
-      this.echo.private(`session.${sessionId}.player.${playerId}`).listenToAll((event: string) => fire(event));
+      this.echo.private(`session.${sessionId}.player.${playerId}`).listenToAll((event: string, data: unknown) => fire(event, data));
     }
   }
 
