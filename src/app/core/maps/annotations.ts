@@ -5,6 +5,7 @@ import { formatDistance, Units } from '../util/units';
 /** A numbered, explained marker for an answered question on the deduction map. */
 export interface MapAnnotation {
   n: number;
+  seq: number;
   category: string;
   icon: string;
   answer: string;
@@ -28,7 +29,7 @@ export function buildAnnotations(questions: ResolvedQuestion[], units: Units): M
   return questions.map((q, i) => {
     const meta = categoryMeta(q.category);
     const answer = q.answer?.answer ?? '';
-    const base = { n: i + 1, category: q.category, icon: meta.icon, answer };
+    const base = { n: i + 1, seq: q.seq, category: q.category, icon: meta.icon, answer };
 
     if (q.category === 'radar' && q.ask.lat != null && q.ask.lng != null) {
       const within = answer === 'yes';

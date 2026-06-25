@@ -20,6 +20,9 @@ export class DeductionState {
 
   private readonly osmRegions = signal<Map<number, RegionQuestion>>(new Map());
   private readonly osmSeen = new Set<number>();
+  // Answers the seeker has chosen to ignore (e.g. they suspect the hider mis-answered).
+  // Excluded from the cut region but kept visible in the history so they can restore them.
+  private readonly dismissedSeqs = signal<Set<number>>(new Set());
   // The play area defaults to the city's real admin boundary (fetched once), not a circle.
   private readonly cityBoundary = signal<Poly | null>(null);
   private boundaryCity: string | null = null;
@@ -29,8 +32,30 @@ export class DeductionState {
   private readonly pending = signal(0);
   readonly computing = computed(() => this.pending() > 0);
 
-  readonly markerQuestions = computed(() => resolvedQuestionsToDeduction(this.store.state()?.questions ?? []));
-  readonly narrowedCount = computed(() => this.markerQuestions().length + this.osmRegions().size);
+  readonly markerQuestions = computed(() =>
+    resolvedQuestionsToDeduction((this.store.state()?.questions ?? []).filter((q) => !this.dismissedSeqs().has(q.seq))),
+  );
+  readonly narrowedCount = computed(() => this.markerQuestions().length + this.activeOsmRegions().length);
+
+  isDismissed(seq: number): boolean {
+    return this.dismissedSeqs().has(seq);
+  }
+
+  /** Toggle whether an answered question contributes to the deduction (seeker's call). */
+  toggleDismiss(seq: number): void {
+    this.dismissedSeqs.update((set) => {
+      const next = new Set(set);
+      next.has(seq) ? next.delete(seq) : next.add(seq);
+
+      return next;
+    });
+  }
+
+  private activeOsmRegions(): RegionQuestion[] {
+    const dismissed = this.dismissedSeqs();
+
+    return [...this.osmRegions().entries()].filter(([seq]) => !dismissed.has(seq)).map(([, r]) => r);
+  }
   /** Numbered, explained markers for every answered question (shared by the map + history). */
   readonly annotations = computed(() => buildAnnotations(this.store.state()?.questions ?? [], unitsOf(this.store.state()?.config)));
 
@@ -45,7 +70,7 @@ export class DeductionState {
     const radiusKm = Number(s.config?.['play_radius_km'] ?? 50) || 50;
     // Prefer the city boundary; fall back to a radius circle until it loads / if it fails.
     const base = this.cityBoundary() ?? playArea(lat, lng, radiusKm);
-    const questions: DeductionQuestion[] = [...this.markerQuestions(), ...this.osmRegions().values()];
+    const questions: DeductionQuestion[] = [...this.markerQuestions(), ...this.activeOsmRegions()];
     try {
       return applyQuestions(base, questions);
     } catch {

@@ -59,7 +59,7 @@ export async function osmRegion(overpass: OverpassService, q: ResolvedQuestion):
   }
 
   if (q.category === 'matching') {
-    // The Voronoi cell of the seeker's nearest feature needs the full local feature
+    // The Voronoi cell of the seeker's reference feature needs the full local feature
     // set, so this one still fetches (cached client-side until a self-hosted backend).
     const features = await overpass.around(lat, lng, SEARCH_KM, tag);
     if (features.features.length < 2) {
@@ -67,7 +67,10 @@ export async function osmRegion(overpass: OverpassService, q: ResolvedQuestion):
     }
     const box = bbox(circle([lng, lat], SEARCH_KM, { units: 'kilometers' })) as [number, number, number, number];
     const cells = voronoi(features, { bbox: box });
-    const cell = cells.features.find((c) => c && booleanPointInPolygon(askPoint, c));
+    // The cell must be the one around the seeker's CONFIRMED reference place — not the
+    // ask point, whose nearest feature can differ from the place the seeker picked.
+    const ref = serverReference(q) ?? askPoint;
+    const cell = cells.features.find((c) => c && booleanPointInPolygon(ref, c));
 
     return cell ? { region: cell as Poly, within: answer === 'yes' } : null;
   }

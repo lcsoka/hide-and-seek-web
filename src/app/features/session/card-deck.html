@@ -31,6 +31,11 @@
           <span class="text-gray-500 dark:text-gray-400">📍 Seeker's closest:</span> <b>{{ ref.name || 'an unnamed place' }}</b>
         </div>
       }
+      @if (q.hider_nearest; as hn) {
+        <div class="rounded-lg bg-white/70 p-2 text-sm dark:bg-gray-900/60">
+          <span class="text-gray-500 dark:text-gray-400">🏛️ Your nearest:</span> <b>{{ hn.name || 'an unnamed place' }}</b>
+        </div>
+      }
 
       @if (canAnswer()) {
         @if (isPhoto()) {
@@ -68,6 +73,27 @@
         }
       }
     </div>
+  }
+
+  @if (amendLast(); as last) {
+    @if (amendOptions(last.category); as opts) {
+      @if (opts.length) {
+        <div class="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950">
+          <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">
+            Answered {{ meta(last.category ?? '').label }} — {{ answerLabel(last.answer?.answer ?? '') }}
+          </p>
+          <p class="text-xs text-amber-700 dark:text-amber-400">Mis-tapped? You can still change it.</p>
+          <div class="flex gap-2">
+            @for (opt of opts; track opt) {
+              <button (click)="amend(opt)" [disabled]="busy() || opt === last.answer?.answer"
+                      class="flex-1 rounded-lg border border-amber-400 p-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-40 dark:text-amber-200 dark:hover:bg-amber-900">
+                Change to {{ answerLabel(opt) }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
   }
 
   @if (playedCurses().length) {

@@ -39,12 +39,12 @@
 
   <section class="space-y-2">
     @for (a of history(); track a.n) {
-      <div class="flex items-center gap-2 rounded-xl border border-gray-200 p-2 dark:border-gray-700">
+      <div class="flex items-center gap-2 rounded-xl border border-gray-200 p-2 dark:border-gray-700" [class.opacity-40]="deduction.isDismissed(a.seq)">
         <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gray-900 text-xs font-bold text-white dark:bg-gray-700">{{ a.n }}</span>
         <span class="text-lg">{{ a.icon }}</span>
         <div class="min-w-0 flex-1">
           <div class="truncate text-sm font-medium capitalize">{{ a.category }}</div>
-          <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ a.effect }}</div>
+          <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ deduction.isDismissed(a.seq) ? 'Ignored in the deduction' : a.effect }}</div>
         </div>
         @if (a.photoUrl) {
           <a [href]="a.photoUrl" target="_blank" rel="noopener" class="shrink-0">
@@ -53,6 +53,11 @@
         } @else {
           <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" [class]="chipClass(a.answer)">{{ label(a.answer) }}</span>
         }
+        <button (click)="deduction.toggleDismiss(a.seq)" type="button"
+                class="shrink-0 rounded-md p-1 text-base text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                [title]="deduction.isDismissed(a.seq) ? 'Restore to deduction' : 'Ignore in deduction'">
+          {{ deduction.isDismissed(a.seq) ? '↩︎' : '🚫' }}
+        </button>
       </div>
     } @empty {
       <p class="text-sm text-gray-400">No questions asked yet — tap “Ask a question”.</p>

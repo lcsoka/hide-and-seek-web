@@ -139,6 +139,25 @@ export class CardDeck {
     await this.act('answer_question', { answer });
   }
 
+  /** The just-answered question the hider may still correct (amend window open), or null. */
+  readonly amendLast = computed<ResolvedQuestion | null>(() => {
+    if (!this.state().available_actions.includes('amend_answer')) {
+      return null;
+    }
+    const qs = this.state().questions ?? [];
+
+    return qs[qs.length - 1] ?? null;
+  });
+
+  /** The answer values a manual answer can be flipped between (matching is yes/no). */
+  amendOptions(category: string | null | undefined): string[] {
+    return category === 'matching' ? ['yes', 'no'] : [];
+  }
+
+  async amend(answer: string): Promise<void> {
+    await this.act('amend_answer', { answer });
+  }
+
   async veto(): Promise<void> {
     const card = this.vetoCard();
     if (card) {

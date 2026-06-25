@@ -48,6 +48,7 @@ export interface PendingQuestion {
   params?: { radius_m: number | null; feature: string | null };
   ask?: { lat: number | null; lng: number | null };
   reference?: { name: string | null; lat: number; lng: number } | null; // the seeker's closest place
+  hider_nearest?: { name: string | null; lat: number; lng: number } | null; // hider-only: their OWN nearest
   preview_answer?: QuestionAnswer | null; // hider-only: the answer they're about to give
 }
 
@@ -76,6 +77,8 @@ export interface ResolvedQuestion {
   asked_at: number | null;
   resolved_at: number | null;
   auto: boolean;
+  manual?: boolean; // the hider's own input set the answer (amendable for a short window)
+  amended?: boolean; // the hider corrected this answer after the fact
   answer: QuestionAnswer | null;
   ask: { lat: number | null; lng: number | null; radius_m: number | null; feature: string | null; start_lat: number | null; start_lng: number | null };
   end: { lat: number | null; lng: number | null };
