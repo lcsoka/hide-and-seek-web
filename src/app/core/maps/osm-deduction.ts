@@ -30,7 +30,8 @@ export async function osmRegion(overpass: OverpassService, q: ResolvedQuestion):
   const { lat, lng, feature, radius_m } = q.ask;
   const tag = feature ? FEATURE_TAGS[feature] : undefined;
   const answer = q.answer?.answer;
-  if (!tag || lat == null || lng == null) {
+  // No answer (e.g. a question that couldn't be computed) must not cut the map.
+  if (!tag || !answer || lat == null || lng == null) {
     return null;
   }
 

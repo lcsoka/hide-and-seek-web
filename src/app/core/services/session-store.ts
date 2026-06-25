@@ -32,6 +32,9 @@ export class SessionStore {
   readonly loading = this.resource.isLoading;
   readonly error = this.resource.error;
   readonly feed = signal<FeedEntry[]>([]);
+  // Flips true briefly when a question is voided (couldn't be answered) so the seeker
+  // knows to ask again; auto-clears.
+  readonly voided = signal(false);
 
   setSession(id: string): void {
     this.sessionId.set(id);
@@ -52,6 +55,11 @@ export class SessionStore {
         this.livePositions.update((m) => ({ ...m, [move.player_id!]: { lat: move.lat!, lng: move.lng! } }));
       }
       return;
+    }
+
+    if (type === 'QuestionVoided') {
+      this.voided.set(true);
+      setTimeout(() => this.voided.set(false), 6000);
     }
 
     this.refresh();

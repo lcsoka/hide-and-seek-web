@@ -134,6 +134,11 @@ export class CardDeck {
     await this.act('answer_question', { photo_url: url });
   }
 
+  /** The hider answers manually (e.g. matching) when the auto-truth couldn't be computed. */
+  async answerManual(answer: string): Promise<void> {
+    await this.act('answer_question', { answer });
+  }
+
   async veto(): Promise<void> {
     const card = this.vetoCard();
     if (card) {

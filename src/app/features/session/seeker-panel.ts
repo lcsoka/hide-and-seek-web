@@ -25,6 +25,7 @@ export class SeekerPanel {
   readonly openPicker = output<void>();
 
   readonly label = answerLabel;
+  readonly voided = this.store.voided;
   readonly canAsk = computed(() => this.state().available_actions.includes('ask_question'));
   readonly running = computed(() => this.state().thermometer);
   readonly history = computed(() => [...this.deduction.annotations()].reverse());
