@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { GameState, Position } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { DeductionState } from '../../core/services/deduction-state';
+import { HidingState } from '../../core/services/hiding-state';
 import { LocationTracker } from '../../core/services/location';
 import { PlayerStore } from '../../core/services/player-store';
 import { Realtime } from '../../core/services/realtime';
@@ -47,6 +48,7 @@ export class SessionView {
   private readonly players = inject(PlayerStore);
   readonly store = inject(SessionStore);
   readonly deduction = inject(DeductionState);
+  readonly hiding = inject(HidingState);
 
   readonly id = signal<string | undefined>(this.route.snapshot.paramMap.get('id') ?? undefined);
   readonly myId = signal<string | null>(null);
@@ -101,6 +103,25 @@ export class SessionView {
 
   showDeductionMap(s: GameState): boolean {
     return this.role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame');
+  }
+
+  /** While the hider is picking a station, surface the candidates + choice on the map. */
+  private picking(s: GameState): boolean {
+    return this.role(s) === 'hider' && s.state === 'hiding';
+  }
+
+  hidingStations(s: GameState): { lat: number; lng: number; name?: string }[] {
+    return this.picking(s) ? (this.hiding.stations() ?? []) : [];
+  }
+
+  hidingHighlight(s: GameState): Position | null {
+    return this.picking(s) ? this.hiding.selectedPosition() : null;
+  }
+
+  hidingPreviewZone(s: GameState): { lat: number; lng: number; radiusM: number } | null {
+    const p = this.hidingHighlight(s);
+
+    return p ? { lat: p.lat, lng: p.lng, radiusM: Number(s.config?.['hiding_zone_radius_m'] ?? 400) || 400 } : null;
   }
 
   prettyState(state: string): string {

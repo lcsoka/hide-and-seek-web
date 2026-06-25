@@ -121,6 +121,7 @@ export interface GameState {
   curses: ActiveCurse[];
   timers: GameTimers;
   hiding_zone: HidingZone | null;
+  zone_locked: boolean;
   hand: HandCard[];
 }
 

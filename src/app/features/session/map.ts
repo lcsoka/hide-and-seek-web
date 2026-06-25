@@ -13,17 +13,24 @@ export class MapView {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
   readonly players = input<PlayerView[]>([]);
   readonly zone = input<HidingZone | null>(null);
+  readonly stations = input<{ lat: number; lng: number; name?: string }[]>([]); // nearby stops to pick from
+  readonly highlight = input<Position | null>(null); // the chosen/nearest station
+  readonly previewZone = input<{ lat: number; lng: number; radiusM: number } | null>(null);
   readonly mapClick = output<Position>();
 
   private map?: L.Map;
   private overlay?: L.LayerGroup;
+  private centred = false;
 
   constructor() {
     afterNextRender(() => this.init());
-    // Re-render whenever the visible players or the hiding zone change.
+    // Re-render whenever any rendered input changes.
     effect(() => {
       this.players();
       this.zone();
+      this.stations();
+      this.highlight();
+      this.previewZone();
       this.render();
     });
   }
@@ -69,6 +76,26 @@ export class MapView {
 
       for (const n of zone.neighbors ?? []) {
         L.circleMarker([n.lat, n.lng], { radius: 4, color: '#9ca3af' }).addTo(this.overlay);
+      }
+    }
+
+    // Hider's station-picking aids: candidate radius, nearby stops, chosen station.
+    const preview = this.previewZone();
+    if (preview) {
+      L.circle([preview.lat, preview.lng], { radius: preview.radiusM, color: '#f59e0b', weight: 1, fillOpacity: 0.08 }).addTo(this.overlay);
+    }
+    for (const st of this.stations()) {
+      L.circleMarker([st.lat, st.lng], { radius: 4, color: '#0891b2', fillColor: '#0891b2', fillOpacity: 0.9, weight: 1 })
+        .bindTooltip(st.name ?? 'stop')
+        .addTo(this.overlay);
+    }
+    const hl = this.highlight();
+    if (hl) {
+      L.circleMarker([hl.lat, hl.lng], { radius: 9, color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.9, weight: 3 }).addTo(this.overlay);
+      // Zoom to the hider's station area once, so the stops + zone are legible.
+      if (!this.centred) {
+        this.centred = true;
+        this.map.setView([hl.lat, hl.lng], 14, { animate: false });
       }
     }
   }

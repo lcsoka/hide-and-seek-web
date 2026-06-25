@@ -3,6 +3,7 @@ import { applyQuestions, DeductionQuestion, playArea, RegionQuestion } from '../
 import { resolvedQuestionsToDeduction } from '../maps/game-deduction';
 import { isOsmCategory, osmRegion } from '../maps/osm-deduction';
 import { OverpassService } from '../maps/overpass';
+import { Poly } from '../maps/operators';
 import { SessionStore } from './session-store';
 
 /**
@@ -17,6 +18,9 @@ export class DeductionState {
 
   private readonly osmRegions = signal<Map<number, RegionQuestion>>(new Map());
   private readonly osmSeen = new Set<number>();
+  // The play area defaults to the city's real admin boundary (fetched once), not a circle.
+  private readonly cityBoundary = signal<Poly | null>(null);
+  private boundaryCity: string | null = null;
 
   readonly markerQuestions = computed(() => resolvedQuestionsToDeduction(this.store.state()?.questions ?? []));
   readonly narrowedCount = computed(() => this.markerQuestions().length + this.osmRegions().size);
@@ -30,15 +34,30 @@ export class DeductionState {
     const lat = city?.lat ?? 47.4979;
     const lng = city?.lng ?? 19.0402;
     const radiusKm = Number(s.config?.['play_radius_km'] ?? 50) || 50;
+    // Prefer the city boundary; fall back to a radius circle until it loads / if it fails.
+    const base = this.cityBoundary() ?? playArea(lat, lng, radiusKm);
     const questions: DeductionQuestion[] = [...this.markerQuestions(), ...this.osmRegions().values()];
     try {
-      return applyQuestions(playArea(lat, lng, radiusKm), questions);
+      return applyQuestions(base, questions);
     } catch {
       return null;
     }
   });
 
   constructor() {
+    // Load the city's admin boundary once per session as the play-area base.
+    effect(() => {
+      const city = this.store.state()?.config?.['city'] as { key?: string; lat?: number; lng?: number } | undefined;
+      if (city?.lat != null && city?.lng != null && (city.key ?? '') !== this.boundaryCity) {
+        this.boundaryCity = city.key ?? `${city.lat},${city.lng}`;
+        void this.overpass.adminBoundary(city.lat, city.lng, 8).then((b) => {
+          if (b) {
+            this.cityBoundary.set(b as Poly);
+          }
+        });
+      }
+    });
+
     effect(() => {
       const s = this.store.state();
       if (!s) {

@@ -4,6 +4,17 @@
     <p class="text-sm text-gray-500 dark:text-gray-400">Play a curse on the seekers. You draw cards as questions are answered.</p>
   </div>
 
+  @if (state().hiding_zone) {
+    @if (canRelocate()) {
+      <div class="flex items-center justify-between gap-2 rounded-xl border border-green-300 bg-green-50 p-3 text-sm dark:border-green-700 dark:bg-green-950">
+        <span>🟢 No seeker in your zone — you may relocate.</span>
+        <button (click)="relocate()" [disabled]="busy()" class="shrink-0 rounded-lg bg-rose-600 px-3 py-1.5 font-medium text-white hover:bg-rose-700 disabled:opacity-40">Move station</button>
+      </div>
+    } @else {
+      <div class="rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">🔒 A seeker is in your zone — you're locked to this station.</div>
+    }
+  }
+
   @if (pending(); as q) {
     <div class="rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-950">
       <p class="text-sm">Seekers asked a <b class="capitalize">{{ q.category }}</b> question.</p>

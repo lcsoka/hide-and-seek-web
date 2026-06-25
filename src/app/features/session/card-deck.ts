@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { GameState } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
+import { HidingState } from '../../core/services/hiding-state';
 import { SessionStore } from '../../core/services/session-store';
 
 /** The hider's hand of curse cards: answer pending questions and play curses, with a draw animation. */
@@ -28,6 +29,7 @@ import { SessionStore } from '../../core/services/session-store';
 export class CardDeck {
   private readonly api = inject(ApiClient);
   private readonly store = inject(SessionStore);
+  private readonly hiding = inject(HidingState);
 
   readonly state = input.required<GameState>();
   readonly sessionId = input.required<string>();
@@ -39,6 +41,7 @@ export class CardDeck {
   readonly hand = computed(() => this.state().hand ?? []);
   readonly pending = computed(() => this.state().pending_question);
   readonly canAnswer = computed(() => this.state().available_actions.includes('answer_question'));
+  readonly canRelocate = computed(() => this.state().available_actions.includes('choose_station'));
 
   constructor() {
     // When the hand grows (a draw), animate the newly added cards in.
@@ -59,6 +62,19 @@ export class CardDeck {
 
   async answer(): Promise<void> {
     await this.act('answer_question', {});
+  }
+
+  /** Re-hide at the station nearest the hider's current position (allowed only while unlocked). */
+  async relocate(): Promise<void> {
+    const me = this.state().players.find((p) => p.role === 'hider');
+    if (me?.lat == null || me?.lng == null) {
+      return;
+    }
+    await this.hiding.loadFor(me.lat, me.lng);
+    const station = this.hiding.selected();
+    if (station) {
+      await this.act('choose_station', { lat: station.lat, lng: station.lng });
+    }
   }
 
   async play(curseId: string): Promise<void> {
