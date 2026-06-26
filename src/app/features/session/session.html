@@ -18,7 +18,7 @@
       } @else {
         <app-map class="block h-full" [players]="s.players" [zone]="s.hiding_zone"
                  [stations]="hidingStations(s)" [highlight]="hidingHighlight(s)" [previewZone]="hidingPreviewZone(s)"
-                 [questionMarker]="hiderQuestionMarker(s)" [reveal]="revealMarker(s)" (mapClick)="onMapClick($event)" />
+                 [questionMarker]="hiderQuestionMarker(s)" [reveal]="revealMarker(s)" [transitModes]="transitModes(s)" (mapClick)="onMapClick($event)" />
       }
     </div>
 

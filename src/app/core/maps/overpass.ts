@@ -177,10 +177,10 @@ export class OverpassService {
     return { type: 'FeatureCollection', features };
   }
 
-  /** Nearby transit stops (rail / tram / metro / bus) for the smart hiding flow. */
-  async transitStops(lat: number, lng: number, radiusKm: number): Promise<FeatureCollection<Point>> {
+  /** Nearby transit stops for the smart hiding flow, limited to the game's allowed modes. */
+  async transitStops(lat: number, lng: number, radiusKm: number, modeIds?: string[]): Promise<FeatureCollection<Point>> {
     const radiusM = Math.round(radiusKm * 1000);
-    const filters = ['[railway=station]', '[railway=tram_stop]', '[railway=halt]', '[station=subway]', '[highway=bus_stop]', '[amenity=bus_station]'];
+    const filters = OverpassService.filtersFor(modeIds?.length ? modeIds : DEFAULT_TRANSIT_MODES);
     const body = filters.map((f) => `nwr${f}(around:${radiusM},${lat},${lng});`).join('');
     const ql = `[out:json][timeout:30];(${body});out center;`;
     const geo = osmtogeojson(await this.run(ql)) as FeatureCollection;

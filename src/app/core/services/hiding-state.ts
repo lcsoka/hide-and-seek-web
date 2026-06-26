@@ -31,15 +31,15 @@ export class HidingState {
     return s ? { lat: s.lat, lng: s.lng } : null;
   });
 
-  async loadFor(lat: number, lng: number): Promise<void> {
-    const key = `${lat.toFixed(3)},${lng.toFixed(3)}`;
+  async loadFor(lat: number, lng: number, modeIds?: string[]): Promise<void> {
+    const key = `${lat.toFixed(3)},${lng.toFixed(3)}|${(modeIds ?? []).join(',')}`;
     if (key === this.loadedKey) {
       return;
     }
     this.loadedKey = key;
 
     try {
-      const fc = await this.overpass.transitStops(lat, lng, 1.5);
+      const fc = await this.overpass.transitStops(lat, lng, 1.5, modeIds);
       const here = point([lng, lat]);
       const list = fc.features
         .map((f) => {

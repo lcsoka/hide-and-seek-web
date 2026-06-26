@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TRANSIT_MODES } from '../../core/maps/overpass';
 import { ApiClient } from '../../core/services/api-client';
 import { PlayerStore } from '../../core/services/player-store';
 import { TokenStore } from '../../core/services/token-store';
@@ -39,6 +40,23 @@ import { TokenStore } from '../../core/services/token-store';
             <option value="imperial">Imperial (mi)</option>
           </select>
         </div>
+
+        <div class="space-y-1.5">
+          <div class="text-sm font-medium">Transport players can hide at</div>
+          <div class="flex flex-wrap gap-2">
+            @for (m of allModes; track m.id) {
+              <button type="button" (click)="toggleMode(m.id)"
+                      class="rounded-full border px-3 py-1.5 text-sm font-medium transition"
+                      [class]="modes().includes(m.id)
+                        ? 'border-rose-500 bg-rose-50 text-rose-700 dark:border-rose-500 dark:bg-rose-950 dark:text-rose-300'
+                        : 'border-gray-300 text-gray-500 hover:border-gray-400 dark:border-gray-600 dark:text-gray-400'">
+                {{ m.label }}
+              </button>
+            }
+          </div>
+          <p class="text-xs text-gray-400">Denser networks (e.g. bus) make smaller hiding zones.</p>
+        </div>
+
         <button (click)="create()" [disabled]="busy()"
                 class="w-full rounded-lg bg-rose-600 p-3 font-medium text-white hover:bg-rose-700 disabled:opacity-50">
           Create game
@@ -72,6 +90,8 @@ export class Landing {
 
   readonly cities = ['budapest', 'debrecen', 'szeged', 'miskolc', 'pecs', 'gyor', 'nyiregyhaza', 'kecskemet', 'szekesfehervar', 'szombathely'];
   readonly sizes = ['small', 'medium', 'large'];
+  readonly allModes = TRANSIT_MODES;
+  readonly modes = signal<string[]>(['metro', 'tram']);
 
   name = '';
   city = 'budapest';
@@ -79,10 +99,15 @@ export class Landing {
   units = 'metric';
   joinCode = '';
 
+  /** Toggle a transit mode, but never let the last one be removed (need ≥1 to hide at). */
+  toggleMode(id: string): void {
+    this.modes.update((m) => (m.includes(id) ? (m.length > 1 ? m.filter((x) => x !== id) : m) : [...m, id]));
+  }
+
   async create(): Promise<void> {
     await this.run(async () => {
       await this.ensureToken();
-      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined, config: { units: this.units } });
+      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined, config: { units: this.units, transit_modes: this.modes() } });
       if (session.host_player_id) {
         this.players.set(session.id, session.host_player_id);
       }

@@ -25,6 +25,8 @@ export class MapView {
   readonly questionMarker = input<{ lat: number; lng: number; radiusM?: number | null; label?: string } | null>(null);
   // Round-over reveal of where the hider was hiding.
   readonly reveal = input<{ lat: number; lng: number; label?: string } | null>(null);
+  // The game's allowed transit modes — which stops bound the carved zone.
+  readonly transitModes = input<string[] | undefined>(undefined);
   readonly mapClick = output<Position>();
 
   private map?: L.Map;
@@ -59,14 +61,15 @@ export class MapView {
       if (!az) {
         return;
       }
-      const key = `${az.lat.toFixed(4)},${az.lng.toFixed(4)}`;
+      const modes = this.transitModes();
+      const key = `${az.lat.toFixed(4)},${az.lng.toFixed(4)}|${(modes ?? []).join(',')}`;
       if (key === this.carveKey) {
         return;
       }
       this.carveKey = key;
       this.carveNeighbors.set(null);
       void this.overpass
-        .transitStops(az.lat, az.lng, (az.radiusM * 2) / 1000)
+        .transitStops(az.lat, az.lng, (az.radiusM * 2) / 1000, modes)
         .then((fc) => this.carveNeighbors.set(fc.features.map((f) => ({ lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }))))
         .catch(() => this.carveNeighbors.set([]));
     });

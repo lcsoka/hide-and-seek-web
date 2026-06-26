@@ -159,6 +159,11 @@ export class SessionView {
     return p ? { lat: p.lat, lng: p.lng, radiusM: Number(s.config?.['hiding_zone_radius_m'] ?? 400) || 400 } : null;
   }
 
+  /** The transit modes players may hide at (drives the station picker + zone carve). */
+  transitModes(s: GameState): string[] | undefined {
+    return s.config?.['transit_modes'] as string[] | undefined;
+  }
+
   /** The hider sees the seeker's pending question on their map. For a place question
    *  this is the seeker's closest object; otherwise the ask point (+ radar radius). */
   hiderQuestionMarker(s: GameState): { lat: number; lng: number; radiusM?: number | null; label?: string } | null {
