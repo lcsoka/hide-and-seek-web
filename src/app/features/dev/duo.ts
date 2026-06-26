@@ -87,6 +87,15 @@ export class DevDuo {
   size = 'medium';
   spectateId = '';
 
+  constructor() {
+    // `?watch=CODE` (printed by `php artisan game:simulate --watch`) → auto-spectate it.
+    const code = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).get('watch');
+    if (code) {
+      this.spectateId = code;
+      void this.spectate();
+    }
+  }
+
   async create(): Promise<void> {
     this.busy.set(true);
     this.error.set(null);
