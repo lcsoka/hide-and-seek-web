@@ -138,7 +138,7 @@ export interface CurseCatalogItem {
   name: string;
   cost: string;
   description: string;
-  parameters: Record<string, unknown> | null;
+  effect: Record<string, unknown> | null;
 }
 
 /** A card in the hider's hand or draw (curse, time bonus, or powerup). */
