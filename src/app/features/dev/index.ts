@@ -27,6 +27,9 @@ import { TokenStore } from '../../core/services/token-store';
                 class="w-full rounded-lg bg-rose-600 p-3 font-medium text-white hover:bg-rose-700 disabled:opacity-50">
           Create &amp; play
         </button>
+        <a routerLink="/dev/duo" class="block rounded-lg border border-gray-300 p-3 text-center font-medium hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800">
+          👥 Duo view — watch a host &amp; seeker(s) play side by side
+        </a>
       </section>
 
       <section class="space-y-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
