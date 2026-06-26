@@ -86,6 +86,14 @@
             }
           </div>
 
+          @if (c.hint_photo_url) {
+            <div class="space-y-1">
+              <div class="text-xs font-medium text-purple-700 dark:text-purple-300">🗺️ Find this place:</div>
+              <a [href]="c.hint_photo_url" target="_blank" rel="noopener">
+                <img [src]="c.hint_photo_url" alt="Find this Street View location" class="h-40 w-full rounded-lg object-cover ring-1 ring-black/10" />
+              </a>
+            </div>
+          }
           @if (c.status === 'completed' && c.proof_url) {
             <a [href]="c.proof_url" target="_blank" rel="noopener">
               <img [src]="c.proof_url" alt="Proof" class="h-24 w-full rounded-lg object-cover ring-1 ring-black/10" />

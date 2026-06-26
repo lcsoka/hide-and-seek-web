@@ -36,6 +36,17 @@ interface DuoView {
                 class="rounded-lg bg-rose-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-50">
           {{ busy() ? 'Creating…' : 'Create duo game' }}
         </button>
+
+        <span class="mx-1 h-6 w-px bg-gray-300 dark:bg-gray-700"></span>
+        <label class="flex items-center gap-1 text-sm">Spectate
+          <input [(ngModel)]="spectateId" placeholder="session id or code"
+                 class="w-48 rounded border border-gray-300 p-1 dark:border-gray-600 dark:bg-gray-800" />
+        </label>
+        <button (click)="spectate()" [disabled]="busy() || !spectateId.trim()"
+                class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 dark:border-gray-600 dark:hover:bg-gray-800">
+          Watch existing
+        </button>
+
         @if (joinCode()) {
           <span class="text-sm text-gray-500 dark:text-gray-400">Code <b class="font-mono">{{ joinCode() }}</b> — others can join too.</span>
         }
@@ -58,7 +69,7 @@ interface DuoView {
         </div>
       } @else {
         <div class="grid flex-1 place-items-center p-6 text-center text-gray-400">
-          <p>Create a game to watch a host and seeker(s) play side by side.<br />Each pane is a real, independent client — drive any of them.</p>
+          <p>Create a game to watch a host and seeker(s) play side by side,<br />or spectate an existing session by id/code.<br />Each pane is a real, independent client — drive any of them.</p>
         </div>
       }
     </main>
@@ -74,6 +85,7 @@ export class DevDuo {
   readonly joinCode = signal<string | null>(null);
   seekers = 1;
   size = 'medium';
+  spectateId = '';
 
   async create(): Promise<void> {
     this.busy.set(true);
@@ -97,6 +109,49 @@ export class DevDuo {
     } finally {
       this.busy.set(false);
     }
+  }
+
+  /** Watch an EXISTING session: mint a token for each of its players and render their real views. */
+  async spectate(): Promise<void> {
+    const id = this.spectateId.trim();
+    this.busy.set(true);
+    this.error.set(null);
+    this.views.set([]);
+    try {
+      const god = await this.debug(`/sessions/${id}/debug/state`);
+      const sessionId: string = god.session_id ?? id;
+      this.joinCode.set(god.state_data?.join_code ?? null);
+      const players: any[] = god.players ?? [];
+      if (!players.length) {
+        throw new Error('That session has no players yet.');
+      }
+
+      const views: DuoView[] = [];
+      for (const p of players) {
+        const { token } = await this.debug(`/sessions/${sessionId}/debug/token`, { player_id: p.id });
+        const role = p.role === 'hider' ? 'hider' : 'seeker';
+        views.push(this.view(p.display_name ?? 'Player', role, sessionId, p.id, token));
+      }
+      this.views.set(views);
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Could not open that session.');
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  /** A debug-API call (GET when no body) carrying the dev token. */
+  private async debug(path: string, body?: unknown): Promise<any> {
+    const res = await fetch(this.base + path, {
+      method: body ? 'POST' : 'GET',
+      headers: { 'Content-Type': 'application/json', 'X-Developer-Token': environment.developerToken },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    if (!res.ok) {
+      throw new Error(`${path} → ${res.status}`);
+    }
+
+    return res.json();
   }
 
   private view(name: string, role: 'hider' | 'seeker', sessionId: string, playerId: string, token: string): DuoView {

@@ -111,6 +111,8 @@ export interface ActiveCurse {
   expires_at: number | null;
   status: 'active' | 'completed' | 'expired';
   proof_url: string | null;
+  /** A photo the hider attached when casting (e.g. the Unguided Tourist's Street View shot). */
+  hint_photo_url?: string | null;
 }
 
 export interface GameTimers {
@@ -151,6 +153,8 @@ export interface HandCard {
   name: string | null;
   cost?: string | null;
   description: string | null;
+  /** This curse requires the hider to attach a photo (e.g. a Street View screenshot) to cast it. */
+  needs_photo?: boolean;
 }
 
 /** Cards the hider just drew and must choose `keep` of. */

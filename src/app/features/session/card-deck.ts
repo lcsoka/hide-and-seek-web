@@ -141,23 +141,30 @@ export class CardDeck {
     await this.act('answer_question', { photo_url: url });
   }
 
-  /** Manual answer options when there's no auto-truth (matching / measuring). */
+  /** Manual answer options when there's no auto-truth (matching / measuring / tentacles). */
   readonly manualOptions = computed<{ value: string; label: string }[] | null>(() => {
     switch (this.pending()?.category) {
       case 'matching':
         return [{ value: 'yes', label: 'Yes — same' }, { value: 'no', label: 'No — different' }];
       case 'measuring':
         return [{ value: 'closer', label: 'Closer' }, { value: 'further', label: 'Further' }];
+      case 'tentacles':
+        return [{ value: 'in_range', label: 'In range' }, { value: 'out_of_range', label: 'Out of range' }];
       default:
         return null;
     }
   });
 
-  readonly manualPrompt = computed(() =>
-    this.pending()?.category === 'measuring'
-      ? 'Compared to the seeker, are you closer to or further from it?'
-      : "Is the seeker's closest place also your nearest?",
-  );
+  readonly manualPrompt = computed(() => {
+    switch (this.pending()?.category) {
+      case 'measuring':
+        return 'Compared to the seeker, are you closer to or further from it?';
+      case 'tentacles':
+        return "Are you within the question's range of one of the seeker's nearby places?";
+      default:
+        return "Is the seeker's closest place also your nearest?";
+    }
+  });
 
   /** The hider answers manually (matching/measuring) when the auto-truth couldn't be computed. */
   async answerManual(answer: string): Promise<void> {
@@ -178,6 +185,9 @@ export class CardDeck {
   amendOptions(category: string | null | undefined): string[] {
     if (category === 'matching') {
       return ['yes', 'no'];
+    }
+    if (category === 'tentacles') {
+      return ['in_range', 'out_of_range'];
     }
 
     return category === 'measuring' ? ['closer', 'further'] : [];
@@ -228,6 +238,15 @@ export class CardDeck {
     this.confirmCard.set(null);
     if (card) {
       await this.act('play_curse', { card_uid: card.uid });
+    }
+  }
+
+  /** Cast a curse that requires a hider photo (e.g. a Street View screenshot) once it's uploaded. */
+  async confirmPlayWithPhoto(url: string): Promise<void> {
+    const card = this.confirmCard();
+    this.confirmCard.set(null);
+    if (card) {
+      await this.act('play_curse', { card_uid: card.uid, photo_url: url });
     }
   }
 

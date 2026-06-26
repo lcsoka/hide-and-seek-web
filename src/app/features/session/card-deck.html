@@ -29,10 +29,20 @@
     <div class="space-y-2 rounded-xl border-2 border-purple-400 bg-purple-50 p-3 dark:bg-purple-950">
       <div class="text-sm">Cast <b>{{ c.name }}</b> on the seekers?</div>
       @if (c.description) { <div class="text-xs text-gray-600 dark:text-gray-300">{{ c.description }}</div> }
-      <div class="flex gap-2">
-        <button (click)="confirmPlay()" [disabled]="busy()" class="flex-1 rounded-lg bg-purple-600 p-2 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-40">Cast it</button>
-        <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">Cancel</button>
-      </div>
+      @if (c.needs_photo) {
+        <p class="text-xs font-medium text-purple-700 dark:text-purple-300">📸 Send the seekers a Street View screenshot — they must find it.</p>
+        <div class="flex gap-2">
+          <app-image-upload class="flex-1" [sessionId]="sessionId()" label="📷 Send screenshot &amp; cast"
+                            cssClass="block w-full cursor-pointer rounded-lg bg-purple-600 p-2 text-center text-sm font-semibold text-white hover:bg-purple-700"
+                            (uploaded)="confirmPlayWithPhoto($event)" />
+          <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">Cancel</button>
+        </div>
+      } @else {
+        <div class="flex gap-2">
+          <button (click)="confirmPlay()" [disabled]="busy()" class="flex-1 rounded-lg bg-purple-600 p-2 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-40">Cast it</button>
+          <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">Cancel</button>
+        </div>
+      }
     </div>
   }
 
@@ -81,7 +91,7 @@
               @for (o of opts; track o.value) {
                 <button (click)="answerManual(o.value)" [disabled]="busy()"
                         class="flex-1 rounded-lg p-2 font-semibold text-white disabled:opacity-40"
-                        [class]="o.value === 'no' || o.value === 'further' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-green-600 hover:bg-green-700'">
+                        [class]="o.value === 'no' || o.value === 'further' || o.value === 'out_of_range' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-green-600 hover:bg-green-700'">
                   {{ o.label }}
                 </button>
               }
