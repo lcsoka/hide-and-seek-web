@@ -94,17 +94,24 @@ export function hidingZone(center: { lat: number; lng: number }, radiusM: number
   return zone;
 }
 
+/** A station that forms an edge of the carved zone: the boundary is the halfway line to it. */
+export interface ZoneCut {
+  station: { lat: number; lng: number };
+  mid: { lat: number; lng: number }; // the halfway point (on the carved boundary) — where it cuts
+}
+
 export interface HidingZoneViz {
   original: Poly; // the full radius circle (before carving)
   carved: Poly; // the final hiding zone
   removed: Poly | null; // the slices cut away (original − carved), to shade differently
-  bounding: { lat: number; lng: number }[]; // the stations near enough to carve the zone
+  cuts: ZoneCut[]; // the stations whose halfway line forms a zone edge (what makes it small)
 }
 
 /**
  * The hiding zone broken into layers for display: the original radius, the carved zone, the
- * removed slices (so they can be shaded as "cut by a nearer station"), and the bounding
- * stations doing the cutting — nearest first, capped to keep the map readable.
+ * removed slices, and the CUTS — the stations whose perpendicular bisector (halfway line)
+ * actually forms an edge of the zone, plus that halfway point. Drawing a line to each makes
+ * it obvious WHY the zone is the size it is (it's cut halfway toward every nearer station).
  */
 export function hidingZoneViz(center: { lat: number; lng: number }, radiusM: number, neighbors: { lat: number; lng: number }[]): HidingZoneViz {
   const original = circle([center.lng, center.lat], radiusM / 1000, { units: 'kilometers', steps: 96 }) as Poly;
@@ -123,14 +130,27 @@ export function hidingZoneViz(center: { lat: number; lng: number }, radiusM: num
 
     return Math.hypot(dLat, dLng);
   };
-  const bounding = neighbors
-    .map((n) => ({ n, d: metres(n) }))
-    .filter((x) => x.d >= 25 && x.d <= radiusM * 1.6) // beyond the chosen stop, close enough to clip
-    .sort((a, b) => a.d - b.d)
-    .slice(0, 24)
-    .map((x) => x.n);
 
-  return { original, carved, removed, bounding };
+  // A neighbour forms an edge when the halfway point between it and the chosen stop lies ON
+  // the carved boundary (that bisector IS the edge). Stations blocked by a closer one have a
+  // halfway point well outside the zone, so they're excluded.
+  const cuts: ZoneCut[] = [];
+  for (const n of neighbors) {
+    const d = metres(n);
+    if (d < 25 || d > radiusM * 2) {
+      continue; // the chosen stop itself, or too far for its bisector to reach the radius
+    }
+    const mid = { lat: (center.lat + n.lat) / 2, lng: (center.lng + n.lng) / 2 };
+    try {
+      if (Math.abs(pointToPolygonDistance(point([mid.lng, mid.lat]), carved)) < 0.03) {
+        cuts.push({ station: { lat: n.lat, lng: n.lng }, mid });
+      }
+    } catch {
+      // ignore a degenerate polygon
+    }
+  }
+
+  return { original, carved, removed, cuts };
 }
 
 export function radarCircle(q: RadarQuestion): Poly {

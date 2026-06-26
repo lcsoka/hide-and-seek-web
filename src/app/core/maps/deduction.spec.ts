@@ -1,5 +1,5 @@
 import { area, booleanPointInPolygon, featureCollection, point } from '@turf/turf';
-import { applyQuestions, hidingZone, measuringRegionToBorder, playArea, RadarQuestion, RegionQuestion, tentacleRegion, ThermometerQuestion } from './deduction';
+import { applyQuestions, hidingZone, hidingZoneViz, measuringRegionToBorder, playArea, RadarQuestion, RegionQuestion, tentacleRegion, ThermometerQuestion } from './deduction';
 import { Feature, FeatureCollection, Point, Polygon } from 'geojson';
 
 const BUD = { lat: 47.4979, lng: 19.0402 };
@@ -21,6 +21,20 @@ describe('hidingZone carve', () => {
 
   it('is smaller than the plain radius circle', () => {
     expect(area(zone)).toBeLessThan(area(hidingZone(center, 800, [])));
+  });
+
+  it('reports the cutting station + its halfway point (the cut)', () => {
+    const viz = hidingZoneViz(center, 800, [neighbor]);
+    expect(viz.cuts.length).toBe(1);
+    expect(viz.cuts[0].station).toEqual(neighbor);
+    // The cut sits halfway between the chosen stop and the neighbour.
+    expect(viz.cuts[0].mid.lng).toBeCloseTo((center.lng + neighbor.lng) / 2, 5);
+    expect(viz.removed).not.toBeNull();
+  });
+
+  it('ignores a far station whose halfway line never reaches the zone', () => {
+    const far = { lat: 47.5, lng: 19.2 }; // ~10 km away — its bisector is well outside the radius
+    expect(hidingZoneViz(center, 800, [far]).cuts.length).toBe(0);
   });
 });
 

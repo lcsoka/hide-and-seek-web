@@ -101,10 +101,17 @@ export class MapView {
       L.geoJSON(viz.removed, { style: { stroke: false, fillColor: '#ef4444', fillOpacity: 0.15 } }).addTo(this.overlay!);
     }
     L.geoJSON(viz.carved, { style: { color: '#f59e0b', weight: 3, fillColor: '#f59e0b', fillOpacity: 0.15 } }).addTo(this.overlay!);
-    if (showPins) {
-      for (const n of viz.bounding) {
-        L.marker([n.lat, n.lng], { icon: markerIcon('🚉', { color: '#6b7280', size: 20 }) })
-          .bindTooltip('Another station — your zone is cut where this one is nearer')
+
+    // Make it obvious WHY the zone is this size: a line from the chosen spot to every
+    // station that forms an edge, with a tick at the halfway point — the zone is cut there.
+    for (const cut of viz.cuts) {
+      L.polyline([[center.lat, center.lng], [cut.station.lat, cut.station.lng]], { color: '#334155', weight: 1.5, dashArray: '2 4', opacity: 0.75 }).addTo(this.overlay!);
+      L.circleMarker([cut.mid.lat, cut.mid.lng], { radius: 3.5, color: '#334155', weight: 1.5, fillColor: '#ffffff', fillOpacity: 1 })
+        .bindTooltip('Cut here — halfway to a nearer station', { direction: 'top' })
+        .addTo(this.overlay!);
+      if (showPins) {
+        L.marker([cut.station.lat, cut.station.lng], { icon: markerIcon('🚉', { color: '#6b7280', size: 20 }) })
+          .bindTooltip('A nearer station bounds your zone')
           .addTo(this.overlay!);
       }
     }
