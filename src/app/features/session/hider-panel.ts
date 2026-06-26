@@ -33,8 +33,9 @@ export class HiderPanel {
     effect(() => {
       const m = this.me();
       const modes = this.state().config?.['transit_modes'] as string[] | undefined;
+      const radiusM = Number(this.state().config?.['hiding_zone_radius_m'] ?? 400) || 400;
       if (m?.lat != null && m?.lng != null) {
-        void this.hiding.loadFor(m.lat, m.lng, modes);
+        void this.hiding.loadFor(m.lat, m.lng, modes, radiusM);
       }
     });
   }

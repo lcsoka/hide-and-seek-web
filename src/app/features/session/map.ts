@@ -1,8 +1,7 @@
-import { afterNextRender, Component, effect, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, computed, effect, ElementRef, inject, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
 import { hidingZoneViz } from '../../core/maps/deduction';
-import { OverpassService } from '../../core/maps/overpass';
 import { disperse } from '../../core/maps/spread';
 import { HidingState } from '../../core/services/hiding-state';
 import { HidingZone, PlayerView, Position } from '../../core/models/models';
@@ -33,12 +32,21 @@ export class MapView {
   private map?: L.Map;
   private overlay?: L.LayerGroup;
   private centred = false;
-  private readonly overpass = inject(OverpassService);
   private readonly hiding = inject(HidingState);
-  // All transit stops near the zone centre, fetched via the cached proxy — reliable
-  // neighbours for carving the zone (the backend's synchronous fetch can be throttled to 0).
-  private readonly carveNeighbors = signal<{ lat: number; lng: number }[] | null>(null);
-  private carveKey = '';
+
+  // The carve's neighbours: the shared nearby-stops set (fetched once by HidingState, also
+  // feeding the picker) filtered to within 2× the radius of the active zone centre. null
+  // while the stops are still loading. No second Overpass fetch.
+  private readonly carveNeighbors = computed<{ lat: number; lng: number }[] | null>(() => {
+    const az = this.activeZone();
+    const all = this.hiding.allStops();
+    if (!az || !all) {
+      return null;
+    }
+    const r = az.radiusM * 2;
+
+    return all.filter((s) => this.metresBetween(az.lat, az.lng, s.lat, s.lng) <= r);
+  });
 
   constructor() {
     afterNextRender(() => this.init());
@@ -55,31 +63,21 @@ export class MapView {
       this.render();
     });
 
-    // Load the bounding transit stops for the carve whenever the active centre moves — the
-    // committed zone OR, while the hider is still picking, the previewed spot. So the carved
-    // zone is shown live as the hider moves around looking for somewhere to hide.
+    // During SEEKING the hider-panel isn't mounted, so ensure the shared stops are loaded
+    // around the committed zone (while picking, the hider-panel already loads them).
     effect(() => {
-      const az = this.activeZone();
-      if (!az) {
-        return;
+      const committed = this.zone();
+      if (committed) {
+        void this.hiding.loadFor(committed.center.lat, committed.center.lng, this.transitModes(), committed.radius_m);
       }
-      const modes = this.transitModes();
-      const key = `${az.lat.toFixed(4)},${az.lng.toFixed(4)}|${(modes ?? []).join(',')}`;
-      if (key === this.carveKey) {
-        return;
-      }
-      this.carveKey = key;
-      this.carveNeighbors.set(null);
-      this.hiding.beginWork();
-      void this.overpass
-        .transitStops(az.lat, az.lng, (az.radiusM * 2) / 1000, modes)
-        .then((fc) => this.carveNeighbors.set(fc.features.map((f) => ({ lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }))))
-        .catch(() => {
-          this.carveKey = ''; // don't cache a throttled failure — let the next change retry
-          this.carveNeighbors.set([]);
-        })
-        .finally(() => this.hiding.endWork());
     });
+  }
+
+  private metresBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {
+    const dLat = (bLat - aLat) * 111000;
+    const dLng = (bLng - aLng) * 111000 * Math.cos((aLat * Math.PI) / 180);
+
+    return Math.hypot(dLat, dLng);
   }
 
   /** The zone being shown: the committed one, or (while picking) the previewed spot. */

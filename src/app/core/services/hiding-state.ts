@@ -21,12 +21,13 @@ export interface NearbyStation {
 export class HidingState {
   private readonly overpass = inject(OverpassService);
 
-  readonly stations = signal<NearbyStation[] | null>(null);
+  readonly stations = signal<NearbyStation[] | null>(null); // the 8 nearest, for the picker
+  readonly allStops = signal<{ lat: number; lng: number }[] | null>(null); // every nearby stop, for the map's carve
   readonly selected = signal<NearbyStation | null>(null);
   private loadedKey: string | null = null;
 
-  // > 0 while any hiding-zone work (station list OR the map's carve) is in flight, so the
-  // UI can show a "calculating…" indicator. Incremented by loadFor + MapView's carve fetch.
+  // > 0 while the nearby-stops fetch is in flight, so the UI can show a "calculating…"
+  // indicator. One fetch now feeds both the picker and the carve.
   private readonly inflight = signal(0);
   readonly calculating = computed(() => this.inflight() > 0);
 
@@ -44,8 +45,14 @@ export class HidingState {
     this.inflight.update((n) => Math.max(0, n - 1));
   }
 
-  async loadFor(lat: number, lng: number, modeIds?: string[]): Promise<void> {
-    const key = `${lat.toFixed(3)},${lng.toFixed(3)}|${(modeIds ?? []).join(',')}`;
+  /**
+   * Fetch the nearby transit stops ONCE for both the picker (8 nearest) and the map's carve
+   * (all of them, filtered to the zone). `carveRadiusM` widens the fetch enough to cover the
+   * carve (radius × 2) for the current game size.
+   */
+  async loadFor(lat: number, lng: number, modeIds?: string[], carveRadiusM = 400): Promise<void> {
+    const fetchKm = Math.max(1.5, (carveRadiusM * 2) / 1000 + 0.3);
+    const key = `${lat.toFixed(3)},${lng.toFixed(3)}|${(modeIds ?? []).join(',')}|${Math.round(fetchKm * 10)}`;
     if (key === this.loadedKey) {
       return;
     }
@@ -53,9 +60,9 @@ export class HidingState {
     this.beginWork();
 
     try {
-      const fc = await this.overpass.transitStops(lat, lng, 1.5, modeIds);
+      const fc = await this.overpass.transitStops(lat, lng, fetchKm, modeIds);
       const here = point([lng, lat]);
-      const list = fc.features
+      const all = fc.features
         .map((f) => {
           const [flng, flat] = (f.geometry as Point).coordinates;
 
@@ -67,10 +74,10 @@ export class HidingState {
             modes: classifyStop(f.properties ?? {}),
           };
         })
-        .sort((a, b) => a.distM - b.distM)
-        .slice(0, 8);
-      this.stations.set(list);
-      this.selected.set(list[0] ?? null);
+        .sort((a, b) => a.distM - b.distM);
+      this.allStops.set(all.map((s) => ({ lat: s.lat, lng: s.lng })));
+      this.stations.set(all.slice(0, 8));
+      this.selected.set(all[0] ?? null);
     } catch {
       // Transient failure (Overpass throttled past the retries) — don't cache it: clear the
       // key so the next position update (or re-render) tries again instead of staying empty.
