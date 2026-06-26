@@ -39,6 +39,11 @@ import { TokenStore } from '../../core/services/token-store';
             <option value="metric">Metric (km)</option>
             <option value="imperial">Imperial (mi)</option>
           </select>
+          <select [(ngModel)]="zoneRule" aria-label="Hiding zone"
+                  class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
+            <option value="nearest">Zone: carved (no other station inside)</option>
+            <option value="circle">Zone: simple circle</option>
+          </select>
         </div>
 
         <div class="space-y-1.5">
@@ -97,6 +102,7 @@ export class Landing {
   city = 'budapest';
   size = 'medium';
   units = 'metric';
+  zoneRule = 'nearest';
   joinCode = '';
 
   /** Toggle a transit mode, but never let the last one be removed (need ≥1 to hide at). */
@@ -107,7 +113,7 @@ export class Landing {
   async create(): Promise<void> {
     await this.run(async () => {
       await this.ensureToken();
-      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined, config: { units: this.units, transit_modes: this.modes() } });
+      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined, config: { units: this.units, transit_modes: this.modes(), hiding_zone_rule: this.zoneRule } });
       if (session.host_player_id) {
         this.players.set(session.id, session.host_player_id);
       }

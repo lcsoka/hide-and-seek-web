@@ -27,6 +27,8 @@ export class MapView {
   readonly reveal = input<{ lat: number; lng: number; label?: string } | null>(null);
   // The game's allowed transit modes — which stops bound the carved zone.
   readonly transitModes = input<string[] | undefined>(undefined);
+  // 'nearest' = carve the zone (no other station inside); 'circle' = plain radius.
+  readonly zoneRule = input<string>('nearest');
   readonly mapClick = output<Position>();
 
   private map?: L.Map;
@@ -35,17 +37,17 @@ export class MapView {
   private readonly hiding = inject(HidingState);
 
   // The carve's neighbours: the shared nearby-stops set (fetched once by HidingState, also
-  // feeding the picker) filtered to within 2× the radius of the active zone centre. null
-  // while the stops are still loading. No second Overpass fetch.
+  // feeding the picker) that fall INSIDE the zone radius — so the zone is carved only by
+  // stations that would otherwise be inside it (no other station can be in the zone), and a
+  // station just outside the radius never cuts it. null while the stops are still loading.
   private readonly carveNeighbors = computed<{ lat: number; lng: number }[] | null>(() => {
     const az = this.activeZone();
     const all = this.hiding.allStops();
     if (!az || !all) {
       return null;
     }
-    const r = az.radiusM * 2;
 
-    return all.filter((s) => this.metresBetween(az.lat, az.lng, s.lat, s.lng) <= r);
+    return all.filter((s) => this.metresBetween(az.lat, az.lng, s.lat, s.lng) <= az.radiusM);
   });
 
   constructor() {
@@ -153,18 +155,29 @@ export class MapView {
         .addTo(this.overlay);
     }
 
+    // 'circle' rule = a plain radius (official, other stations don't matter); otherwise carve.
+    const carve = this.zoneRule() !== 'circle';
+
     // The committed zone (seeking) shows the carve with bounding-station pins.
     const zone = this.zone();
     if (zone) {
-      this.drawCarvedZone(zone.center, zone.radius_m, true);
+      if (carve) {
+        this.drawCarvedZone(zone.center, zone.radius_m, true);
+      } else {
+        L.circle([zone.center.lat, zone.center.lng], { radius: zone.radius_m, color: '#f59e0b', weight: 2, fillOpacity: 0.12 }).addTo(this.overlay);
+      }
     }
 
-    // While the hider is still picking, show the SAME carve live for the previewed spot
+    // While the hider is still picking, show the SAME zone live for the previewed spot
     // (recomputed as they move) so they can see the area they'd hide in. The pickable
     // stops are drawn as their own mode-coloured markers below, so skip the grey pins.
     const preview = this.previewZone();
     if (preview && !zone) {
-      this.drawCarvedZone({ lat: preview.lat, lng: preview.lng }, preview.radiusM, false);
+      if (carve) {
+        this.drawCarvedZone({ lat: preview.lat, lng: preview.lng }, preview.radiusM, false);
+      } else {
+        L.circle([preview.lat, preview.lng], { radius: preview.radiusM, color: '#f59e0b', weight: 1, dashArray: '4 4', fillOpacity: 0.08 }).addTo(this.overlay);
+      }
     }
     for (const st of disperse(this.stations())) {
       const meta = transitMeta(st.modes?.[0] ?? 'stop');

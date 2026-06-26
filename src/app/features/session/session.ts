@@ -164,6 +164,11 @@ export class SessionView {
     return s.config?.['transit_modes'] as string[] | undefined;
   }
 
+  /** Hiding-zone rule: 'nearest' (carved, no other station inside) or 'circle' (plain radius). */
+  zoneRule(s: GameState): string {
+    return (s.config?.['hiding_zone_rule'] as string) ?? 'nearest';
+  }
+
   /** True while the hiding zone (stations + carve) is being fetched — shows a HUD loader. */
   hidingCalculating(): boolean {
     return this.hiding.calculating();
