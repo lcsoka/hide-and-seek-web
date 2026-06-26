@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FEATURE_TAGS } from '../../core/maps/osm-deduction';
 import { OverpassService } from '../../core/maps/overpass';
+import { distanceMeters } from '../../core/util/geo';
 import { ActiveCurse, GameState, HandCard, PendingQuestion, ResolvedQuestion } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
@@ -13,6 +14,7 @@ interface TentaclePlace {
   name: string;
   lat: number;
   lng: number;
+  distanceM?: number; // distance from the hider (for sorting + display)
 }
 
 /** The hider's hand: see the full pending question, confirm the answer, play cards. */
@@ -158,13 +160,19 @@ export class CardDeck {
     }
     try {
       const fc = await this.overpass.pois(lat, lng, (q.params?.radius_m ?? 1609) / 1000, tag);
+      const me = this.state().players.find((p) => p.role === 'hider');
+      const here = me?.lat != null && me?.lng != null ? { lat: me.lat, lng: me.lng } : null;
       const places = fc.features
-        .map((f) => ({
-          name: (f.properties?.['name'] as string) ?? 'Unnamed',
-          lat: f.geometry.coordinates[1],
-          lng: f.geometry.coordinates[0],
-        }))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .map((f) => {
+          const place: TentaclePlace = { name: (f.properties?.['name'] as string) ?? 'Unnamed', lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] };
+          if (here) {
+            place.distanceM = distanceMeters(here, { lat: place.lat, lng: place.lng });
+          }
+
+          return place;
+        })
+        // Nearest to the hider first (that's the one they'll pick); names break ties.
+        .sort((a, b) => (a.distanceM ?? Infinity) - (b.distanceM ?? Infinity) || a.name.localeCompare(b.name));
       this.tentaclePlaces.set(places);
     } catch {
       this.tentaclePlaces.set([]); // unavailable → the simple In range / Out of range fallback shows
@@ -174,6 +182,10 @@ export class CardDeck {
   /** The hider names the specific place they're nearest to (tentacles). */
   async answerTentaclePlace(place: TentaclePlace): Promise<void> {
     await this.act('answer_question', { answer: 'in_range', feature_name: place.name, feature_lat: place.lat, feature_lng: place.lng });
+  }
+
+  placeDistance(m: number | undefined): string {
+    return m == null ? '' : formatDistance(m, this.units());
   }
 
   cardClass(card: HandCard): string {

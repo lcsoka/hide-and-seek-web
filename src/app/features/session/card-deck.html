@@ -93,8 +93,11 @@
               <div class="max-h-48 space-y-1 overflow-y-auto">
                 @for (pl of tentaclePlaces(); track pl.name) {
                   <button (click)="answerTentaclePlace(pl)" [disabled]="busy()"
-                          class="block w-full truncate rounded-lg bg-green-600 p-2 text-left text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-40">
-                    {{ pl.name }}
+                          class="flex w-full items-center justify-between gap-2 rounded-lg bg-green-600 p-2 text-left text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-40">
+                    <span class="truncate">{{ pl.name }}</span>
+                    @if (pl.distanceM != null) {
+                      <span class="shrink-0 rounded bg-black/20 px-1.5 py-0.5 font-mono text-xs">{{ placeDistance(pl.distanceM) }}</span>
+                    }
                   </button>
                 }
               </div>

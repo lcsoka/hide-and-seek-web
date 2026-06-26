@@ -1,7 +1,8 @@
-import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
+import { afterNextRender, Component, effect, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
-import { hidingZone } from '../../core/maps/deduction';
+import { hidingZoneViz } from '../../core/maps/deduction';
+import { OverpassService } from '../../core/maps/overpass';
 import { disperse } from '../../core/maps/spread';
 import { HidingZone, PlayerView, Position } from '../../core/models/models';
 import { transitMeta } from '../../core/util/transit';
@@ -29,6 +30,11 @@ export class MapView {
   private map?: L.Map;
   private overlay?: L.LayerGroup;
   private centred = false;
+  private readonly overpass = inject(OverpassService);
+  // All transit stops near the zone centre, fetched via the cached proxy — reliable
+  // neighbours for carving the zone (the backend's synchronous fetch can be throttled to 0).
+  private readonly carveNeighbors = signal<{ lat: number; lng: number }[] | null>(null);
+  private carveKey = '';
 
   constructor() {
     afterNextRender(() => this.init());
@@ -41,7 +47,26 @@ export class MapView {
       this.previewZone();
       this.questionMarker();
       this.reveal();
+      this.carveNeighbors();
       this.render();
+    });
+
+    // Load the bounding transit stops for the carve when the hider's zone centre changes.
+    effect(() => {
+      const zone = this.zone();
+      if (!zone) {
+        return;
+      }
+      const key = `${zone.center.lat.toFixed(5)},${zone.center.lng.toFixed(5)}`;
+      if (key === this.carveKey) {
+        return;
+      }
+      this.carveKey = key;
+      this.carveNeighbors.set(null);
+      void this.overpass
+        .transitStops(zone.center.lat, zone.center.lng, (zone.radius_m * 2) / 1000)
+        .then((fc) => this.carveNeighbors.set(fc.features.map((f) => ({ lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }))))
+        .catch(() => this.carveNeighbors.set([]));
     });
   }
 
@@ -75,11 +100,23 @@ export class MapView {
 
     const zone = this.zone();
     if (zone) {
-      // Draw the true (carved) zone: the radius circle minus areas closer to another
-      // station, so the hider sees exactly where their station stays the nearest.
-      if (zone.neighbors?.length) {
-        const carved = hidingZone(zone.center, zone.radius_m, zone.neighbors);
-        L.geoJSON(carved, { style: { color: '#f59e0b', weight: 2, fillOpacity: 0.12 } }).addTo(this.overlay);
+      // Show WHY the zone is the shape it is: the original radius (dashed), the slices cut
+      // away because a different station is nearer (red), the final zone (bold amber
+      // outline), and the bounding stations doing the cutting (grey pins). Prefer the
+      // proxy-fetched stops (reliable) over the backend's (sometimes throttled to none).
+      const neighbors = this.carveNeighbors() ?? zone.neighbors ?? [];
+      if (neighbors.length) {
+        const viz = hidingZoneViz(zone.center, zone.radius_m, neighbors);
+        L.geoJSON(viz.original, { style: { color: '#9ca3af', weight: 1, dashArray: '4 4', fill: false } }).addTo(this.overlay);
+        if (viz.removed) {
+          L.geoJSON(viz.removed, { style: { stroke: false, fillColor: '#ef4444', fillOpacity: 0.18 } }).addTo(this.overlay);
+        }
+        L.geoJSON(viz.carved, { style: { color: '#f59e0b', weight: 3, fillColor: '#f59e0b', fillOpacity: 0.15 } }).addTo(this.overlay);
+        for (const n of viz.bounding) {
+          L.marker([n.lat, n.lng], { icon: markerIcon('🚉', { color: '#6b7280', size: 20 }) })
+            .bindTooltip('Another station — your zone is cut where this one is nearer')
+            .addTo(this.overlay);
+        }
       } else {
         L.circle([zone.center.lat, zone.center.lng], { radius: zone.radius_m, color: '#f59e0b', fillOpacity: 0.1 }).addTo(this.overlay);
       }

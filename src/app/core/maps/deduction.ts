@@ -94,6 +94,45 @@ export function hidingZone(center: { lat: number; lng: number }, radiusM: number
   return zone;
 }
 
+export interface HidingZoneViz {
+  original: Poly; // the full radius circle (before carving)
+  carved: Poly; // the final hiding zone
+  removed: Poly | null; // the slices cut away (original − carved), to shade differently
+  bounding: { lat: number; lng: number }[]; // the stations near enough to carve the zone
+}
+
+/**
+ * The hiding zone broken into layers for display: the original radius, the carved zone, the
+ * removed slices (so they can be shaded as "cut by a nearer station"), and the bounding
+ * stations doing the cutting — nearest first, capped to keep the map readable.
+ */
+export function hidingZoneViz(center: { lat: number; lng: number }, radiusM: number, neighbors: { lat: number; lng: number }[]): HidingZoneViz {
+  const original = circle([center.lng, center.lat], radiusM / 1000, { units: 'kilometers', steps: 96 }) as Poly;
+  const carved = hidingZone(center, radiusM, neighbors);
+
+  let removed: Poly | null = null;
+  try {
+    removed = difference(featureCollection([original, carved])) as Poly | null;
+  } catch {
+    removed = null;
+  }
+
+  const metres = (n: { lat: number; lng: number }): number => {
+    const dLat = (n.lat - center.lat) * 111000;
+    const dLng = (n.lng - center.lng) * 111000 * Math.cos((center.lat * Math.PI) / 180);
+
+    return Math.hypot(dLat, dLng);
+  };
+  const bounding = neighbors
+    .map((n) => ({ n, d: metres(n) }))
+    .filter((x) => x.d >= 25 && x.d <= radiusM * 1.6) // beyond the chosen stop, close enough to clip
+    .sort((a, b) => a.d - b.d)
+    .slice(0, 24)
+    .map((x) => x.n);
+
+  return { original, carved, removed, bounding };
+}
+
 export function radarCircle(q: RadarQuestion): Poly {
   return circle([q.lng, q.lat], q.radiusKm, { units: 'kilometers', steps: 128 }) as Poly;
 }
