@@ -52,6 +52,8 @@ export class CardDeck {
   readonly chosenCategories = signal<string[]>([]);
 
   readonly hand = computed(() => this.state().hand ?? []);
+  readonly handLimit = computed(() => this.state().hand_limit ?? 6);
+  readonly handFull = computed(() => this.hand().length >= this.handLimit());
   readonly history = computed(() => [...(this.state().questions ?? [])].reverse());
   readonly pending = computed(() => this.state().pending_question);
   readonly isPhoto = computed(() => this.pending()?.category === 'photo');
@@ -183,6 +185,11 @@ export class CardDeck {
 
   async amend(answer: string): Promise<void> {
     await this.act('amend_answer', { answer });
+  }
+
+  /** Drop a card from the hand to free a slot (manage the hand limit). */
+  async discard(card: HandCard): Promise<void> {
+    await this.act('discard_card', { card_uid: card.uid });
   }
 
   /** Toggle a category in the Drained Brain pick (capped at the curse's count). */

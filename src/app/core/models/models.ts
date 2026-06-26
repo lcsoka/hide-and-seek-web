@@ -183,6 +183,7 @@ export interface GameState {
   standings: Standing[];
   last_round: RoundReveal | null;
   hand: HandCard[];
+  hand_limit: number | null; // hider-only: max cards they may hold (raised by 'draw_1_expand_1')
   pending_draw: PendingDraw | null;
   time_bonus_s: number | null;
   thermometer: ThermometerRunning | null;

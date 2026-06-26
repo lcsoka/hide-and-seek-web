@@ -27,7 +27,7 @@ import { RoundResults } from './round-results';
 import { SeekerPanel } from './seeker-panel';
 
 // Actions with a dedicated panel — kept out of the generic button row.
-const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'start_thermometer', 'stop_thermometer', 'confirm_found', 'amend_answer', 'choose_disabled_categories'];
+const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'start_thermometer', 'stop_thermometer', 'confirm_found', 'amend_answer', 'choose_disabled_categories', 'discard_card'];
 
 const STATUS_HINTS: Record<string, string> = {
   role_assignment: 'Waiting for the host to assign roles…',

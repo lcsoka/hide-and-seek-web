@@ -1,6 +1,6 @@
 <div class="space-y-3">
   <div class="flex items-center justify-between">
-    <h2 class="text-lg font-bold">Your hand</h2>
+    <h2 class="text-lg font-bold">Your hand <span class="text-sm font-medium" [class]="handFull() ? 'text-rose-500' : 'text-gray-400'">{{ hand().length }}/{{ handLimit() }}</span></h2>
     @if (timeBonusMin() > 0) {
       <span class="rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white">⏱️ +{{ timeBonusMin() }} min banked</span>
     }
@@ -148,9 +148,11 @@
   @if (hand().length) {
     <div class="grid grid-cols-2 gap-2">
       @for (c of hand(); track c.uid; let i = $index) {
-        <div class="flex h-36 flex-col justify-between rounded-xl p-2.5 text-white shadow-lg ring-1 ring-white/20"
+        <div class="relative flex h-36 flex-col justify-between rounded-xl p-2.5 text-white shadow-lg ring-1 ring-white/20"
              [class]="cardClass(c)" [class.card-draw]="i >= animatingFrom()">
-          <div class="min-h-0">
+          <button (click)="discard(c)" [disabled]="busy()" title="Discard"
+                  class="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-black/25 text-xs leading-none hover:bg-black/45 disabled:opacity-40">✕</button>
+          <div class="min-h-0 pr-5">
             <div class="text-[11px] font-bold leading-tight">{{ c.name ?? cardTitle(c) }}</div>
             @if (c.description) { <div class="mt-1 line-clamp-4 text-[9px] leading-snug opacity-80">{{ c.description }}</div> }
           </div>
