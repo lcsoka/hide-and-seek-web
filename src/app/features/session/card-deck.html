@@ -83,6 +83,33 @@
                     class="w-full rounded-lg bg-rose-600 p-2 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
               Confirm answer
             </button>
+          } @else if (isTentacleManual()) {
+            <!-- Tentacles: name the actual place you're nearest to (not just "in range"),
+                 so the seekers get the real region. -->
+            @if (tentaclePlaces() === null) {
+              <div class="rounded-lg bg-white p-2 text-center text-sm text-gray-400 dark:bg-gray-900">Finding nearby places…</div>
+            } @else if (tentaclePlaces()?.length) {
+              <p class="text-xs text-gray-600 dark:text-gray-300">Which of these is your nearest? Tap it.</p>
+              <div class="max-h-48 space-y-1 overflow-y-auto">
+                @for (pl of tentaclePlaces(); track pl.name) {
+                  <button (click)="answerTentaclePlace(pl)" [disabled]="busy()"
+                          class="block w-full truncate rounded-lg bg-green-600 p-2 text-left text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-40">
+                    {{ pl.name }}
+                  </button>
+                }
+              </div>
+              <button (click)="answerManual('out_of_range')" [disabled]="busy()"
+                      class="w-full rounded-lg bg-rose-600 p-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
+                🚫 Out of range — none of these
+              </button>
+            } @else {
+              <!-- Couldn't load the place list (offline / no data) — fall back to a plain verdict. -->
+              <p class="text-xs text-gray-600 dark:text-gray-300">{{ manualPrompt() }}</p>
+              <div class="flex gap-2">
+                <button (click)="answerManual('in_range')" [disabled]="busy()" class="flex-1 rounded-lg bg-green-600 p-2 font-semibold text-white hover:bg-green-700 disabled:opacity-40">In range</button>
+                <button (click)="answerManual('out_of_range')" [disabled]="busy()" class="flex-1 rounded-lg bg-rose-600 p-2 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">Out of range</button>
+              </div>
+            }
           } @else if (manualOptions(); as opts) {
             <!-- No auto-truth (slow map data, or a subject with no point feature like a
                  border / coastline) — the hider answers it themselves. -->

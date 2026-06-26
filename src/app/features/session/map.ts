@@ -83,10 +83,6 @@ export class MapView {
       } else {
         L.circle([zone.center.lat, zone.center.lng], { radius: zone.radius_m, color: '#f59e0b', fillOpacity: 0.1 }).addTo(this.overlay);
       }
-
-      for (const n of zone.neighbors ?? []) {
-        L.circleMarker([n.lat, n.lng], { radius: 4, color: '#9ca3af' }).addTo(this.overlay);
-      }
     }
 
     // Hider's station-picking aids: candidate radius, nearby stops, chosen station.

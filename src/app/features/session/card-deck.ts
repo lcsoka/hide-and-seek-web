@@ -1,11 +1,19 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { ActiveCurse, GameState, HandCard, ResolvedQuestion } from '../../core/models/models';
+import { FEATURE_TAGS } from '../../core/maps/osm-deduction';
+import { OverpassService } from '../../core/maps/overpass';
+import { ActiveCurse, GameState, HandCard, PendingQuestion, ResolvedQuestion } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
 import { SessionStore } from '../../core/services/session-store';
 import { answerLabel, answerPositive, categoryMeta } from '../../core/util/categories';
 import { formatDistance, unitsOf } from '../../core/util/units';
 import { ImageUpload } from './image-upload';
+
+interface TentaclePlace {
+  name: string;
+  lat: number;
+  lng: number;
+}
 
 /** The hider's hand: see the full pending question, confirm the answer, play cards. */
 @Component({
@@ -34,6 +42,7 @@ export class CardDeck {
   private readonly api = inject(ApiClient);
   private readonly store = inject(SessionStore);
   private readonly clock = inject(Clock);
+  private readonly overpass = inject(OverpassService);
 
   readonly state = input.required<GameState>();
   readonly sessionId = input.required<string>();
@@ -59,6 +68,14 @@ export class CardDeck {
   readonly isPhoto = computed(() => this.pending()?.category === 'photo');
   readonly canAnswer = computed(() => this.state().available_actions.includes('answer_question'));
   readonly preview = computed(() => this.pending()?.preview_answer ?? null);
+
+  // Tentacles answered by hand: the hider must name the actual place they're nearest to
+  // (not just "in range"), so the seekers get the real Voronoi cell. We fetch the candidate
+  // places within the question's radius of the seeker; null = loading, [] = none/unavailable.
+  readonly isTentacleManual = computed(
+    () => this.pending()?.category === 'tentacles' && this.canAnswer() && !this.preview(),
+  );
+  readonly tentaclePlaces = signal<TentaclePlace[] | null>(null);
   readonly timeBonusMin = computed(() => Math.round((this.state().time_bonus_s ?? 0) / 60));
   readonly playedCurses = computed(() => this.state().curses.filter((c) => c.status === 'active'));
   readonly vetoCard = computed(() => this.hand().find((c) => c.type === 'powerup' && c.power === 'veto') ?? null);
@@ -109,6 +126,54 @@ export class CardDeck {
       }
       this.prevLen = len;
     });
+
+    // Load the tentacle candidate places (within the seeker's radius) when the hider has a
+    // tentacles question to answer by hand. Keyed by question seq so it loads once per ask.
+    let loadedSeq: number | null = null;
+    effect(() => {
+      const q = this.pending();
+      if (!this.isTentacleManual() || !q) {
+        loadedSeq = null;
+        this.tentaclePlaces.set(null);
+
+        return;
+      }
+      if (q.seq === loadedSeq) {
+        return;
+      }
+      loadedSeq = q.seq ?? null;
+      this.tentaclePlaces.set(null);
+      void this.loadTentaclePlaces(q);
+    });
+  }
+
+  private async loadTentaclePlaces(q: PendingQuestion): Promise<void> {
+    const tag = q.params?.feature ? FEATURE_TAGS[q.params.feature] : undefined;
+    const lat = q.ask?.lat;
+    const lng = q.ask?.lng;
+    if (!tag || lat == null || lng == null) {
+      this.tentaclePlaces.set([]);
+
+      return;
+    }
+    try {
+      const fc = await this.overpass.pois(lat, lng, (q.params?.radius_m ?? 1609) / 1000, tag);
+      const places = fc.features
+        .map((f) => ({
+          name: (f.properties?.['name'] as string) ?? 'Unnamed',
+          lat: f.geometry.coordinates[1],
+          lng: f.geometry.coordinates[0],
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      this.tentaclePlaces.set(places);
+    } catch {
+      this.tentaclePlaces.set([]); // unavailable → the simple In range / Out of range fallback shows
+    }
+  }
+
+  /** The hider names the specific place they're nearest to (tentacles). */
+  async answerTentaclePlace(place: TentaclePlace): Promise<void> {
+    await this.act('answer_question', { answer: 'in_range', feature_name: place.name, feature_lat: place.lat, feature_lng: place.lng });
   }
 
   cardClass(card: HandCard): string {
@@ -148,8 +213,7 @@ export class CardDeck {
         return [{ value: 'yes', label: 'Yes — same' }, { value: 'no', label: 'No — different' }];
       case 'measuring':
         return [{ value: 'closer', label: 'Closer' }, { value: 'further', label: 'Further' }];
-      case 'tentacles':
-        return [{ value: 'in_range', label: 'In range' }, { value: 'out_of_range', label: 'Out of range' }];
+      // tentacles is handled by a dedicated place picker (isTentacleManual), not these verdicts.
       default:
         return null;
     }

@@ -27,12 +27,24 @@ const SEARCH_KM = 80; // matching/measuring need a wide-area feature set
  * server reasoned over. Returns the region to keep plus whether to keep inside it.
  */
 export async function osmRegion(overpass: OverpassService, q: ResolvedQuestion): Promise<{ region: Poly; within: boolean } | null> {
-  const { lat, lng, feature, radius_m } = q.ask;
+  const { lat, lng, feature, radius_m, admin_level } = q.ask;
   const tag = feature ? FEATURE_TAGS[feature] : undefined;
   const answer = q.answer?.answer;
   // No answer (e.g. a question that couldn't be computed) must not cut the map.
-  if (!tag || !answer || lat == null || lng == null) {
+  if (!answer || lat == null || lng == null) {
     return null;
+  }
+
+  // Zone matching ("same administrative division as me?"): keep (yes) or remove (no) the
+  // admin boundary the seeker is standing in. No point feature involved.
+  if (q.category === 'matching' && admin_level != null) {
+    const boundary = await overpass.adminBoundary(lat, lng, admin_level);
+
+    return boundary ? { region: boundary as Poly, within: answer === 'yes' } : null;
+  }
+
+  if (!tag) {
+    return null; // the remaining categories need a point-feature tag
   }
 
   const askPoint = point([lng, lat]);

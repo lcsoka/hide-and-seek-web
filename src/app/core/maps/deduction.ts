@@ -76,7 +76,11 @@ export function hidingZone(center: { lat: number; lng: number }, radiusM: number
   let zone = circle([center.lng, center.lat], radiusM / 1000, { units: 'kilometers', steps: 96 }) as Poly;
 
   for (const n of neighbors) {
-    if (n.lat === center.lat && n.lng === center.lng) {
+    // Skip the chosen stop itself (it's in the neighbour set too) — within ~25 m counts as
+    // the same stop, so its own bisector can't slice the zone in half at the centre.
+    const dLat = (n.lat - center.lat) * 111000;
+    const dLng = (n.lng - center.lng) * 111000 * Math.cos((center.lat * Math.PI) / 180);
+    if (Math.hypot(dLat, dLng) < 25) {
       continue;
     }
     // Keep the side closer to the chosen station than to this neighbour.
