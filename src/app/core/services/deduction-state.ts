@@ -31,6 +31,9 @@ export class DeductionState {
   // the hold so a slow/rate-limited Overpass can never block the map indefinitely.
   private readonly pending = signal(0);
   readonly computing = computed(() => this.pending() > 0);
+  // The seq-keyed caches above are per-round; question seq resets each round, so they must
+  // be cleared on a round change or round 2's seq 1 would collide with round 1's.
+  private currentRound: number | null = null;
 
   readonly markerQuestions = computed(() =>
     resolvedQuestionsToDeduction((this.store.state()?.questions ?? []).filter((q) => !this.dismissedSeqs().has(q.seq))),
@@ -79,6 +82,18 @@ export class DeductionState {
   });
 
   constructor() {
+    // A new round starts fresh: clear the per-round, seq-keyed caches so a previous round's
+    // regions/dismissals don't leak into (or collide with) the new round's questions.
+    effect(() => {
+      const round = this.store.state()?.round ?? null;
+      if (round !== this.currentRound) {
+        this.currentRound = round;
+        this.osmRegions.set(new Map());
+        this.osmSeen.clear();
+        this.dismissedSeqs.set(new Set());
+      }
+    });
+
     // Load the city's admin boundary once per session as the play-area base.
     effect(() => {
       const city = this.store.state()?.config?.['city'] as { key?: string; lat?: number; lng?: number } | undefined;
