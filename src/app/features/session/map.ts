@@ -51,23 +51,63 @@ export class MapView {
       this.render();
     });
 
-    // Load the bounding transit stops for the carve when the hider's zone centre changes.
+    // Load the bounding transit stops for the carve whenever the active centre moves — the
+    // committed zone OR, while the hider is still picking, the previewed spot. So the carved
+    // zone is shown live as the hider moves around looking for somewhere to hide.
     effect(() => {
-      const zone = this.zone();
-      if (!zone) {
+      const az = this.activeZone();
+      if (!az) {
         return;
       }
-      const key = `${zone.center.lat.toFixed(5)},${zone.center.lng.toFixed(5)}`;
+      const key = `${az.lat.toFixed(4)},${az.lng.toFixed(4)}`;
       if (key === this.carveKey) {
         return;
       }
       this.carveKey = key;
       this.carveNeighbors.set(null);
       void this.overpass
-        .transitStops(zone.center.lat, zone.center.lng, (zone.radius_m * 2) / 1000)
+        .transitStops(az.lat, az.lng, (az.radiusM * 2) / 1000)
         .then((fc) => this.carveNeighbors.set(fc.features.map((f) => ({ lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }))))
         .catch(() => this.carveNeighbors.set([]));
     });
+  }
+
+  /** The zone being shown: the committed one, or (while picking) the previewed spot. */
+  private activeZone(): { lat: number; lng: number; radiusM: number } | null {
+    const z = this.zone();
+    if (z) {
+      return { lat: z.center.lat, lng: z.center.lng, radiusM: z.radius_m };
+    }
+    const p = this.previewZone();
+
+    return p ? { lat: p.lat, lng: p.lng, radiusM: p.radiusM } : null;
+  }
+
+  /**
+   * Draw the carved hiding zone: original radius (dashed), slices cut away by a nearer
+   * station (red), the final zone (bold amber outline), and — for the committed zone — the
+   * bounding stations (🚉). Falls back to a plain circle until the stops load.
+   */
+  private drawCarvedZone(center: { lat: number; lng: number }, radiusM: number, showPins: boolean): void {
+    const neighbors = this.carveNeighbors() ?? [];
+    if (!neighbors.length) {
+      L.circle([center.lat, center.lng], { radius: radiusM, color: '#f59e0b', weight: 1, dashArray: '4 4', fillOpacity: 0.08 }).addTo(this.overlay!);
+
+      return;
+    }
+    const viz = hidingZoneViz(center, radiusM, neighbors);
+    L.geoJSON(viz.original, { style: { color: '#9ca3af', weight: 1, dashArray: '4 4', fill: false } }).addTo(this.overlay!);
+    if (viz.removed) {
+      L.geoJSON(viz.removed, { style: { stroke: false, fillColor: '#ef4444', fillOpacity: 0.15 } }).addTo(this.overlay!);
+    }
+    L.geoJSON(viz.carved, { style: { color: '#f59e0b', weight: 3, fillColor: '#f59e0b', fillOpacity: 0.15 } }).addTo(this.overlay!);
+    if (showPins) {
+      for (const n of viz.bounding) {
+        L.marker([n.lat, n.lng], { icon: markerIcon('🚉', { color: '#6b7280', size: 20 }) })
+          .bindTooltip('Another station — your zone is cut where this one is nearer')
+          .addTo(this.overlay!);
+      }
+    }
   }
 
   private init(): void {
@@ -98,34 +138,18 @@ export class MapView {
         .addTo(this.overlay);
     }
 
+    // The committed zone (seeking) shows the carve with bounding-station pins.
     const zone = this.zone();
     if (zone) {
-      // Show WHY the zone is the shape it is: the original radius (dashed), the slices cut
-      // away because a different station is nearer (red), the final zone (bold amber
-      // outline), and the bounding stations doing the cutting (grey pins). Prefer the
-      // proxy-fetched stops (reliable) over the backend's (sometimes throttled to none).
-      const neighbors = this.carveNeighbors() ?? zone.neighbors ?? [];
-      if (neighbors.length) {
-        const viz = hidingZoneViz(zone.center, zone.radius_m, neighbors);
-        L.geoJSON(viz.original, { style: { color: '#9ca3af', weight: 1, dashArray: '4 4', fill: false } }).addTo(this.overlay);
-        if (viz.removed) {
-          L.geoJSON(viz.removed, { style: { stroke: false, fillColor: '#ef4444', fillOpacity: 0.18 } }).addTo(this.overlay);
-        }
-        L.geoJSON(viz.carved, { style: { color: '#f59e0b', weight: 3, fillColor: '#f59e0b', fillOpacity: 0.15 } }).addTo(this.overlay);
-        for (const n of viz.bounding) {
-          L.marker([n.lat, n.lng], { icon: markerIcon('🚉', { color: '#6b7280', size: 20 }) })
-            .bindTooltip('Another station — your zone is cut where this one is nearer')
-            .addTo(this.overlay);
-        }
-      } else {
-        L.circle([zone.center.lat, zone.center.lng], { radius: zone.radius_m, color: '#f59e0b', fillOpacity: 0.1 }).addTo(this.overlay);
-      }
+      this.drawCarvedZone(zone.center, zone.radius_m, true);
     }
 
-    // Hider's station-picking aids: candidate radius, nearby stops, chosen station.
+    // While the hider is still picking, show the SAME carve live for the previewed spot
+    // (recomputed as they move) so they can see the area they'd hide in. The pickable
+    // stops are drawn as their own mode-coloured markers below, so skip the grey pins.
     const preview = this.previewZone();
-    if (preview) {
-      L.circle([preview.lat, preview.lng], { radius: preview.radiusM, color: '#f59e0b', weight: 1, fillOpacity: 0.08 }).addTo(this.overlay);
+    if (preview && !zone) {
+      this.drawCarvedZone({ lat: preview.lat, lng: preview.lng }, preview.radiusM, false);
     }
     for (const st of disperse(this.stations())) {
       const meta = transitMeta(st.modes?.[0] ?? 'stop');
