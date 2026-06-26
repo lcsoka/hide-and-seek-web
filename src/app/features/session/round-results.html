@@ -3,7 +3,7 @@
     <h2 class="text-lg font-bold">{{ finished() ? '🏁 Game over' : '🔚 Round over' }}</h2>
     @if (reveal(); as r) {
       <p class="text-sm text-gray-600 dark:text-gray-300">
-        {{ r.hider_name ?? 'The hider' }} stayed hidden for <span class="font-semibold">{{ duration(r.seconds) }}</span>.
+        {{ r.hider_name ?? 'The hider' }} stayed hidden for <span class="font-semibold">{{ duration(r.seconds) }}</span>@if (r.time_bonus_s) { <span class="text-emerald-600 dark:text-emerald-400"> + {{ duration(r.time_bonus_s) }} bonus</span> }.
         @if (r.surrendered) {
           <span>They surrendered.</span>
         } @else if (r.found_by_name) {

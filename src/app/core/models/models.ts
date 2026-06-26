@@ -200,6 +200,7 @@ export interface RoundReveal {
   found_by_name: string | null;
   surrendered: boolean;
   seconds: number;
+  time_bonus_s: number;
   hider_position: { lat: number; lng: number } | null;
   questions_count: number;
   curses_played: number;
