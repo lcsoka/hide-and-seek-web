@@ -25,11 +25,24 @@ export class HidingState {
   readonly selected = signal<NearbyStation | null>(null);
   private loadedKey: string | null = null;
 
+  // > 0 while any hiding-zone work (station list OR the map's carve) is in flight, so the
+  // UI can show a "calculating…" indicator. Incremented by loadFor + MapView's carve fetch.
+  private readonly inflight = signal(0);
+  readonly calculating = computed(() => this.inflight() > 0);
+
   readonly selectedPosition = computed<Position | null>(() => {
     const s = this.selected();
 
     return s ? { lat: s.lat, lng: s.lng } : null;
   });
+
+  beginWork(): void {
+    this.inflight.update((n) => n + 1);
+  }
+
+  endWork(): void {
+    this.inflight.update((n) => Math.max(0, n - 1));
+  }
 
   async loadFor(lat: number, lng: number, modeIds?: string[]): Promise<void> {
     const key = `${lat.toFixed(3)},${lng.toFixed(3)}|${(modeIds ?? []).join(',')}`;
@@ -37,6 +50,7 @@ export class HidingState {
       return;
     }
     this.loadedKey = key;
+    this.beginWork();
 
     try {
       const fc = await this.overpass.transitStops(lat, lng, 1.5, modeIds);
@@ -58,7 +72,12 @@ export class HidingState {
       this.stations.set(list);
       this.selected.set(list[0] ?? null);
     } catch {
-      this.stations.set([]);
+      // Transient failure (Overpass throttled past the retries) — don't cache it: clear the
+      // key so the next position update (or re-render) tries again instead of staying empty.
+      this.loadedKey = null;
+      this.stations.set(this.stations() ?? []);
+    } finally {
+      this.endWork();
     }
   }
 }

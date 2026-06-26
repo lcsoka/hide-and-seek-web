@@ -164,6 +164,11 @@ export class SessionView {
     return s.config?.['transit_modes'] as string[] | undefined;
   }
 
+  /** True while the hiding zone (stations + carve) is being fetched — shows a HUD loader. */
+  hidingCalculating(): boolean {
+    return this.hiding.calculating();
+  }
+
   /** The hider sees the seeker's pending question on their map. For a place question
    *  this is the seeker's closest object; otherwise the ask point (+ radar radius). */
   hiderQuestionMarker(s: GameState): { lat: number; lng: number; radiusM?: number | null; label?: string } | null {

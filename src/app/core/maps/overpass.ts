@@ -84,18 +84,33 @@ export class OverpassService {
     }
   }
 
-  /** Run the query through the backend proxy (server-cached); the browser never calls public Overpass. */
+  /**
+   * Run the query through the backend proxy (server-cached); the browser never calls public
+   * Overpass. Retries a few times — the proxy returns 502 when every OSM mirror is
+   * momentarily throttled, and a short wait usually clears it (then it's cached 6h).
+   */
   private async fetchFromBackend(ql: string): Promise<unknown> {
-    const res = await fetch(this.proxyUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ql }),
-    });
-    if (!res.ok) {
-      throw new Error(`Overpass proxy request failed (${res.status})`);
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) {
+        await new Promise((r) => setTimeout(r, 1500 * attempt));
+      }
+      try {
+        const res = await fetch(this.proxyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ql }),
+        });
+        if (res.ok) {
+          return await res.json();
+        }
+        lastError = new Error(`Overpass proxy request failed (${res.status})`);
+      } catch (e) {
+        lastError = e;
+      }
     }
 
-    return res.json();
+    throw lastError instanceof Error ? lastError : new Error('Overpass proxy request failed');
   }
 
   private readStored(key: string): unknown {

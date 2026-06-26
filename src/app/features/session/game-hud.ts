@@ -13,6 +13,7 @@ export class GameHud {
   readonly timer = input<GameTimer | null>(null);
   readonly role = input<string | null>(null);
   readonly stateLabel = input('');
+  readonly calculating = input(false); // hiding-zone (stations + carve) being fetched
   readonly copied = signal(false);
 
   async copy(): Promise<void> {

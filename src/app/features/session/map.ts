@@ -4,6 +4,7 @@ import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
 import { hidingZoneViz } from '../../core/maps/deduction';
 import { OverpassService } from '../../core/maps/overpass';
 import { disperse } from '../../core/maps/spread';
+import { HidingState } from '../../core/services/hiding-state';
 import { HidingZone, PlayerView, Position } from '../../core/models/models';
 import { transitMeta } from '../../core/util/transit';
 
@@ -33,6 +34,7 @@ export class MapView {
   private overlay?: L.LayerGroup;
   private centred = false;
   private readonly overpass = inject(OverpassService);
+  private readonly hiding = inject(HidingState);
   // All transit stops near the zone centre, fetched via the cached proxy — reliable
   // neighbours for carving the zone (the backend's synchronous fetch can be throttled to 0).
   private readonly carveNeighbors = signal<{ lat: number; lng: number }[] | null>(null);
@@ -68,10 +70,15 @@ export class MapView {
       }
       this.carveKey = key;
       this.carveNeighbors.set(null);
+      this.hiding.beginWork();
       void this.overpass
         .transitStops(az.lat, az.lng, (az.radiusM * 2) / 1000, modes)
         .then((fc) => this.carveNeighbors.set(fc.features.map((f) => ({ lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }))))
-        .catch(() => this.carveNeighbors.set([]));
+        .catch(() => {
+          this.carveKey = ''; // don't cache a throttled failure — let the next change retry
+          this.carveNeighbors.set([]);
+        })
+        .finally(() => this.hiding.endWork());
     });
   }
 
