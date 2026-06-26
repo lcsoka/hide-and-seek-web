@@ -111,15 +111,18 @@ export class DevDuo {
     }
   }
 
-  /** Watch an EXISTING session: mint a token for each of its players and render their real views. */
+  /** Watch an EXISTING session by id OR join code: mint a token per player and render their real views. */
   async spectate(): Promise<void> {
-    const id = this.spectateId.trim();
+    const raw = this.spectateId.trim();
     this.busy.set(true);
     this.error.set(null);
     this.views.set([]);
     try {
-      const god = await this.debug(`/sessions/${id}/debug/state`);
-      const sessionId: string = god.session_id ?? id;
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raw);
+      const god = isUuid
+        ? await this.debug(`/sessions/${raw}/debug/state`)
+        : await this.debug(`/debug/sessions/${encodeURIComponent(raw.toUpperCase())}`);
+      const sessionId: string = god.session_id ?? raw;
       this.joinCode.set(god.state_data?.join_code ?? null);
       const players: any[] = god.players ?? [];
       if (!players.length) {
