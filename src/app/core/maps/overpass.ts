@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from 'geojson';
 import osmtogeojson from 'osmtogeojson';
+import { environment } from '../../../environments/environment';
 
 export interface TransitMode {
   id: string;
@@ -38,19 +39,19 @@ export const POI_TYPES: PoiType[] = [
   { id: 'library', label: 'Library', filter: '[amenity=library]', defaultRadiusKm: 1.6 },
 ];
 
-/** Thin client over the public Overpass API (CORS-enabled). */
+/**
+ * OSM data client. Every query goes through the BACKEND Overpass proxy
+ * (`POST /geo/overpass`), which holds the authoritative 6h cache and is the only thing
+ * that talks to the public Overpass mirrors — the browser never hits OSM directly. A small
+ * in-memory + sessionStorage cache here just de-dupes repeat queries within a session.
+ */
 @Injectable({ providedIn: 'root' })
 export class OverpassService {
-  // Primary + fallback (the public endpoints rate-limit heavy `out geom` queries with 429).
-  private readonly endpoints = [
-    'https://overpass-api.de/api/interpreter',
-    'https://overpass.private.coffee/api/interpreter',
-    'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
-  ];
+  private readonly proxyUrl = `${environment.apiBase}/geo/overpass`;
 
-  // Cache successful responses — OSM data is stable, and the hiding flow, picker, and
-  // deduction otherwise re-fetch the same queries (and on every reload). In-memory for
-  // the session + sessionStorage so reloads are free. Until a self-hosted OSM backend.
+  // Cache responses — OSM data is stable, and the hiding flow, picker, and deduction
+  // otherwise re-request the same queries (and on every reload). In-memory for the session
+  // + sessionStorage so reloads are free; the backend is the cross-client/source cache.
   private static readonly TTL_MS = 6 * 60 * 60 * 1000; // 6h, mirrors the server cache
   private readonly mem = new Map<string, unknown>();
   private inflight = new Map<string, Promise<unknown>>();
@@ -68,7 +69,7 @@ export class OverpassService {
       return pending;
     }
 
-    const promise = this.fetchFromEndpoints(ql).then((result) => {
+    const promise = this.fetchFromBackend(ql).then((result) => {
       this.mem.set(key, result);
       this.writeStored(key, result);
 
@@ -83,23 +84,18 @@ export class OverpassService {
     }
   }
 
-  private async fetchFromEndpoints(ql: string): Promise<unknown> {
-    const data = encodeURIComponent(ql);
-    let lastError: unknown;
-
-    for (const endpoint of this.endpoints) {
-      try {
-        const res = await fetch(`${endpoint}?data=${data}`);
-        if (res.ok) {
-          return await res.json();
-        }
-        lastError = new Error(`Overpass request failed (${res.status})`);
-      } catch (e) {
-        lastError = e;
-      }
+  /** Run the query through the backend proxy (server-cached); the browser never calls public Overpass. */
+  private async fetchFromBackend(ql: string): Promise<unknown> {
+    const res = await fetch(this.proxyUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ql }),
+    });
+    if (!res.ok) {
+      throw new Error(`Overpass proxy request failed (${res.status})`);
     }
 
-    throw lastError instanceof Error ? lastError : new Error('Overpass request failed');
+    return res.json();
   }
 
   private readStored(key: string): unknown {
