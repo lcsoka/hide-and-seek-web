@@ -6,6 +6,25 @@
     }
   </div>
 
+  @if (curseChoice(); as choice) {
+    <div class="space-y-2 rounded-xl border-2 border-purple-400 bg-purple-50 p-3 dark:bg-purple-950">
+      <p class="text-sm font-semibold text-purple-800 dark:text-purple-300">🧠 Pick {{ choice.count }} question categories to disable</p>
+      <div class="flex flex-wrap gap-2">
+        @for (c of allCategories; track c) {
+          <button (click)="toggleCategory(c)"
+                  class="rounded-full px-3 py-1.5 text-sm font-medium transition"
+                  [class]="chosenCategories().includes(c) ? 'bg-purple-600 text-white' : 'border border-purple-300 text-purple-700 dark:border-purple-700 dark:text-purple-300'">
+            {{ meta(c).icon }} {{ meta(c).label }}
+          </button>
+        }
+      </div>
+      <button (click)="confirmDisable()" [disabled]="busy() || chosenCategories().length !== choice.count"
+              class="w-full rounded-lg bg-purple-600 p-2 font-semibold text-white hover:bg-purple-700 disabled:opacity-40">
+        Disable {{ chosenCategories().length }}/{{ choice.count }}
+      </button>
+    </div>
+  }
+
   @if (confirmCard(); as c) {
     <div class="space-y-2 rounded-xl border-2 border-purple-400 bg-purple-50 p-3 dark:bg-purple-950">
       <div class="text-sm">Cast <b>{{ c.name }}</b> on the seekers?</div>

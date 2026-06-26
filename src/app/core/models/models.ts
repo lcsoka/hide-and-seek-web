@@ -177,12 +177,21 @@ export interface GameState {
   hiding_zone: HidingZone | null;
   zone_locked: boolean;
   relocating: boolean; // hider played 'move' and must re-confirm a new spot
+  disabled_categories: string[]; // question categories a curse currently blocks
+  questions_blocked: boolean; // a blocking curse is stopping the seekers from asking
+  curse_choice: CurseChoice | null; // hider-only: a 'choose' curse awaiting category picks
   standings: Standing[];
   last_round: RoundReveal | null;
   hand: HandCard[];
   pending_draw: PendingDraw | null;
   time_bonus_s: number | null;
   thermometer: ThermometerRunning | null;
+}
+
+export interface CurseChoice {
+  uid: string;
+  curse_id: string | null;
+  count: number;
 }
 
 export interface Standing {

@@ -81,6 +81,7 @@
 
     <app-question-picker [catalog]="catalog()" [units]="askUnits(s)" [open]="pickerOpen()"
                          [seekerLat]="me(s)?.lat ?? null" [seekerLng]="me(s)?.lng ?? null"
+                         [disabledCategories]="s.disabled_categories"
                          (ask)="onAsk(s, $event)" (closeChange)="pickerOpen.set($event)" />
 
     @if (role(s) === 'hider' && s.pending_draw) {

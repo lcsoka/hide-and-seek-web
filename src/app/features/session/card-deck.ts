@@ -46,6 +46,11 @@ export class CardDeck {
   readonly answerLabel = answerLabel;
   readonly confirmCard = signal<HandCard | null>(null);
 
+  // A 'choose' curse (The Drained Brain) awaiting the hider's category picks.
+  readonly curseChoice = computed(() => this.state().curse_choice);
+  readonly allCategories = ['matching', 'measuring', 'radar', 'thermometer', 'photo', 'tentacles'];
+  readonly chosenCategories = signal<string[]>([]);
+
   readonly hand = computed(() => this.state().hand ?? []);
   readonly history = computed(() => [...(this.state().questions ?? [])].reverse());
   readonly pending = computed(() => this.state().pending_question);
@@ -178,6 +183,21 @@ export class CardDeck {
 
   async amend(answer: string): Promise<void> {
     await this.act('amend_answer', { answer });
+  }
+
+  /** Toggle a category in the Drained Brain pick (capped at the curse's count). */
+  toggleCategory(category: string): void {
+    const chosen = this.chosenCategories();
+    if (chosen.includes(category)) {
+      this.chosenCategories.set(chosen.filter((c) => c !== category));
+    } else if (chosen.length < (this.curseChoice()?.count ?? 0)) {
+      this.chosenCategories.set([...chosen, category]);
+    }
+  }
+
+  async confirmDisable(): Promise<void> {
+    await this.act('choose_disabled_categories', { categories: this.chosenCategories() });
+    this.chosenCategories.set([]);
   }
 
   async veto(): Promise<void> {

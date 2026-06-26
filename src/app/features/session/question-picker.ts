@@ -27,6 +27,7 @@ export class QuestionPicker {
   readonly open = input(false);
   readonly seekerLat = input<number | null>(null);
   readonly seekerLng = input<number | null>(null);
+  readonly disabledCategories = input<string[]>([]);
   readonly ask = output<{ questionId: string; category: string; payload: Record<string, unknown> }>();
   readonly closeChange = output<boolean>();
 
@@ -49,7 +50,14 @@ export class QuestionPicker {
   readonly thermoPresets = computed(() => THERMO_PRESETS[this.units()]);
   readonly unitLabel = computed(() => (this.units() === 'imperial' ? 'mi' : 'km'));
 
+  isDisabled(category: string): boolean {
+    return this.disabledCategories().includes(category);
+  }
+
   pick(category: string): void {
+    if (this.isDisabled(category)) {
+      return;
+    }
     this.selected.set(category);
   }
 

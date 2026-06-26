@@ -30,6 +30,10 @@
               class="w-full rounded-xl bg-rose-600 p-3 text-base font-semibold text-white shadow-sm hover:bg-rose-700">
         ＋ Ask a question
       </button>
+    } @else if (state().questions_blocked) {
+      <p class="rounded-lg bg-purple-100 p-2 text-center text-sm font-medium text-purple-800 dark:bg-purple-950 dark:text-purple-300">
+        🧿 A curse is blocking questions — clear it below to ask again.
+      </p>
     } @else {
       <p class="rounded-lg bg-gray-100 p-2 text-center text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
         {{ state().pending_question ? 'Waiting for the hider to answer…' : 'Asking opens once seeking begins.' }}
