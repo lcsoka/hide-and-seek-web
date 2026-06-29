@@ -38,7 +38,7 @@
         } @else if (s.state === 'hiding' && role(s) === 'hider') {
           <app-hider-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" />
         } @else if (role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame')) {
-          <app-seeker-panel [state]="s" [sessionId]="s.session_id" (openPicker)="openAsk()" />
+          <app-seeker-panel [state]="s" [sessionId]="s.session_id" (openPicker)="openAsk()" (openBoard)="boardOpen.set(true)" />
         } @else if (role(s) === 'hider' && (s.state === 'seeking' || s.state === 'endgame')) {
           @if (s.relocating) {
             <div class="mb-3 rounded-lg bg-amber-100 p-3 dark:bg-amber-950">
@@ -86,6 +86,8 @@
                          [seekerLat]="me(s)?.lat ?? null" [seekerLng]="me(s)?.lng ?? null"
                          [disabledCategories]="s.disabled_categories" [onTransit]="s.transit?.on_transit ?? false"
                          (ask)="onAsk(s, $event)" (closeChange)="pickerOpen.set($event)" />
+    <app-transit-picker [open]="boardOpen()" [seekerLat]="me(s)?.lat ?? null" [seekerLng]="me(s)?.lng ?? null"
+                        [transitModes]="transitModes(s)" (board)="onBoard(s, $event)" (closeChange)="boardOpen.set($event)" />
 
     @if (role(s) === 'hider' && s.pending_draw) {
       <app-draw-modal [sessionId]="s.session_id" [draw]="s.pending_draw" />

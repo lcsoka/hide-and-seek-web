@@ -261,6 +261,16 @@
     "title": "Tömegközlekedés",
     "board": "🚆 Felszállás",
     "alight": "🚉 Leszállás",
-    "onboardNote": "Tömegközlekedésen vagy — a hőmérőt gyalog kell megtenni, ezért leszállásig nem elérhető."
+    "onboard": "Tömegközlekedésen",
+    "onboardNote": "A hőmérőt gyalog kell megtenni, ezért leszállásig nem elérhető.",
+    "boardTitle": "Felszállás",
+    "pickStop": "Hol szállsz fel?",
+    "findingStops": "Megállók keresése…",
+    "noStops": "Nincs megálló a közelben.",
+    "pickLine": "Koppints egy vonalra az útvonal kirajzolásához, majd szállj fel.",
+    "findingLines": "Vonalak keresése…",
+    "noLines": "Nincs vonal ennél a megállónál.",
+    "boardLine": "Felszállás: {{ line }}",
+    "boardAnyway": "Felszállás mindenképp"
   }
 }

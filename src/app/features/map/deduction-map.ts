@@ -8,6 +8,8 @@ import { DeductionQuestion } from '../../core/maps/deduction';
 import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
 import { holedMask, Poly } from '../../core/maps/operators';
 import { disperse } from '../../core/maps/spread';
+import { TransitRoutes } from '../../core/services/transit-routes';
+import { transitMeta } from '../../core/util/transit';
 import { PlayerView, Position } from '../../core/models/models';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
@@ -51,12 +53,14 @@ export class DeductionMap {
   readonly meId = input<string | null>(null);
   readonly mapClick = output<Position>();
 
+  private readonly transitRoutes = inject(TransitRoutes);
   private map?: L.Map;
   private overlay?: L.LayerGroup;
   private resize?: ResizeObserver;
   // View preservation: only auto-fit when the deduction changes, and never once the
   // user has panned/zoomed — so background /state refreshes don't reset their view.
   private lastFitSig = '';
+  private lastRouteSig = '';
   private userMoved = false;
   private programmaticMove = false;
 
@@ -72,6 +76,7 @@ export class DeductionMap {
       this.loading();
       this.thermoMarker();
       this.players();
+      this.transitRoutes.displayed();
       this.render();
     });
     inject(DestroyRef).onDestroy(() => {
@@ -114,6 +119,20 @@ export class DeductionMap {
 
     this.overlay?.remove();
     this.overlay = L.layerGroup().addTo(this.map);
+
+    // The transit line the seeker is previewing in the board picker / currently riding,
+    // in its mode colour with a white halo so it reads over the candidate mask + tiles.
+    const route = this.transitRoutes.displayed();
+    if (route) {
+      const color = transitMeta(route.mode).color;
+      for (const seg of route.lines) {
+        if (seg.length > 1) {
+          const latlngs = seg.map((p) => [p.lat, p.lng] as L.LatLngTuple);
+          L.polyline(latlngs, { color: '#ffffff', weight: 8, opacity: 0.7 }).addTo(this.overlay);
+          L.polyline(latlngs, { color, weight: 4, opacity: 0.95 }).addTo(this.overlay);
+        }
+      }
+    }
 
     const cand = this.candidate();
     if (cand) {
@@ -209,6 +228,30 @@ export class DeductionMap {
       L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, isMe ? '#2563eb' : colorFor(p.id), isMe) })
         .bindTooltip(isMe ? 'You' : p.display_name, isMe ? { permanent: true, direction: 'top', offset: [0, -20] } : {})
         .addTo(this.overlay);
+    }
+
+    // When a transit route is (re)shown, frame it so the path is legible — the whole point
+    // of drawing it. This deliberately overrides the candidate fit / user view.
+    const shownRoute = this.transitRoutes.displayed();
+    const routeSig = shownRoute ? `${shownRoute.ref}:${shownRoute.mode}:${shownRoute.lines.length}` : '';
+    if (routeSig && routeSig !== this.lastRouteSig) {
+      this.lastRouteSig = routeSig;
+      const pts = shownRoute!.lines.flat();
+      if (pts.length) {
+        try {
+          const lats = pts.map((p) => p.lat);
+          const lngs = pts.map((p) => p.lng);
+          this.programmaticMove = true;
+          this.map.fitBounds([[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]], { padding: [40, 40], maxZoom: 15, animate: true, duration: 0.5 });
+          setTimeout(() => (this.programmaticMove = false), 600);
+        } catch {
+          // degenerate geometry — leave the view
+        }
+      }
+      return; // don't also run the candidate fit this pass
+    }
+    if (!routeSig) {
+      this.lastRouteSig = '';
     }
 
     // Auto-fit only when the deduction actually changed (a new clue), and never after

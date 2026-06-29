@@ -261,6 +261,16 @@
     "title": "Transit",
     "board": "🚆 Board transit",
     "alight": "🚉 Get off here",
-    "onboardNote": "On transit — the thermometer must be walked, so it's unavailable until you get off."
+    "onboard": "On transit",
+    "onboardNote": "The thermometer must be walked, so it's unavailable until you get off.",
+    "boardTitle": "Board transit",
+    "pickStop": "Where are you boarding?",
+    "findingStops": "Finding stops…",
+    "noStops": "No stops nearby.",
+    "pickLine": "Tap a line to draw its route, then board.",
+    "findingLines": "Finding lines…",
+    "noLines": "No lines found at this stop.",
+    "boardLine": "Board line {{ line }}",
+    "boardAnyway": "Board here anyway"
   }
 }

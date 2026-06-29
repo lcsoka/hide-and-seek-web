@@ -4,6 +4,7 @@ import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
 import { hidingZoneViz } from '../../core/maps/deduction';
 import { disperse } from '../../core/maps/spread';
 import { HidingState } from '../../core/services/hiding-state';
+import { TransitRoutes } from '../../core/services/transit-routes';
 import { HidingZone, PlayerView, Position } from '../../core/models/models';
 import { transitMeta } from '../../core/util/transit';
 
@@ -36,6 +37,7 @@ export class MapView {
   private centred = false;
   private wasPicking = false; // tracks picking sessions so a re-pick (e.g. Move) re-zooms
   private readonly hiding = inject(HidingState);
+  private readonly transitRoutes = inject(TransitRoutes);
 
   // The carve's neighbours: the shared nearby-stops set (fetched once by HidingState, also
   // feeding the picker) that fall INSIDE the zone radius — so the zone is carved only by
@@ -63,6 +65,7 @@ export class MapView {
       this.questionMarker();
       this.reveal();
       this.carveNeighbors();
+      this.transitRoutes.displayed();
       this.render();
     });
 
@@ -147,6 +150,20 @@ export class MapView {
 
     this.overlay?.remove();
     this.overlay = L.layerGroup().addTo(this.map);
+
+    // The transit line the seeker is previewing / riding, drawn in its mode colour (beneath
+    // the markers). A halo underneath keeps it legible over busy map tiles.
+    const route = this.transitRoutes.displayed();
+    if (route) {
+      const color = transitMeta(route.mode).color;
+      for (const seg of route.lines) {
+        if (seg.length > 1) {
+          const latlngs = seg.map((p) => [p.lat, p.lng] as L.LatLngTuple);
+          L.polyline(latlngs, { color: '#ffffff', weight: 8, opacity: 0.7 }).addTo(this.overlay);
+          L.polyline(latlngs, { color, weight: 4, opacity: 0.95 }).addTo(this.overlay);
+        }
+      }
+    }
 
     const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
     for (const p of disperse(located)) {

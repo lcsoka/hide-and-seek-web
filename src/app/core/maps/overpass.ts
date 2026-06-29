@@ -21,6 +21,24 @@ export const TRANSIT_MODES: TransitMode[] = [
 
 export const DEFAULT_TRANSIT_MODES = ['metro', 'tram'];
 
+/** A public-transport line serving a stop (one OSM `type=route` relation = one direction). */
+export interface RouteLine {
+  id: string; // relation id, for fetching geometry
+  ref: string; // line label, e.g. "47", "M2"
+  mode: string; // our mode id (tram/metro/light_rail/rail/bus/trolleybus)
+  name: string;
+  to: string; // terminus (the route's `to` tag), to tell the two directions apart
+  colour?: string; // OSM `colour` tag, e.g. "#FFD700"
+}
+
+/** our mode id → the OSM `route` relation value; and the reverse. */
+const ROUTE_VALUE: Record<string, string> = {
+  metro: 'subway', tram: 'tram', light_rail: 'light_rail', rail: 'train', bus: 'bus', trolleybus: 'trolleybus',
+};
+const MODE_OF_ROUTE: Record<string, string> = {
+  subway: 'metro', tram: 'tram', light_rail: 'light_rail', train: 'rail', railway: 'rail', bus: 'bus', trolleybus: 'trolleybus',
+};
+
 export interface PoiType {
   id: string;
   label: string;
@@ -207,5 +225,35 @@ export class OverpassService {
   /** Resolve the Overpass tag filters for a set of selected mode ids. */
   static filtersFor(modeIds: string[]): string[] {
     return TRANSIT_MODES.filter((m) => modeIds.includes(m.id)).flatMap((m) => m.filters);
+  }
+
+  /** Public-transport lines (route relations) passing within `radiusM` of a stop. */
+  async transitRoutes(lat: number, lng: number, modeIds?: string[], radiusM = 140): Promise<RouteLine[]> {
+    const values = (modeIds?.length ? modeIds : DEFAULT_TRANSIT_MODES).map((m) => ROUTE_VALUE[m]).filter(Boolean);
+    if (!values.length) {
+      return [];
+    }
+    const ql = `[out:json][timeout:25];rel(around:${radiusM},${lat},${lng})[type=route][route~"^(${values.join('|')})$"];out tags;`;
+    const res = (await this.run(ql)) as { elements?: { id: number; tags?: Record<string, string> }[] };
+
+    return (res.elements ?? []).map((e) => ({
+      id: String(e.id),
+      ref: String(e.tags?.['ref'] ?? e.tags?.['name'] ?? '?'),
+      mode: MODE_OF_ROUTE[e.tags?.['route'] ?? ''] ?? 'bus',
+      name: String(e.tags?.['name'] ?? ''),
+      to: String(e.tags?.['to'] ?? ''),
+      colour: e.tags?.['colour'],
+    }));
+  }
+
+  /** The path a route follows, as one polyline per member way (lat/lng points). */
+  async routeGeometry(relationId: string): Promise<{ lat: number; lng: number }[][]> {
+    const ql = `[out:json][timeout:25];rel(${relationId});out geom;`;
+    const res = (await this.run(ql)) as { elements?: { members?: { type: string; geometry?: { lat: number; lon: number }[] }[] }[] };
+    const members = res.elements?.[0]?.members ?? [];
+
+    return members
+      .filter((m) => m.type === 'way' && Array.isArray(m.geometry))
+      .map((m) => m.geometry!.map((g) => ({ lat: g.lat, lng: g.lon })));
   }
 }

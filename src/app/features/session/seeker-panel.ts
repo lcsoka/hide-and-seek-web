@@ -5,7 +5,9 @@ import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
 import { DeductionState } from '../../core/services/deduction-state';
 import { SessionStore } from '../../core/services/session-store';
+import { TransitRoutes } from '../../core/services/transit-routes';
 import { answerPositive } from '../../core/util/categories';
+import { transitMeta } from '../../core/util/transit';
 import { DiceRoller } from './dice-roller';
 import { ImageUpload } from './image-upload';
 
@@ -19,11 +21,14 @@ export class SeekerPanel {
   private readonly api = inject(ApiClient);
   private readonly store = inject(SessionStore);
   private readonly clock = inject(Clock);
+  private readonly transitRoutes = inject(TransitRoutes);
   readonly deduction = inject(DeductionState);
 
   readonly state = input.required<GameState>();
   readonly sessionId = input.required<string>();
   readonly openPicker = output<void>();
+  readonly openBoard = output<void>();
+  readonly mode = transitMeta;
 
   readonly questionNotice = this.store.questionNotice;
   readonly canAsk = computed(() => this.state().available_actions.includes('ask_question'));
@@ -52,13 +57,9 @@ export class SeekerPanel {
     return parts.join(' · ');
   }
 
-  async board(): Promise<void> {
-    await this.api.submitAction(this.sessionId(), 'board_transit', {});
-    this.store.refresh();
-  }
-
   async alight(): Promise<void> {
     await this.api.submitAction(this.sessionId(), 'alight_transit', {});
+    this.transitRoutes.clearDisplayed();
     this.store.refresh();
   }
 

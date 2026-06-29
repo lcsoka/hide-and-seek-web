@@ -23,6 +23,7 @@ import { HostPanel } from './host-panel';
 import { LobbyPanel } from './lobby-panel';
 import { MapView } from './map';
 import { QuestionPicker } from './question-picker';
+import { BoardChoice, TransitPicker } from './transit-picker';
 import { RoundResults } from './round-results';
 import { SeekerPanel } from './seeker-panel';
 
@@ -36,7 +37,7 @@ const STATUS_HINT_STATES = new Set(['role_assignment', 'hiding', 'seeking', 'end
 @Component({
   selector: 'app-session',
   host: { class: 'block h-[100dvh] w-full' },
-  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, DrawModal, CurseAlert, RoundResults],
+  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -55,6 +56,7 @@ export class SessionView {
   readonly devMode = !!environment.developerToken;
   readonly devPlacing = signal(false);
   readonly pickerOpen = signal(false);
+  readonly boardOpen = signal(false);
   readonly catalog = signal<QuestionCatalogItem[]>([]);
   readonly curseAlert = signal<ActiveCurse | null>(null);
   private readonly seenCurses = new Set<string>();
@@ -216,6 +218,13 @@ export class SessionView {
     // A thermometer is started (then stopped) rather than asked outright.
     const action = event.category === 'thermometer' ? 'start_thermometer' : 'ask_question';
     await this.api.submitAction(s.session_id, action, { question_id: event.questionId, ...event.payload });
+    this.store.refresh();
+  }
+
+  /** The seeker chose a stop + line in the board picker — record the boarding. */
+  async onBoard(s: GameState, choice: BoardChoice): Promise<void> {
+    this.boardOpen.set(false);
+    await this.api.submitAction(s.session_id, 'board_transit', choice as unknown as Record<string, unknown>);
     this.store.refresh();
   }
 

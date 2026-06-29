@@ -198,6 +198,8 @@ export interface GameState {
 export interface TransitState {
   on_transit: boolean; // is THIS seeker currently riding
   boarded_at: number | null;
+  line: string | null; // the line this seeker is currently riding (e.g. "47")
+  mode: string | null;
   riding: string[]; // display names of teammates currently riding
   log: TransitLeg[]; // completed rides, oldest first
 }
@@ -205,6 +207,10 @@ export interface TransitState {
 export interface TransitLeg {
   player_id: string | null;
   display_name: string | null;
+  line: string | null; // line ref, e.g. "47" / "M2"
+  mode: string | null; // transit mode id
+  board_stop: string | null;
+  alight_stop: string | null;
   board: { lat: number | null; lng: number | null; at: number | null };
   alight: { lat: number | null; lng: number | null; at: number | null };
   distance_m: number | null;
