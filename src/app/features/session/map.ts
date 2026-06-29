@@ -34,6 +34,7 @@ export class MapView {
   private map?: L.Map;
   private overlay?: L.LayerGroup;
   private centred = false;
+  private wasPicking = false; // tracks picking sessions so a re-pick (e.g. Move) re-zooms
   private readonly hiding = inject(HidingState);
 
   // The carve's neighbours: the shared nearby-stops set (fetched once by HidingState, also
@@ -197,13 +198,25 @@ export class MapView {
         .addTo(this.overlay);
     }
 
+    // A picking session is the hider choosing a spot: a previewed zone with no committed one
+    // yet (initial hiding, or again after a 'move'). When one (re)starts, re-arm the one-shot
+    // auto-zoom so the new pick area + its carved zone are framed (a ~400 m zone is invisible
+    // at the seeking-phase zoom otherwise).
+    const picking = !!this.previewZone() && !this.zone();
+    if (picking && !this.wasPicking) {
+      this.centred = false;
+    }
+    this.wasPicking = picking;
+
     const hl = this.highlight();
     if (hl) {
       L.circleMarker([hl.lat, hl.lng], { radius: 9, color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.9, weight: 3 }).addTo(this.overlay);
-      // Zoom to the hider's station area once, so the stops + zone are legible.
+      // Zoom to the hider's station area once per picking session, so the stops + zone are
+      // legible. Non-animated: the panel re-renders rapidly and an animated zoom gets
+      // interrupted (and silently no-ops) before it lands.
       if (!this.centred) {
         this.centred = true;
-        this.map.setView([hl.lat, hl.lng], 14, { animate: false });
+        this.map.setView([hl.lat, hl.lng], 15, { animate: false });
       }
     }
 
