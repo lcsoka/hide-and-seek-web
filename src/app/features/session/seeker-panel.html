@@ -41,6 +41,35 @@
     }
   </section>
 
+  @if (transit(); as tr2) {
+    <section class="space-y-2">
+      <div class="flex items-center justify-between">
+        <h2 class="font-semibold">{{ tr('transit.title') }}</h2>
+        @if (tr2.riding.length) {
+          <span class="text-xs text-indigo-600 dark:text-indigo-400">🚆 {{ tr2.riding.join(', ') }}</span>
+        }
+      </div>
+
+      @if (onTransit()) {
+        <button (click)="alight()" class="w-full rounded-xl bg-indigo-600 p-3 font-semibold text-white hover:bg-indigo-700">{{ tr('transit.alight') }}</button>
+        <p class="rounded-lg bg-indigo-50 p-2 text-xs text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">{{ tr('transit.onboardNote') }}</p>
+      } @else if (canBoard()) {
+        <button (click)="board()" class="w-full rounded-xl border border-indigo-400 p-2.5 font-semibold text-indigo-700 hover:bg-indigo-50 dark:text-indigo-300 dark:hover:bg-indigo-950">{{ tr('transit.board') }}</button>
+      }
+
+      @if (journey().length) {
+        <ul class="space-y-1">
+          @for (leg of journey(); track leg.board.at) {
+            <li class="flex items-center justify-between gap-2 rounded-lg border border-gray-200 px-2 py-1.5 text-xs dark:border-gray-700">
+              <span class="min-w-0 flex-1 truncate">🚆 {{ leg.display_name }}</span>
+              <span class="shrink-0 font-medium text-gray-500 dark:text-gray-400">{{ legSummary(leg) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
   <section class="space-y-2">
     @for (a of history(); track a.n) {
       <div class="flex items-center gap-2 rounded-xl border border-gray-200 p-2 dark:border-gray-700" [class.opacity-40]="deduction.isDismissed(a.seq)">

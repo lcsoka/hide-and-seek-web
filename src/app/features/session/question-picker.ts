@@ -30,6 +30,7 @@ export class QuestionPicker {
   readonly seekerLat = input<number | null>(null);
   readonly seekerLng = input<number | null>(null);
   readonly disabledCategories = input<string[]>([]);
+  readonly onTransit = input(false); // seeker is riding → thermometer is unavailable (walk-only)
   readonly ask = output<{ questionId: string; category: string; payload: Record<string, unknown> }>();
   readonly closeChange = output<boolean>();
 
@@ -53,7 +54,12 @@ export class QuestionPicker {
   readonly unitLabel = computed(() => (this.units() === 'imperial' ? 'mi' : 'km'));
 
   isDisabled(category: string): boolean {
-    return this.disabledCategories().includes(category);
+    return this.disabledCategories().includes(category) || (category === 'thermometer' && this.onTransit());
+  }
+
+  /** Why a category tile is greyed: walk-only (on transit) vs blocked by a curse. */
+  disabledReason(category: string): string {
+    return category === 'thermometer' && this.onTransit() ? 'picker.thermoTransit' : 'picker.disabledLock';
   }
 
   pick(category: string): void {

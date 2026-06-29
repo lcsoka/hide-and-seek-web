@@ -201,7 +201,8 @@
     "noQuestionsCat": "No questions in this category.",
     "back": "‹ back",
     "custom": "custom",
-    "findingPlaces": "Finding nearby places…"
+    "findingPlaces": "Finding nearby places…",
+    "thermoTransit": "🚶 Walk-only — get off transit"
   },
   "timer": {
     "answering": "Hider answering",
@@ -217,6 +218,8 @@
     "answer_question": "Answer question",
     "play_curse": "Play curse",
     "declare_endgame": "Declare endgame",
+    "board_transit": "Board transit",
+    "alight_transit": "Get off transit",
     "confirm_found": "I found them!",
     "surrender": "Surrender",
     "advance_round": "Next round",
@@ -253,5 +256,11 @@
     "endgame": "Final guesses!",
     "round_end": "Round over.",
     "finished": "Game over."
+  },
+  "transit": {
+    "title": "Transit",
+    "board": "🚆 Board transit",
+    "alight": "🚉 Get off here",
+    "onboardNote": "On transit — the thermometer must be walked, so it's unavailable until you get off."
   }
 }

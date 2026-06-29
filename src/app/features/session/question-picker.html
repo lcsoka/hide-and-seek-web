@@ -21,7 +21,7 @@
                     [title]="isDisabled(c) ? t('picker.disabled') : ''">
               <span class="text-2xl">{{ meta(c).icon }}</span>
               <span class="font-semibold">{{ t('category.' + c) }}</span>
-              <span class="text-xs leading-snug text-gray-500 dark:text-gray-400">{{ isDisabled(c) ? t('picker.disabledLock') : t('categoryHint.' + c) }}</span>
+              <span class="text-xs leading-snug text-gray-500 dark:text-gray-400">{{ isDisabled(c) ? t(disabledReason(c)) : t('categoryHint.' + c) }}</span>
             </button>
           }
         </div>

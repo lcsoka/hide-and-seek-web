@@ -201,7 +201,8 @@
     "noQuestionsCat": "Nincs kérdés ebben a kategóriában.",
     "back": "‹ vissza",
     "custom": "egyéni",
-    "findingPlaces": "Közeli helyek keresése…"
+    "findingPlaces": "Közeli helyek keresése…",
+    "thermoTransit": "🚶 Csak gyalog — szállj le"
   },
   "timer": {
     "answering": "Bújó válaszol",
@@ -217,6 +218,8 @@
     "answer_question": "Válasz",
     "play_curse": "Átok kijátszása",
     "declare_endgame": "Hajrá indítása",
+    "board_transit": "Felszállás",
+    "alight_transit": "Leszállás",
     "confirm_found": "Megtaláltam!",
     "surrender": "Feladás",
     "advance_round": "Következő kör",
@@ -253,5 +256,11 @@
     "endgame": "Végső tippek!",
     "round_end": "Kör vége.",
     "finished": "Vége a játéknak."
+  },
+  "transit": {
+    "title": "Tömegközlekedés",
+    "board": "🚆 Felszállás",
+    "alight": "🚉 Leszállás",
+    "onboardNote": "Tömegközlekedésen vagy — a hőmérőt gyalog kell megtenni, ezért leszállásig nem elérhető."
   }
 }

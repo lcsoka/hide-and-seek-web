@@ -191,6 +191,24 @@ export interface GameState {
   pending_draw: PendingDraw | null;
   time_bonus_s: number | null;
   thermometer: ThermometerRunning | null;
+  transit: TransitState | null; // seeker-only: board/alight status + the team's journey log
+}
+
+/** Seekers' public-transport status + journey log (seeker-only). */
+export interface TransitState {
+  on_transit: boolean; // is THIS seeker currently riding
+  boarded_at: number | null;
+  riding: string[]; // display names of teammates currently riding
+  log: TransitLeg[]; // completed rides, oldest first
+}
+
+export interface TransitLeg {
+  player_id: string | null;
+  display_name: string | null;
+  board: { lat: number | null; lng: number | null; at: number | null };
+  alight: { lat: number | null; lng: number | null; at: number | null };
+  distance_m: number | null;
+  duration_s: number | null;
 }
 
 export interface CurseChoice {

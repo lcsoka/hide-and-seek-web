@@ -30,9 +30,37 @@ export class SeekerPanel {
   readonly canCatch = computed(() => this.state().available_actions.includes('confirm_found'));
   readonly closingIn = computed(() => this.state().state === 'endgame' && !this.canCatch());
   readonly running = computed(() => this.state().thermometer);
+  readonly transit = computed(() => this.state().transit);
+  readonly onTransit = computed(() => this.transit()?.on_transit ?? false);
+  readonly canBoard = computed(() => this.state().available_actions.includes('board_transit'));
+  // Journey log newest-first; only completed legs (with an alight time).
+  readonly journey = computed(() => [...(this.transit()?.log ?? [])].filter((l) => l.alight.at != null).reverse());
   readonly history = computed(() => [...this.deduction.annotations()].reverse());
   // Done curses (time ran out / task completed) disappear — only show active ones.
   readonly curses = computed(() => this.state().curses.filter((c) => c.status === 'active'));
+
+  /** Compact "12m · 3.4 km" summary for a journey leg. */
+  legSummary(leg: { duration_s: number | null; distance_m: number | null }): string {
+    const parts: string[] = [];
+    if (leg.duration_s != null) {
+      parts.push(leg.duration_s >= 60 ? `${Math.round(leg.duration_s / 60)}m` : `${leg.duration_s}s`);
+    }
+    if (leg.distance_m != null) {
+      parts.push(leg.distance_m >= 1000 ? `${(leg.distance_m / 1000).toFixed(1)} km` : `${leg.distance_m} m`);
+    }
+
+    return parts.join(' · ');
+  }
+
+  async board(): Promise<void> {
+    await this.api.submitAction(this.sessionId(), 'board_transit', {});
+    this.store.refresh();
+  }
+
+  async alight(): Promise<void> {
+    await this.api.submitAction(this.sessionId(), 'alight_transit', {});
+    this.store.refresh();
+  }
 
   chipClass(answer: string): string {
     const positive = answerPositive(answer);
