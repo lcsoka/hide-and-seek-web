@@ -1,4 +1,5 @@
 import { Component, inject, input, signal } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { GameState } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { SessionStore } from '../../core/services/session-store';
@@ -6,6 +7,7 @@ import { SessionStore } from '../../core/services/session-store';
 /** Role assignment: the host picks which player hides (or rolls a random one). */
 @Component({
   selector: 'app-host-panel',
+  imports: [TranslocoModule],
   templateUrl: './host-panel.html',
 })
 export class HostPanel {

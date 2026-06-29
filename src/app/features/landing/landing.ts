@@ -1,53 +1,58 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { TRANSIT_MODES } from '../../core/maps/overpass';
 import { ApiClient } from '../../core/services/api-client';
 import { PlayerStore } from '../../core/services/player-store';
 import { TokenStore } from '../../core/services/token-store';
+import { LangToggle } from '../../shared/lang-toggle';
 
 @Component({
   selector: 'app-landing',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle],
   template: `
-    <main class="mx-auto w-full max-w-md space-y-6 p-4 sm:p-6">
-      <h1 class="text-center text-2xl font-bold sm:text-3xl">Jet Lag Hungary</h1>
+    <main class="mx-auto w-full max-w-md space-y-6 p-4 sm:p-6" *transloco="let t">
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold sm:text-3xl">Jet Lag Hungary</h1>
+        <app-lang-toggle />
+      </div>
 
       @if (error(); as e) {
         <p class="rounded-lg bg-red-100 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">{{ e }}</p>
       }
 
       <div class="space-y-1">
-        <label class="text-sm font-medium" for="name">Your name</label>
+        <label class="text-sm font-medium" for="name">{{ t('landing.yourName') }}</label>
         <input id="name" [(ngModel)]="name" placeholder="Anna" autocomplete="off"
                class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800" />
       </div>
 
       <section class="space-y-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-        <h2 class="font-semibold">Start a game</h2>
+        <h2 class="font-semibold">{{ t('landing.startGame') }}</h2>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <select [(ngModel)]="city" aria-label="City"
-                  class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
+          <select [(ngModel)]="city" [attr.aria-label]="t('landing.startGame')"
+                  class="w-full rounded-lg border border-gray-300 bg-white p-3 capitalize dark:border-gray-600 dark:bg-gray-800">
             @for (c of cities; track c) { <option [value]="c">{{ c }}</option> }
           </select>
           <select [(ngModel)]="size" aria-label="Map size"
                   class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
-            @for (s of sizes; track s) { <option [value]="s">{{ s }}</option> }
+            @for (s of sizes; track s) { <option [value]="s">{{ t('landing.size.' + s) }}</option> }
           </select>
           <select [(ngModel)]="units" aria-label="Units"
                   class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
-            <option value="metric">Metric (km)</option>
-            <option value="imperial">Imperial (mi)</option>
+            <option value="metric">{{ t('landing.units.metric') }}</option>
+            <option value="imperial">{{ t('landing.units.imperial') }}</option>
           </select>
           <select [(ngModel)]="zoneRule" aria-label="Hiding zone"
                   class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
-            <option value="nearest">Zone: carved (no other station inside)</option>
-            <option value="circle">Zone: simple circle</option>
+            <option value="nearest">{{ t('landing.zoneCarved') }}</option>
+            <option value="circle">{{ t('landing.zoneCircle') }}</option>
           </select>
         </div>
 
         <div class="space-y-1.5">
-          <div class="text-sm font-medium">Transport players can hide at</div>
+          <div class="text-sm font-medium">{{ t('landing.transport') }}</div>
           <div class="flex flex-wrap gap-2">
             @for (m of allModes; track m.id) {
               <button type="button" (click)="toggleMode(m.id)"
@@ -55,31 +60,31 @@ import { TokenStore } from '../../core/services/token-store';
                       [class]="modes().includes(m.id)
                         ? 'border-rose-500 bg-rose-50 text-rose-700 dark:border-rose-500 dark:bg-rose-950 dark:text-rose-300'
                         : 'border-gray-300 text-gray-500 hover:border-gray-400 dark:border-gray-600 dark:text-gray-400'">
-                {{ m.label }}
+                {{ t('mode.' + m.id) }}
               </button>
             }
           </div>
-          <p class="text-xs text-gray-400">Denser networks (e.g. bus) make smaller hiding zones.</p>
+          <p class="text-xs text-gray-400">{{ t('landing.transportHint') }}</p>
         </div>
 
         <button (click)="create()" [disabled]="busy()"
                 class="w-full rounded-lg bg-rose-600 p-3 font-medium text-white hover:bg-rose-700 disabled:opacity-50">
-          Create game
+          {{ t('landing.createGame') }}
         </button>
       </section>
 
       <section class="space-y-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-        <h2 class="font-semibold">Join a game</h2>
-        <input [(ngModel)]="joinCode" placeholder="Join code" autocapitalize="characters"
+        <h2 class="font-semibold">{{ t('landing.joinTitle') }}</h2>
+        <input [(ngModel)]="joinCode" [placeholder]="t('landing.joinCode')" autocapitalize="characters"
                class="w-full rounded-lg border border-gray-300 bg-white p-3 uppercase dark:border-gray-600 dark:bg-gray-800" />
         <button (click)="join()" [disabled]="busy() || !joinCode.trim()"
                 class="w-full rounded-lg border border-gray-300 p-3 font-medium hover:bg-gray-100 disabled:opacity-50 dark:border-gray-600 dark:hover:bg-gray-800">
-          Join game
+          {{ t('landing.joinBtn') }}
         </button>
       </section>
 
       <p class="text-center text-sm">
-        <a routerLink="/map" class="text-rose-600 hover:underline">🗺 Open the deduction map</a>
+        <a routerLink="/map" class="text-rose-600 hover:underline">{{ t('landing.openMap') }}</a>
       </p>
     </main>
   `,
@@ -89,6 +94,7 @@ export class Landing {
   private readonly tokens = inject(TokenStore);
   private readonly players = inject(PlayerStore);
   private readonly router = inject(Router);
+  private readonly transloco = inject(TranslocoService);
 
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
@@ -143,7 +149,7 @@ export class Landing {
     try {
       await fn();
     } catch (e: any) {
-      this.error.set(e?.error?.message ?? 'Something went wrong.');
+      this.error.set(e?.error?.message ?? this.transloco.translate('common.error'));
     } finally {
       this.busy.set(false);
     }

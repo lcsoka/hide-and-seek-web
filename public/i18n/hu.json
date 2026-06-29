@@ -1,0 +1,75 @@
+{
+  "common": {
+    "loading": "Betöltés…",
+    "cancel": "Mégse",
+    "leave": "Kilépés",
+    "code": "Kód",
+    "copied": "Másolva!",
+    "error": "Valami hiba történt."
+  },
+  "role": { "hider": "Bújó", "seeker": "Kereső" },
+  "state": {
+    "lobby": "Váróterem",
+    "role_assignment": "Szereposztás",
+    "hiding": "Elbújás",
+    "seeking": "Keresés",
+    "endgame": "Hajrá",
+    "round_end": "Kör vége",
+    "finished": "Vége"
+  },
+  "mode": {
+    "metro": "Metró",
+    "tram": "Villamos",
+    "rail": "Vasút",
+    "light_rail": "HÉV",
+    "bus": "Busz",
+    "trolleybus": "Trolibusz"
+  },
+  "landing": {
+    "yourName": "A neved",
+    "startGame": "Új játék",
+    "createGame": "Játék létrehozása",
+    "joinTitle": "Csatlakozás játékhoz",
+    "joinBtn": "Csatlakozás",
+    "joinCode": "Csatlakozási kód",
+    "transport": "Milyen megállóknál bújhatnak el a játékosok",
+    "transportHint": "A sűrűbb hálózat (pl. busz) kisebb búvóhely-zónát eredményez.",
+    "zoneCarved": "Zóna: kivágott (nincs benne másik megálló)",
+    "zoneCircle": "Zóna: egyszerű kör",
+    "openMap": "🗺 Nyomozótérkép megnyitása",
+    "createFailed": "Nem sikerült létrehozni a játékot.",
+    "joinFailed": "Nem sikerült csatlakozni — ellenőrizd a kódot.",
+    "size": { "small": "Kicsi", "medium": "Közepes", "large": "Nagy" },
+    "units": { "metric": "Metrikus (km)", "imperial": "Angolszász (mérföld)" }
+  },
+  "lobby": {
+    "title": "Váróterem",
+    "share": "Oszd meg a fenti kódot, hogy másokat is meghívj.",
+    "host": "házigazda",
+    "needPlayers": "Legalább 2 játékos kell",
+    "start": "Játék indítása",
+    "waiting": "Várakozás a házigazdára…"
+  },
+  "host": {
+    "choose": "Válaszd ki a bújót",
+    "tapOrRandom": "Koppints egy játékosra, vagy sorsolj véletlenszerűen.",
+    "you": "(te)",
+    "make": "Legyen ő a bújó",
+    "random": "🎲 Véletlen bújó"
+  },
+  "hud": { "calculating": "Búvóhely-zóna számítása…" },
+  "results": {
+    "gameOver": "🏁 Vége a játéknak",
+    "roundOver": "🔚 Kör vége",
+    "theHider": "A bújó",
+    "stayedHidden": "ennyi ideig maradt rejtve:",
+    "bonus": "bónusz",
+    "surrendered": "Feladta.",
+    "caughtBy": "Elkapta:",
+    "winnerLong": "leghosszabb rejtőzés",
+    "standings": "Állás",
+    "questions": "kérdés",
+    "curses": "átok",
+    "nextHint": "A lenti gombbal indítsd a következő kört."
+  }
+}

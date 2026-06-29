@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Language } from './core/services/language';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,8 @@ import { RouterOutlet } from '@angular/router';
     </div>
   `,
 })
-export class App {}
+export class App {
+  constructor() {
+    inject(Language).init(); // restore the saved language (Hungarian by default)
+  }
+}

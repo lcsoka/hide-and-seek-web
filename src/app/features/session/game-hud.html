@@ -1,9 +1,9 @@
-<div class="pointer-events-none absolute inset-x-0 top-0 z-[600] flex items-start justify-between gap-2 p-3 sm:p-4">
+<div class="pointer-events-none absolute inset-x-0 top-0 z-[600] flex items-start justify-between gap-2 p-3 sm:p-4" *transloco="let tr">
   <div class="pointer-events-auto flex items-center gap-2">
-    <a routerLink="/" aria-label="Leave"
+    <a routerLink="/" [attr.aria-label]="tr('common.leave')"
        class="grid h-9 w-9 place-items-center rounded-full bg-white/85 text-lg text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">←</a>
     <button (click)="copy()" class="flex items-center gap-2 rounded-full bg-white/85 px-3 py-1.5 shadow-lg backdrop-blur dark:bg-gray-900/80">
-      <span class="text-[10px] font-semibold uppercase tracking-widest text-gray-400">{{ copied() ? 'Copied!' : 'Code' }}</span>
+      <span class="text-[10px] font-semibold uppercase tracking-widest text-gray-400">{{ copied() ? tr('common.copied') : tr('common.code') }}</span>
       <span class="font-mono text-sm font-bold tracking-[0.2em] text-gray-900 dark:text-white">{{ joinCode() }}</span>
     </button>
   </div>
@@ -16,21 +16,22 @@
     </div>
   }
 
-  <div class="pointer-events-auto">
+  <div class="pointer-events-auto flex items-center gap-2">
+    <app-lang-toggle />
     @if (role(); as r) {
       <span class="rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-lg backdrop-blur"
-            [class]="r === 'hider' ? 'bg-rose-600' : 'bg-blue-600'">{{ r }}</span>
+            [class]="r === 'hider' ? 'bg-rose-600' : 'bg-blue-600'">{{ tr('role.' + r) }}</span>
     } @else {
-      <span class="rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium capitalize text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">{{ stateLabel() }}</span>
+      <span class="rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">{{ tr('state.' + stateLabel()) }}</span>
     }
   </div>
 </div>
 
 @if (calculating()) {
-  <div class="pointer-events-none absolute inset-x-0 top-16 z-[600] flex justify-center sm:top-20">
+  <div class="pointer-events-none absolute inset-x-0 top-16 z-[600] flex justify-center sm:top-20" *transloco="let tr">
     <span class="pointer-events-auto flex items-center gap-2 rounded-full bg-amber-500/90 px-3 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur">
       <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
-      Calculating hiding zone…
+      {{ tr('hud.calculating') }}
     </span>
   </div>
 }

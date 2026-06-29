@@ -1,11 +1,13 @@
 import { Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslocoModule } from '@jsverse/transloco';
 import { GameTimer } from '../../core/util/game-timer';
+import { LangToggle } from '../../shared/lang-toggle';
 
 /** Floating HUD: leave button, copyable invite code, the phase timer, and the role badge. */
 @Component({
   selector: 'app-game-hud',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslocoModule, LangToggle],
   templateUrl: './game-hud.html',
 })
 export class GameHud {

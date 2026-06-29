@@ -1,0 +1,75 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "leave": "Leave",
+    "code": "Code",
+    "copied": "Copied!",
+    "error": "Something went wrong."
+  },
+  "role": { "hider": "Hider", "seeker": "Seeker" },
+  "state": {
+    "lobby": "Lobby",
+    "role_assignment": "Roles",
+    "hiding": "Hiding",
+    "seeking": "Seeking",
+    "endgame": "Endgame",
+    "round_end": "Round over",
+    "finished": "Finished"
+  },
+  "mode": {
+    "metro": "Metro",
+    "tram": "Tram",
+    "rail": "Rail",
+    "light_rail": "Light rail",
+    "bus": "Bus",
+    "trolleybus": "Trolleybus"
+  },
+  "landing": {
+    "yourName": "Your name",
+    "startGame": "Start a game",
+    "createGame": "Create game",
+    "joinTitle": "Join a game",
+    "joinBtn": "Join game",
+    "joinCode": "Join code",
+    "transport": "Transport players can hide at",
+    "transportHint": "Denser networks (e.g. bus) make smaller hiding zones.",
+    "zoneCarved": "Zone: carved (no other station inside)",
+    "zoneCircle": "Zone: simple circle",
+    "openMap": "🗺 Open the deduction map",
+    "createFailed": "Could not create the game.",
+    "joinFailed": "Could not join — check the code.",
+    "size": { "small": "Small", "medium": "Medium", "large": "Large" },
+    "units": { "metric": "Metric (km)", "imperial": "Imperial (mi)" }
+  },
+  "lobby": {
+    "title": "Waiting room",
+    "share": "Share the code up top to invite players.",
+    "host": "host",
+    "needPlayers": "Need at least 2 players",
+    "start": "Start game",
+    "waiting": "Waiting for the host to start…"
+  },
+  "host": {
+    "choose": "Choose the hider",
+    "tapOrRandom": "Tap a player, or roll a random one.",
+    "you": "(you)",
+    "make": "Make hider",
+    "random": "🎲 Pick a random hider"
+  },
+  "hud": { "calculating": "Calculating hiding zone…" },
+  "results": {
+    "gameOver": "🏁 Game over",
+    "roundOver": "🔚 Round over",
+    "theHider": "The hider",
+    "stayedHidden": "stayed hidden:",
+    "bonus": "bonus",
+    "surrendered": "They surrendered.",
+    "caughtBy": "Caught by",
+    "winnerLong": "longest hidden",
+    "standings": "Standings",
+    "questions": "questions",
+    "curses": "curses",
+    "nextHint": "Use the button below to start the next round."
+  }
+}
