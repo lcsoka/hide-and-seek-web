@@ -2,6 +2,7 @@ import { Component, computed, DestroyRef, effect, inject, signal } from '@angula
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models/models';
+import { ALL_TRANSIT_MODES } from '../../core/maps/overpass';
 import { unitsOf } from '../../core/util/units';
 import { ApiClient } from '../../core/services/api-client';
 import { DeductionState } from '../../core/services/deduction-state';
@@ -57,6 +58,8 @@ export class SessionView {
   readonly devPlacing = signal(false);
   readonly pickerOpen = signal(false);
   readonly boardOpen = signal(false);
+  // Seekers may board ANY mode (not just the game's hiding modes), so the picker offers all.
+  readonly allTransitModes = ALL_TRANSIT_MODES;
   readonly catalog = signal<QuestionCatalogItem[]>([]);
   readonly curseAlert = signal<ActiveCurse | null>(null);
   private readonly seenCurses = new Set<string>();

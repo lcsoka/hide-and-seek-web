@@ -87,7 +87,7 @@
                          [disabledCategories]="s.disabled_categories" [onTransit]="s.transit?.on_transit ?? false"
                          (ask)="onAsk(s, $event)" (closeChange)="pickerOpen.set($event)" />
     <app-transit-picker [open]="boardOpen()" [seekerLat]="me(s)?.lat ?? null" [seekerLng]="me(s)?.lng ?? null"
-                        [transitModes]="transitModes(s)" (board)="onBoard(s, $event)" (closeChange)="boardOpen.set($event)" />
+                        [transitModes]="allTransitModes" (board)="onBoard(s, $event)" (closeChange)="boardOpen.set($event)" />
 
     @if (role(s) === 'hider' && s.pending_draw) {
       <app-draw-modal [sessionId]="s.session_id" [draw]="s.pending_draw" />

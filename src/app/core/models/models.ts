@@ -200,6 +200,7 @@ export interface TransitState {
   boarded_at: number | null;
   line: string | null; // the line this seeker is currently riding (e.g. "47")
   mode: string | null;
+  board: { lat: number | null; lng: number | null } | null; // where they boarded (to re-draw the route)
   riding: string[]; // display names of teammates currently riding
   log: TransitLeg[]; // completed rides, oldest first
 }

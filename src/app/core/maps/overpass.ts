@@ -20,6 +20,8 @@ export const TRANSIT_MODES: TransitMode[] = [
 ];
 
 export const DEFAULT_TRANSIT_MODES = ['metro', 'tram'];
+/** Every transit mode id — the seeker may board ANY of these (independent of the game's hiding modes). */
+export const ALL_TRANSIT_MODES = TRANSIT_MODES.map((m) => m.id);
 
 /** A public-transport line serving a stop (one OSM `type=route` relation = one direction). */
 export interface RouteLine {

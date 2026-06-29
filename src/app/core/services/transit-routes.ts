@@ -86,6 +86,29 @@ export class TransitRoutes {
     }
   }
 
+  /**
+   * Re-draw the line a seeker is already riding (e.g. after a reload) — the geometry is
+   * in-memory, so re-find the route by ref/mode near where they boarded and draw it.
+   */
+  async restoreActive(lat: number, lng: number, ref: string, mode: string, modeIds?: string[]): Promise<void> {
+    if (this.displayed()) {
+      return;
+    }
+    this.inflight.update((n) => n + 1);
+    try {
+      const lines = await this.overpass.transitRoutes(lat, lng, modeIds);
+      const match = lines.find((l) => l.ref === ref && l.mode === mode) ?? lines.find((l) => l.ref === ref);
+      if (match) {
+        const geom = await this.overpass.routeGeometry(match.id);
+        this.displayed.set({ ref: match.ref, mode: match.mode, lines: geom });
+      }
+    } catch {
+      // leave it undrawn — the journey log still shows the ride
+    } finally {
+      this.inflight.update((n) => Math.max(0, n - 1));
+    }
+  }
+
   /** Fetch + draw a line's path on the map. */
   async showRoute(line: RouteLine): Promise<void> {
     this.inflight.update((n) => n + 1);

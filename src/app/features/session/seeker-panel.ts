@@ -1,6 +1,7 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, effect, inject, input, output } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
 import { ActiveCurse, GameState } from '../../core/models/models';
+import { ALL_TRANSIT_MODES } from '../../core/maps/overpass';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
 import { DeductionState } from '../../core/services/deduction-state';
@@ -43,6 +44,25 @@ export class SeekerPanel {
   readonly history = computed(() => [...this.deduction.annotations()].reverse());
   // Done curses (time ran out / task completed) disappear — only show active ones.
   readonly curses = computed(() => this.state().curses.filter((c) => c.status === 'active'));
+
+  private restoredRide: string | null = null;
+
+  constructor() {
+    // After a reload the ridden line's geometry is gone (it was in-memory) — re-fetch + draw
+    // it once per ride from the stored board point + line.
+    effect(() => {
+      const t = this.transit();
+      if (t?.on_transit && t.line && t.board?.lat != null && t.board?.lng != null) {
+        const key = `${t.line}:${t.boarded_at}`;
+        if (this.restoredRide !== key) {
+          this.restoredRide = key;
+          void this.transitRoutes.restoreActive(t.board.lat, t.board.lng, t.line, t.mode ?? 'tram', ALL_TRANSIT_MODES);
+        }
+      } else if (!t?.on_transit) {
+        this.restoredRide = null;
+      }
+    });
+  }
 
   /** Compact "12m · 3.4 km" summary for a journey leg. */
   legSummary(leg: { duration_s: number | null; distance_m: number | null }): string {
