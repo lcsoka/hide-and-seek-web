@@ -149,6 +149,18 @@ export class Landing {
     try {
       await fn();
     } catch (e: any) {
+      // A stored token can outlive the backend it was minted against (e.g. the dev DB was
+      // reset), so the stale token 401s. Drop it, mint a fresh guest token, and retry once.
+      if (e?.status === 401) {
+        this.tokens.clear();
+        try {
+          await fn();
+
+          return;
+        } catch (retryError: any) {
+          e = retryError;
+        }
+      }
       this.error.set(e?.error?.message ?? this.transloco.translate('common.error'));
     } finally {
       this.busy.set(false);
