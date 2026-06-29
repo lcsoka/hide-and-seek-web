@@ -133,9 +133,11 @@ export class SessionView {
     return this.role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame');
   }
 
-  /** While the hider is picking a station, surface the candidates + choice on the map. */
+  /** While the hider is picking a station, surface the candidates + choice on the map —
+   *  during the hiding phase, and again while relocating after a 'move' powerup. */
   private picking(s: GameState): boolean {
-    return this.role(s) === 'hider' && s.state === 'hiding';
+    return this.role(s) === 'hider'
+      && (s.state === 'hiding' || (!!s.relocating && (s.state === 'seeking' || s.state === 'endgame')));
   }
 
   hidingStations(s: GameState): { lat: number; lng: number; name?: string; modes?: string[] }[] {

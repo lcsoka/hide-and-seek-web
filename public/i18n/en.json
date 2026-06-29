@@ -39,7 +39,7 @@
     "pickDifferent": "Pick a different stop",
     "none": "No stations found nearby. Move closer to a station.",
     "relocated": "🚚 You played Move",
-    "relocateTravel": "Travel to your new spot, then confirm it.",
+    "relocateTravel": "Travel to a new area, then pick a station below to hide at.",
     "relocateConfirm": "Confirm new spot"
   },
   "draw": {
