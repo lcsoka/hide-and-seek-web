@@ -1,19 +1,19 @@
-<div class="space-y-4">
+<div class="space-y-4" *transloco="let tr">
   @if (canCatch()) {
     <div class="space-y-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 p-3 dark:border-emerald-500 dark:bg-emerald-950">
-      <p class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">🎯 You've reached the hider!</p>
+      <p class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">{{ tr('seeker.reached') }}</p>
       <button (click)="confirmFound()" class="w-full rounded-lg bg-emerald-600 p-3 text-base font-semibold text-white hover:bg-emerald-700">
-        I found them!
+        {{ tr('seeker.iFound') }}
       </button>
     </div>
   } @else if (closingIn()) {
-    <p class="rounded-lg bg-rose-100 p-2 text-center text-sm text-rose-800 dark:bg-rose-950 dark:text-rose-300">Endgame — close in on the hider to catch them.</p>
+    <p class="rounded-lg bg-rose-100 p-2 text-center text-sm text-rose-800 dark:bg-rose-950 dark:text-rose-300">{{ tr('seeker.endgameClose') }}</p>
   }
 
   <section class="space-y-2">
     <div class="flex items-center justify-between">
-      <h2 class="text-lg font-bold">Questions</h2>
-      <span class="text-xs text-gray-500 dark:text-gray-400">{{ deduction.narrowedCount() }} on the map</span>
+      <h2 class="text-lg font-bold">{{ tr('seeker.questions') }}</h2>
+      <span class="text-xs text-gray-500 dark:text-gray-400">{{ deduction.narrowedCount() }} {{ tr('seeker.onMap') }}</span>
     </div>
     @if (questionNotice(); as notice) {
       <p class="rounded-lg bg-amber-100 p-2 text-center text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">{{ notice }}</p>
@@ -21,22 +21,22 @@
 
     @if (running(); as t) {
       <div class="space-y-2 rounded-xl border-2 border-amber-400 bg-amber-50 p-3 dark:border-amber-600 dark:bg-amber-950">
-        <div class="flex items-center gap-2 text-sm font-semibold">🌡️ Thermometer running</div>
-        <p class="text-xs text-gray-600 dark:text-gray-300">Travel about <b>{{ t.distance_label }}</b>, then stop — the hider will see your start → end.</p>
-        <button (click)="stopThermometer()" class="w-full rounded-lg bg-amber-600 p-2.5 font-semibold text-white hover:bg-amber-700">⏹ Stop &amp; send</button>
+        <div class="flex items-center gap-2 text-sm font-semibold">🌡️ {{ tr('seeker.thermoRunning') }}</div>
+        <p class="text-xs text-gray-600 dark:text-gray-300">{{ tr('seeker.thermoTravel', { dist: t.distance_label }) }}</p>
+        <button (click)="stopThermometer()" class="w-full rounded-lg bg-amber-600 p-2.5 font-semibold text-white hover:bg-amber-700">{{ tr('seeker.stopSend') }}</button>
       </div>
     } @else if (canAsk()) {
       <button (click)="openPicker.emit()"
               class="w-full rounded-xl bg-rose-600 p-3 text-base font-semibold text-white shadow-sm hover:bg-rose-700">
-        ＋ Ask a question
+        {{ tr('seeker.ask') }}
       </button>
     } @else if (state().questions_blocked) {
       <p class="rounded-lg bg-purple-100 p-2 text-center text-sm font-medium text-purple-800 dark:bg-purple-950 dark:text-purple-300">
-        🧿 A curse is blocking questions — clear it below to ask again.
+        {{ tr('seeker.blocked') }}
       </p>
     } @else {
       <p class="rounded-lg bg-gray-100 p-2 text-center text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-        {{ state().pending_question ? 'Waiting for the hider to answer…' : 'Asking opens once seeking begins.' }}
+        {{ state().pending_question ? tr('seeker.waitingAnswer') : tr('seeker.asksOpen') }}
       </p>
     }
   </section>
@@ -47,48 +47,48 @@
         <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gray-900 text-xs font-bold text-white dark:bg-gray-700">{{ a.n }}</span>
         <span class="text-lg">{{ a.icon }}</span>
         <div class="min-w-0 flex-1">
-          <div class="truncate text-sm font-medium capitalize">{{ a.category }}</div>
-          <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ deduction.isDismissed(a.seq) ? 'Ignored in the deduction' : a.effect }}</div>
+          <div class="truncate text-sm font-medium">{{ tr('category.' + a.category) }}</div>
+          <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ deduction.isDismissed(a.seq) ? tr('seeker.ignored') : a.effect }}</div>
         </div>
         @if (a.photoUrl) {
           <a [href]="a.photoUrl" target="_blank" rel="noopener" class="shrink-0">
             <img [src]="a.photoUrl" alt="Photo clue" class="h-12 w-12 rounded-lg object-cover ring-1 ring-black/10" />
           </a>
         } @else {
-          <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" [class]="chipClass(a.answer)">{{ label(a.answer) }}</span>
+          <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" [class]="chipClass(a.answer)">{{ tr('answer.' + (a.answer || 'none')) }}</span>
         }
         <button (click)="deduction.toggleDismiss(a.seq)" type="button"
                 class="shrink-0 rounded-md p-1 text-base text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                [title]="deduction.isDismissed(a.seq) ? 'Restore to deduction' : 'Ignore in deduction'">
+                [title]="deduction.isDismissed(a.seq) ? tr('seeker.restore') : tr('seeker.ignore')">
           {{ deduction.isDismissed(a.seq) ? '↩︎' : '🚫' }}
         </button>
       </div>
     } @empty {
-      <p class="text-sm text-gray-400">No questions asked yet — tap “Ask a question”.</p>
+      <p class="text-sm text-gray-400">{{ tr('seeker.noQuestions') }}</p>
     }
   </section>
 
   @if (curses().length) {
     <section class="space-y-2">
-      <h2 class="font-semibold">Curses</h2>
+      <h2 class="font-semibold">{{ tr('seeker.curses') }}</h2>
       @for (c of curses(); track c.uid) {
         <div class="space-y-2 rounded-xl border p-3 text-sm"
              [class]="c.status === 'completed' ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950' : 'border-purple-300 bg-purple-50 dark:border-purple-700 dark:bg-purple-950'">
           <div class="flex items-start justify-between gap-2">
             <div class="min-w-0">
-              <div class="font-semibold">{{ c.name ?? 'Curse' }}</div>
+              <div class="font-semibold">{{ c.name ?? tr('seeker.curse') }}</div>
               @if (c.description) { <div class="text-xs text-gray-600 dark:text-gray-300">{{ c.description }}</div> }
             </div>
             @if (countdown(c); as left) {
               <span class="shrink-0 rounded-full bg-purple-600 px-2 py-0.5 font-mono text-xs font-bold text-white">⏳ {{ left }}</span>
             } @else if (c.status === 'completed') {
-              <span class="shrink-0 font-medium text-green-600 dark:text-green-400">✓ done</span>
+              <span class="shrink-0 font-medium text-green-600 dark:text-green-400">{{ tr('seeker.done') }}</span>
             }
           </div>
 
           @if (c.hint_photo_url) {
             <div class="space-y-1">
-              <div class="text-xs font-medium text-purple-700 dark:text-purple-300">🗺️ Find this place:</div>
+              <div class="text-xs font-medium text-purple-700 dark:text-purple-300">{{ tr('seeker.findPlace') }}</div>
               <a [href]="c.hint_photo_url" target="_blank" rel="noopener">
                 <img [src]="c.hint_photo_url" alt="Find this Street View location" class="h-40 w-full rounded-lg object-cover ring-1 ring-black/10" />
               </a>
@@ -99,7 +99,7 @@
               <img [src]="c.proof_url" alt="Proof" class="h-24 w-full rounded-lg object-cover ring-1 ring-black/10" />
             </a>
           } @else if (c.requires_proof && c.status === 'active') {
-            <app-image-upload [sessionId]="sessionId()" label="📷 Submit proof" (uploaded)="submitProof(c, $event)" />
+            <app-image-upload [sessionId]="sessionId()" [label]="tr('seeker.submitProof')" (uploaded)="submitProof(c, $event)" />
           }
           @if (c.dice && c.status === 'active') {
             <app-dice-roller [sessionId]="sessionId()" [curse]="c" />

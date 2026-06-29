@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { Point } from 'geojson';
 import { distance, point } from '@turf/turf';
+import { TranslocoModule } from '@jsverse/transloco';
 import { QuestionCatalogItem } from '../../core/models/models';
 import { FEATURE_TAGS } from '../../core/maps/osm-deduction';
 import { OverpassService } from '../../core/maps/overpass';
@@ -17,6 +18,7 @@ interface NearbyPlace {
 /** Icon-tile question chooser shown as a modal / bottom sheet — pick a category, then a question. */
 @Component({
   selector: 'app-question-picker',
+  imports: [TranslocoModule],
   templateUrl: './question-picker.html',
 })
 export class QuestionPicker {

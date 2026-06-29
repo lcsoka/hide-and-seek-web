@@ -1,17 +1,18 @@
 import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { ActiveCurse, GameState } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
 import { DeductionState } from '../../core/services/deduction-state';
 import { SessionStore } from '../../core/services/session-store';
-import { answerLabel, answerPositive } from '../../core/util/categories';
+import { answerPositive } from '../../core/util/categories';
 import { DiceRoller } from './dice-roller';
 import { ImageUpload } from './image-upload';
 
 /** Seeker side panel: an Ask button, the numbered history (with photo clues), and curses. */
 @Component({
   selector: 'app-seeker-panel',
-  imports: [ImageUpload, DiceRoller],
+  imports: [ImageUpload, DiceRoller, TranslocoModule],
   templateUrl: './seeker-panel.html',
 })
 export class SeekerPanel {
@@ -24,7 +25,6 @@ export class SeekerPanel {
   readonly sessionId = input.required<string>();
   readonly openPicker = output<void>();
 
-  readonly label = answerLabel;
   readonly questionNotice = this.store.questionNotice;
   readonly canAsk = computed(() => this.state().available_actions.includes('ask_question'));
   readonly canCatch = computed(() => this.state().available_actions.includes('confirm_found'));

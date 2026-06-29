@@ -6,8 +6,9 @@ import { ActiveCurse, GameState, HandCard, PendingQuestion, ResolvedQuestion } f
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
 import { SessionStore } from '../../core/services/session-store';
-import { answerLabel, answerPositive, categoryMeta } from '../../core/util/categories';
+import { answerPositive, categoryMeta } from '../../core/util/categories';
 import { formatDistance, unitsOf } from '../../core/util/units';
+import { TranslocoModule } from '@jsverse/transloco';
 import { ImageUpload } from './image-upload';
 
 interface TentaclePlace {
@@ -20,7 +21,7 @@ interface TentaclePlace {
 /** The hider's hand: see the full pending question, confirm the answer, play cards. */
 @Component({
   selector: 'app-card-deck',
-  imports: [ImageUpload],
+  imports: [ImageUpload, TranslocoModule],
   templateUrl: './card-deck.html',
   styles: [
     `
@@ -54,7 +55,6 @@ export class CardDeck {
   private prevLen = 0;
 
   readonly meta = categoryMeta;
-  readonly answerLabel = answerLabel;
   readonly confirmCard = signal<HandCard | null>(null);
 
   // A 'choose' curse (The Drained Brain) awaiting the hider's category picks.
@@ -218,27 +218,29 @@ export class CardDeck {
     await this.act('answer_question', { photo_url: url });
   }
 
-  /** Manual answer options when there's no auto-truth (matching / measuring / tentacles). */
-  readonly manualOptions = computed<{ value: string; label: string }[] | null>(() => {
+  /** Manual answer options when there's no auto-truth (matching / measuring). `labelKey` is a
+   *  translation key resolved in the template. */
+  readonly manualOptions = computed<{ value: string; labelKey: string }[] | null>(() => {
     switch (this.pending()?.category) {
       case 'matching':
-        return [{ value: 'yes', label: 'Yes — same' }, { value: 'no', label: 'No — different' }];
+        return [{ value: 'yes', labelKey: 'deck.matchSame' }, { value: 'no', labelKey: 'deck.matchDiff' }];
       case 'measuring':
-        return [{ value: 'closer', label: 'Closer' }, { value: 'further', label: 'Further' }];
+        return [{ value: 'closer', labelKey: 'answer.closer' }, { value: 'further', labelKey: 'answer.further' }];
       // tentacles is handled by a dedicated place picker (isTentacleManual), not these verdicts.
       default:
         return null;
     }
   });
 
+  /** Translation key for the manual-answer prompt (resolved in the template). */
   readonly manualPrompt = computed(() => {
     switch (this.pending()?.category) {
       case 'measuring':
-        return 'Compared to the seeker, are you closer to or further from it?';
+        return 'deck.promptMeasuring';
       case 'tentacles':
-        return "Are you within the question's range of one of the seeker's nearby places?";
+        return 'deck.promptTentacles';
       default:
-        return "Is the seeker's closest place also your nearest?";
+        return 'deck.promptMatching';
     }
   });
 

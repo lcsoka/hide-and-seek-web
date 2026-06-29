@@ -1,46 +1,46 @@
-<div class="space-y-3">
+<div class="space-y-3" *transloco="let t">
   <div class="flex items-center justify-between">
-    <h2 class="text-lg font-bold">Your hand <span class="text-sm font-medium" [class]="handFull() ? 'text-rose-500' : 'text-gray-400'">{{ hand().length }}/{{ handLimit() }}</span></h2>
+    <h2 class="text-lg font-bold">{{ t('deck.yourHand') }} <span class="text-sm font-medium" [class]="handFull() ? 'text-rose-500' : 'text-gray-400'">{{ hand().length }}/{{ handLimit() }}</span></h2>
     @if (timeBonusMin() > 0) {
-      <span class="rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white">⏱️ +{{ timeBonusMin() }} min banked</span>
+      <span class="rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white">⏱️ +{{ timeBonusMin() }} {{ t('deck.minBanked') }}</span>
     }
   </div>
 
   @if (curseChoice(); as choice) {
     <div class="space-y-2 rounded-xl border-2 border-purple-400 bg-purple-50 p-3 dark:bg-purple-950">
-      <p class="text-sm font-semibold text-purple-800 dark:text-purple-300">🧠 Pick {{ choice.count }} question categories to disable</p>
+      <p class="text-sm font-semibold text-purple-800 dark:text-purple-300">{{ t('deck.pickDisable', { count: choice.count }) }}</p>
       <div class="flex flex-wrap gap-2">
         @for (c of allCategories; track c) {
           <button (click)="toggleCategory(c)"
                   class="rounded-full px-3 py-1.5 text-sm font-medium transition"
                   [class]="chosenCategories().includes(c) ? 'bg-purple-600 text-white' : 'border border-purple-300 text-purple-700 dark:border-purple-700 dark:text-purple-300'">
-            {{ meta(c).icon }} {{ meta(c).label }}
+            {{ meta(c).icon }} {{ t('category.' + c) }}
           </button>
         }
       </div>
       <button (click)="confirmDisable()" [disabled]="busy() || chosenCategories().length !== choice.count"
               class="w-full rounded-lg bg-purple-600 p-2 font-semibold text-white hover:bg-purple-700 disabled:opacity-40">
-        Disable {{ chosenCategories().length }}/{{ choice.count }}
+        {{ t('deck.disableBtn', { chosen: chosenCategories().length, count: choice.count }) }}
       </button>
     </div>
   }
 
   @if (confirmCard(); as c) {
     <div class="space-y-2 rounded-xl border-2 border-purple-400 bg-purple-50 p-3 dark:bg-purple-950">
-      <div class="text-sm">Cast <b>{{ c.name }}</b> on the seekers?</div>
+      <div class="text-sm">{{ t('deck.castPre') }} <b>{{ c.name }}</b> {{ t('deck.castPost') }}</div>
       @if (c.description) { <div class="text-xs text-gray-600 dark:text-gray-300">{{ c.description }}</div> }
       @if (c.needs_photo) {
-        <p class="text-xs font-medium text-purple-700 dark:text-purple-300">📸 Send the seekers a Street View screenshot — they must find it.</p>
+        <p class="text-xs font-medium text-purple-700 dark:text-purple-300">{{ t('deck.streetView') }}</p>
         <div class="flex gap-2">
-          <app-image-upload class="flex-1" [sessionId]="sessionId()" label="📷 Send screenshot &amp; cast"
+          <app-image-upload class="flex-1" [sessionId]="sessionId()" [label]="t('deck.sendCast')"
                             cssClass="block w-full cursor-pointer rounded-lg bg-purple-600 p-2 text-center text-sm font-semibold text-white hover:bg-purple-700"
                             (uploaded)="confirmPlayWithPhoto($event)" />
-          <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">Cancel</button>
+          <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">{{ t('common.cancel') }}</button>
         </div>
       } @else {
         <div class="flex gap-2">
-          <button (click)="confirmPlay()" [disabled]="busy()" class="flex-1 rounded-lg bg-purple-600 p-2 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-40">Cast it</button>
-          <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">Cancel</button>
+          <button (click)="confirmPlay()" [disabled]="busy()" class="flex-1 rounded-lg bg-purple-600 p-2 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-40">{{ t('deck.castIt') }}</button>
+          <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">{{ t('common.cancel') }}</button>
         </div>
       }
     </div>
@@ -50,46 +50,44 @@
     <div class="space-y-2 rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-950">
       <div class="flex items-center gap-2">
         <span class="text-xl">{{ meta(q.category ?? '').icon }}</span>
-        <span class="font-semibold">{{ q.title || meta(q.category ?? '').label }}</span>
+        <span class="font-semibold">{{ q.title || t('category.' + (q.category ?? '')) }}</span>
       </div>
       @if (q.prompt) { <p class="text-sm text-gray-700 dark:text-gray-200">{{ q.prompt }}</p> }
       @if (questionParams(); as p) { <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ p }}</p> }
 
       @if (q.reference; as ref) {
         <div class="rounded-lg bg-white/70 p-2 text-sm dark:bg-gray-900/60">
-          <span class="text-gray-500 dark:text-gray-400">📍 Seeker's closest:</span> <b>{{ ref.name || 'an unnamed place' }}</b>
+          <span class="text-gray-500 dark:text-gray-400">{{ t('deck.seekerClosest') }}</span> <b>{{ ref.name || t('deck.unnamedPlace') }}</b>
         </div>
       }
       @if (q.hider_nearest; as hn) {
         <div class="rounded-lg bg-white/70 p-2 text-sm dark:bg-gray-900/60">
-          <span class="text-gray-500 dark:text-gray-400">🏛️ Your nearest:</span> <b>{{ hn.name || 'an unnamed place' }}</b>
+          <span class="text-gray-500 dark:text-gray-400">{{ t('deck.yourNearest') }}</span> <b>{{ hn.name || t('deck.unnamedPlace') }}</b>
         </div>
       }
 
       @if (canAnswer()) {
         @if (isPhoto()) {
-          <p class="text-xs text-gray-600 dark:text-gray-300">Take or pick a photo to send back.</p>
-          <app-image-upload class="block" [sessionId]="sessionId()" label="📷 Send a photo"
+          <p class="text-xs text-gray-600 dark:text-gray-300">{{ t('deck.takePhoto') }}</p>
+          <app-image-upload class="block" [sessionId]="sessionId()" [label]="t('deck.sendPhoto')"
                             cssClass="block w-full cursor-pointer rounded-lg bg-rose-600 p-2 text-center font-semibold text-white hover:bg-rose-700"
                             (uploaded)="answerPhoto($event)" />
         } @else {
           @if (preview(); as a) {
             <div class="rounded-lg bg-white p-2 text-center dark:bg-gray-900">
-              <div class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">You will answer</div>
-              <div class="text-2xl font-extrabold" [class]="previewColor()">{{ answerLabel(a.answer) }}</div>
+              <div class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">{{ t('deck.willAnswer') }}</div>
+              <div class="text-2xl font-extrabold" [class]="previewColor()">{{ t('answer.' + (a.answer || 'none')) }}</div>
               @if (a.feature_name) { <div class="text-xs text-gray-500 dark:text-gray-400">({{ a.feature_name }})</div> }
             </div>
             <button (click)="answer()" [disabled]="busy()"
                     class="w-full rounded-lg bg-rose-600 p-2 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
-              Confirm answer
+              {{ t('deck.confirmAnswer') }}
             </button>
           } @else if (isTentacleManual()) {
-            <!-- Tentacles: name the actual place you're nearest to (not just "in range"),
-                 so the seekers get the real region. -->
             @if (tentaclePlaces() === null) {
-              <div class="rounded-lg bg-white p-2 text-center text-sm text-gray-400 dark:bg-gray-900">Finding nearby places…</div>
+              <div class="rounded-lg bg-white p-2 text-center text-sm text-gray-400 dark:bg-gray-900">{{ t('deck.findingPlaces') }}</div>
             } @else if (tentaclePlaces()?.length) {
-              <p class="text-xs text-gray-600 dark:text-gray-300">Which of these is your nearest? Tap it.</p>
+              <p class="text-xs text-gray-600 dark:text-gray-300">{{ t('deck.whichNearest') }}</p>
               <div class="max-h-48 space-y-1 overflow-y-auto">
                 @for (pl of tentaclePlaces(); track pl.name) {
                   <button (click)="answerTentaclePlace(pl)" [disabled]="busy()"
@@ -103,36 +101,33 @@
               </div>
               <button (click)="answerManual('out_of_range')" [disabled]="busy()"
                       class="w-full rounded-lg bg-rose-600 p-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
-                🚫 Out of range — none of these
+                {{ t('deck.outOfRangeNone') }}
               </button>
             } @else {
-              <!-- Couldn't load the place list (offline / no data) — fall back to a plain verdict. -->
-              <p class="text-xs text-gray-600 dark:text-gray-300">{{ manualPrompt() }}</p>
+              <p class="text-xs text-gray-600 dark:text-gray-300">{{ t(manualPrompt()) }}</p>
               <div class="flex gap-2">
-                <button (click)="answerManual('in_range')" [disabled]="busy()" class="flex-1 rounded-lg bg-green-600 p-2 font-semibold text-white hover:bg-green-700 disabled:opacity-40">In range</button>
-                <button (click)="answerManual('out_of_range')" [disabled]="busy()" class="flex-1 rounded-lg bg-rose-600 p-2 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">Out of range</button>
+                <button (click)="answerManual('in_range')" [disabled]="busy()" class="flex-1 rounded-lg bg-green-600 p-2 font-semibold text-white hover:bg-green-700 disabled:opacity-40">{{ t('answer.in_range') }}</button>
+                <button (click)="answerManual('out_of_range')" [disabled]="busy()" class="flex-1 rounded-lg bg-rose-600 p-2 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">{{ t('answer.out_of_range') }}</button>
               </div>
             }
           } @else if (manualOptions(); as opts) {
-            <!-- No auto-truth (slow map data, or a subject with no point feature like a
-                 border / coastline) — the hider answers it themselves. -->
-            <p class="text-xs text-gray-600 dark:text-gray-300">{{ manualPrompt() }}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-300">{{ t(manualPrompt()) }}</p>
             <div class="flex gap-2">
               @for (o of opts; track o.value) {
                 <button (click)="answerManual(o.value)" [disabled]="busy()"
                         class="flex-1 rounded-lg p-2 font-semibold text-white disabled:opacity-40"
                         [class]="o.value === 'no' || o.value === 'further' || o.value === 'out_of_range' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-green-600 hover:bg-green-700'">
-                  {{ o.label }}
+                  {{ t(o.labelKey) }}
                 </button>
               }
             </div>
           } @else {
-            <div class="rounded-lg bg-white p-2 text-center text-sm text-gray-400 dark:bg-gray-900">Computing the answer…</div>
+            <div class="rounded-lg bg-white p-2 text-center text-sm text-gray-400 dark:bg-gray-900">{{ t('deck.computing') }}</div>
           }
           @if (vetoCard()) {
             <button (click)="veto()" [disabled]="busy()"
                     class="w-full rounded-lg border border-amber-400 p-2 text-sm font-medium text-amber-700 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-950">
-              🚫 Veto — refuse this question
+              {{ t('deck.veto') }}
             </button>
           }
         }
@@ -145,14 +140,14 @@
       @if (opts.length) {
         <div class="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950">
           <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">
-            Answered {{ meta(last.category ?? '').label }} — {{ answerLabel(last.answer?.answer ?? '') }}
+            {{ t('deck.answered') }} {{ t('category.' + (last.category ?? '')) }} — {{ t('answer.' + (last.answer?.answer || 'none')) }}
           </p>
-          <p class="text-xs text-amber-700 dark:text-amber-400">Mis-tapped? You can still change it.</p>
+          <p class="text-xs text-amber-700 dark:text-amber-400">{{ t('deck.misTapped') }}</p>
           <div class="flex gap-2">
             @for (opt of opts; track opt) {
               <button (click)="amend(opt)" [disabled]="busy() || opt === last.answer?.answer"
                       class="flex-1 rounded-lg border border-amber-400 p-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-40 dark:text-amber-200 dark:hover:bg-amber-900">
-                Change to {{ answerLabel(opt) }}
+                {{ t('deck.changeTo') }} {{ t('answer.' + opt) }}
               </button>
             }
           </div>
@@ -163,10 +158,10 @@
 
   @if (playedCurses().length) {
     <div class="space-y-2">
-      <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300">Curses in play</h3>
+      <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300">{{ t('deck.cursesInPlay') }}</h3>
       @for (c of playedCurses(); track c.uid) {
         <div class="flex items-center justify-between gap-2 rounded-lg border border-purple-300 bg-purple-50 p-2 text-xs dark:border-purple-700 dark:bg-purple-950">
-          <span class="min-w-0 flex-1 truncate font-medium">{{ c.name ?? 'Curse' }}</span>
+          <span class="min-w-0 flex-1 truncate font-medium">{{ c.name ?? t('seeker.curse') }}</span>
           @if (countdown(c); as left) {
             <span class="shrink-0 font-mono font-bold text-purple-700 dark:text-purple-300">⏳ {{ left }}</span>
           } @else if (c.status === 'completed') {
@@ -175,10 +170,10 @@
                 <img [src]="c.proof_url" alt="Proof" class="h-9 w-9 rounded object-cover ring-1 ring-black/10" />
               </a>
             } @else {
-              <span class="shrink-0 text-green-600 dark:text-green-400">✓ done</span>
+              <span class="shrink-0 text-green-600 dark:text-green-400">{{ t('seeker.done') }}</span>
             }
           } @else if (c.requires_proof) {
-            <span class="shrink-0 text-gray-500 dark:text-gray-400">awaiting proof…</span>
+            <span class="shrink-0 text-gray-500 dark:text-gray-400">{{ t('deck.awaitingProof') }}</span>
           }
         </div>
       }
@@ -190,36 +185,36 @@
       @for (c of hand(); track c.uid; let i = $index) {
         <div class="relative flex h-36 flex-col justify-between rounded-xl p-2.5 text-white shadow-lg ring-1 ring-white/20"
              [class]="cardClass(c)" [class.card-draw]="i >= animatingFrom()">
-          <button (click)="discard(c)" [disabled]="busy()" title="Discard"
+          <button (click)="discard(c)" [disabled]="busy()" [title]="t('deck.discard')"
                   class="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-black/25 text-xs leading-none hover:bg-black/45 disabled:opacity-40">✕</button>
           <div class="min-h-0 pr-5">
             <div class="text-[11px] font-bold leading-tight">{{ c.name ?? cardTitle(c) }}</div>
             @if (c.description) { <div class="mt-1 line-clamp-4 text-[9px] leading-snug opacity-80">{{ c.description }}</div> }
           </div>
           @if (c.type === 'time_bonus') {
-            <span class="block rounded bg-white/20 py-1 text-center text-[10px] font-bold uppercase tracking-wide">Banked</span>
+            <span class="block rounded bg-white/20 py-1 text-center text-[10px] font-bold uppercase tracking-wide">{{ t('deck.banked') }}</span>
           } @else {
             <button (click)="playCard(c)" [disabled]="busy() || (c.power === 'veto' && !pending())"
                     class="block w-full rounded bg-white/25 py-1 text-center text-[10px] font-bold uppercase tracking-wide hover:bg-white/40 disabled:opacity-40">
-              Play
+              {{ t('deck.play') }}
             </button>
           }
         </div>
       }
     </div>
   } @else {
-    <p class="text-sm text-gray-400">No cards yet — you draw cards as the seekers ask questions.</p>
+    <p class="text-sm text-gray-400">{{ t('deck.noCards') }}</p>
   }
 
   @if (history().length) {
     <div class="space-y-2 border-t border-gray-100 pt-3 dark:border-gray-800">
-      <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300">Your answers</h3>
+      <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300">{{ t('deck.yourAnswers') }}</h3>
       @for (q of history(); track q.seq) {
         <div class="flex items-center gap-2 rounded-lg border border-gray-200 p-2 dark:border-gray-700">
           <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gray-900 text-xs font-bold text-white dark:bg-gray-700">{{ q.seq }}</span>
           <span class="text-base">{{ meta(q.category).icon }}</span>
           <div class="min-w-0 flex-1">
-            <div class="truncate text-sm font-medium capitalize">{{ q.category }}</div>
+            <div class="truncate text-sm font-medium">{{ t('category.' + q.category) }}</div>
             @if (questionInfo(q); as info) { <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ info }}</div> }
           </div>
           @if (q.answer?.answer === 'photo' && q.answer?.photo_url) {
@@ -227,7 +222,7 @@
               <img [src]="q.answer!.photo_url!" alt="Your photo" class="h-9 w-9 rounded object-cover ring-1 ring-black/10" />
             </a>
           } @else {
-            <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" [class]="historyChip(q)">{{ answerLabel(q.answer?.answer) }}</span>
+            <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" [class]="historyChip(q)">{{ t('answer.' + (q.answer?.answer || 'none')) }}</span>
           }
         </div>
       }
