@@ -21,9 +21,31 @@
     "metro": "Metro",
     "tram": "Tram",
     "rail": "Rail",
+    "train": "Train",
     "light_rail": "Light rail",
     "bus": "Bus",
-    "trolleybus": "Trolleybus"
+    "trolleybus": "Trolleybus",
+    "stop": "Stop"
+  },
+  "hider": {
+    "title": "Find your hiding spot",
+    "subtitle": "Hide near a station — we'll find the closest one to you.",
+    "waitingGps": "Waiting for your GPS location — enable location to find the nearest station.",
+    "finding": "Finding stations near you…",
+    "hideNear": "Hide near",
+    "metersAway": "m away",
+    "hideHere": "I'm hidden here",
+    "hiding": "Hiding…",
+    "pickDifferent": "Pick a different stop",
+    "none": "No stations found nearby. Move closer to a station."
+  },
+  "draw": {
+    "title": "You drew {{ drew }} — keep {{ keep }}",
+    "tap": "Tap the cards you want to keep.",
+    "intoHand": "These go into your hand.",
+    "tapCard": "tap",
+    "kept": "✓ keep",
+    "keep": "Keep {{ chosen }}/{{ keep }}"
   },
   "landing": {
     "yourName": "Your name",

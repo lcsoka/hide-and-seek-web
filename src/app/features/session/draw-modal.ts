@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { HandCard, PendingDraw } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { SessionStore } from '../../core/services/session-store';
@@ -6,6 +7,7 @@ import { SessionStore } from '../../core/services/session-store';
 /** Reveal of the cards the hider just drew; they keep `keep` of them. */
 @Component({
   selector: 'app-draw-modal',
+  imports: [TranslocoModule],
   templateUrl: './draw-modal.html',
   styles: [
     `

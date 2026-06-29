@@ -1,8 +1,8 @@
-<div class="fixed inset-0 z-[820] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+<div class="fixed inset-0 z-[820] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" *transloco="let t">
   <div class="w-full max-w-md rounded-3xl bg-white p-4 shadow-2xl dark:bg-gray-900">
-    <h2 class="text-center text-lg font-bold">You drew {{ draw().cards.length }} — keep {{ keep() }}</h2>
+    <h2 class="text-center text-lg font-bold">{{ t('draw.title', { drew: draw().cards.length, keep: keep() }) }}</h2>
     <p class="mb-3 text-center text-sm text-gray-500 dark:text-gray-400">
-      @if (keep() < draw().cards.length) { Tap the cards you want to keep. } @else { These go into your hand. }
+      @if (keep() < draw().cards.length) { {{ t('draw.tap') }} } @else { {{ t('draw.intoHand') }} }
     </p>
 
     <div class="grid grid-cols-3 gap-2">
@@ -19,14 +19,14 @@
             @if (c.description) { <div class="mt-1 line-clamp-5 text-[8px] leading-snug opacity-80">{{ c.description }}</div> }
           </div>
           <span class="block rounded py-0.5 text-center text-[9px] font-bold uppercase tracking-wide"
-                [class]="isSelected(c.uid) ? 'bg-rose-500' : 'bg-white/20'">{{ isSelected(c.uid) ? '✓ keep' : 'tap' }}</span>
+                [class]="isSelected(c.uid) ? 'bg-rose-500' : 'bg-white/20'">{{ isSelected(c.uid) ? t('draw.kept') : t('draw.tapCard') }}</span>
         </button>
       }
     </div>
 
     <button (click)="confirm()" [disabled]="busy() || !canConfirm()"
             class="mt-4 w-full rounded-xl bg-rose-600 p-3 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
-      Keep {{ selected().size }}/{{ keep() }}
+      {{ t('draw.keep', { chosen: selected().size, keep: keep() }) }}
     </button>
   </div>
 </div>

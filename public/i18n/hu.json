@@ -21,9 +21,31 @@
     "metro": "Metró",
     "tram": "Villamos",
     "rail": "Vasút",
+    "train": "Vonat",
     "light_rail": "HÉV",
     "bus": "Busz",
-    "trolleybus": "Trolibusz"
+    "trolleybus": "Trolibusz",
+    "stop": "Megálló"
+  },
+  "hider": {
+    "title": "Keress búvóhelyet",
+    "subtitle": "Bújj el egy megálló közelében — megkeressük a hozzád legközelebbit.",
+    "waitingGps": "Várakozás a GPS-helyzetedre — engedélyezd a helymeghatározást a legközelebbi megálló megkereséséhez.",
+    "finding": "Megállók keresése a közeledben…",
+    "hideNear": "Bújj el itt",
+    "metersAway": "m-re innen",
+    "hideHere": "Itt bújtam el",
+    "hiding": "Elbújás…",
+    "pickDifferent": "Válassz másik megállót",
+    "none": "Nincs megálló a közelben. Menj közelebb egy megállóhoz."
+  },
+  "draw": {
+    "title": "Húztál {{ drew }} lapot — tarts meg {{ keep }}-t",
+    "tap": "Koppints a megtartani kívánt lapokra.",
+    "intoHand": "Ezek a kezedbe kerülnek.",
+    "tapCard": "koppints",
+    "kept": "✓ marad",
+    "keep": "Megtartás {{ chosen }}/{{ keep }}"
   },
   "landing": {
     "yourName": "A neved",

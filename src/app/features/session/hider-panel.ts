@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { GameState } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { HidingState } from '../../core/services/hiding-state';
@@ -8,6 +9,7 @@ import { transitMeta } from '../../core/util/transit';
 /** Smart hiding: auto-find the nearest station (shared with the map) and confirm in one tap. */
 @Component({
   selector: 'app-hider-panel',
+  imports: [TranslocoModule],
   templateUrl: './hider-panel.html',
 })
 export class HiderPanel {

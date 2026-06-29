@@ -1,6 +1,7 @@
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { TranslocoService } from '@jsverse/transloco';
 import { TokenStore } from '../services/token-store';
 import { authInterceptor } from './auth.interceptor';
 
@@ -11,7 +12,11 @@ describe('authInterceptor', () => {
   beforeEach(() => {
     localStorage.clear();
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(withInterceptors([authInterceptor])), provideHttpClientTesting()],
+      providers: [
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+        { provide: TranslocoService, useValue: { getActiveLang: () => 'hu' } },
+      ],
     });
     http = TestBed.inject(HttpClient);
     httpMock = TestBed.inject(HttpTestingController);
@@ -33,6 +38,14 @@ describe('authInterceptor', () => {
 
     const req = httpMock.expectOne('/y');
     expect(req.request.headers.has('Authorization')).toBe(false);
+    req.flush({});
+  });
+
+  it('sends the active language so the backend localizes content', () => {
+    http.get('/z').subscribe();
+
+    const req = httpMock.expectOne('/z');
+    expect(req.request.headers.get('Accept-Language')).toBe('hu');
     req.flush({});
   });
 });
