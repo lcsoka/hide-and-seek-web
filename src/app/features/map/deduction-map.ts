@@ -2,6 +2,7 @@ import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, inp
 import { bbox } from '@turf/turf';
 import { Feature, FeatureCollection, GeoJsonObject, Point } from 'geojson';
 import * as L from 'leaflet';
+import { TranslocoModule } from '@jsverse/transloco';
 import { MapAnnotation } from '../../core/maps/annotations';
 import { DeductionQuestion } from '../../core/maps/deduction';
 import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
@@ -18,18 +19,19 @@ const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
  */
 @Component({
   selector: 'app-deduction-map',
+  imports: [TranslocoModule],
   host: { class: 'relative block h-full' },
   template: `
     <div #el class="h-full min-h-72 w-full overflow-hidden"></div>
     @if (loading()) {
       <div class="pointer-events-none absolute inset-0 z-[500] flex items-center justify-center">
-        <span class="rounded-full bg-gray-900/85 px-3 py-1.5 text-sm font-medium text-white shadow-lg">Calculating deduction…</span>
+        <span class="rounded-full bg-gray-900/85 px-3 py-1.5 text-sm font-medium text-white shadow-lg">{{ 'map.calculating' | transloco }}</span>
       </div>
     }
     @if (candidate()) {
-      <button (click)="fitToCandidate()" title="Fit the deduced area on screen"
+      <button (click)="fitToCandidate()" [title]="'map.fitTitle' | transloco"
               class="absolute bottom-3 left-3 z-[500] flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-2 text-sm font-semibold text-gray-800 shadow-lg ring-1 ring-black/10 hover:bg-white">
-        ⊕ Fit area
+        ⊕ {{ 'map.fit' | transloco }}
       </button>
     }
   `,

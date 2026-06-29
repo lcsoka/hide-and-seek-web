@@ -11,7 +11,7 @@
   @if (timer(); as t) {
     <div class="pointer-events-auto rounded-2xl px-5 py-1.5 text-center shadow-xl backdrop-blur transition-colors"
          [class]="t.urgent ? 'bg-red-600 text-white' : 'bg-gray-900/85 text-white'">
-      <div class="text-[10px] font-semibold uppercase tracking-widest opacity-70">{{ t.label }}</div>
+      <div class="text-[10px] font-semibold uppercase tracking-widest opacity-70">{{ tr(t.label) }}</div>
       <div class="font-mono text-2xl font-bold leading-none tabular-nums">{{ t.text }}</div>
     </div>
   }

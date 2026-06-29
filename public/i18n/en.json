@@ -37,7 +37,10 @@
     "hideHere": "I'm hidden here",
     "hiding": "Hiding…",
     "pickDifferent": "Pick a different stop",
-    "none": "No stations found nearby. Move closer to a station."
+    "none": "No stations found nearby. Move closer to a station.",
+    "relocated": "🚚 You played Move",
+    "relocateTravel": "Travel to your new spot, then confirm it.",
+    "relocateConfirm": "Confirm new spot"
   },
   "draw": {
     "title": "You drew {{ drew }} — keep {{ keep }}",
@@ -199,5 +202,56 @@
     "back": "‹ back",
     "custom": "custom",
     "findingPlaces": "Finding nearby places…"
+  },
+  "timer": {
+    "answering": "Hider answering",
+    "seeking": "Seeking",
+    "hiding": "Hiding"
+  },
+  "action": {
+    "start": "Start game",
+    "assign_hider": "Assign hider",
+    "choose_station": "Choose station",
+    "confirm_hidden": "I'm hidden",
+    "ask_question": "Ask question",
+    "answer_question": "Answer question",
+    "play_curse": "Play curse",
+    "declare_endgame": "Declare endgame",
+    "confirm_found": "I found them!",
+    "surrender": "Surrender",
+    "advance_round": "Next round",
+    "end_game": "End game"
+  },
+  "map": {
+    "calculating": "Calculating deduction…",
+    "fit": "Fit area",
+    "fitTitle": "Fit the deduced area on screen"
+  },
+  "annot": {
+    "radarIn": "Hider within {{ dist }} of here → kept this circle",
+    "radarOut": "Hider beyond {{ dist }} from here → removed this circle",
+    "thermoWarm": "Hider got warmer moving this way → kept the half toward here",
+    "thermoCold": "Hider got colder moving this way → kept the half behind the start",
+    "photo": "Photo clue from the hider",
+    "tentOut": "Hider outside this {{ dist }} ring → removed it",
+    "tentInPlace": "Hider's nearest is {{ place }} → kept {{ place }}'s area",
+    "tentIn": "Hider in range → kept that cell",
+    "measCloser": "Hider closer to {{ place }} than you → kept inside that ring",
+    "measFurther": "Hider further from {{ place }} than you → kept outside that ring",
+    "matchSameZone": "Same {{ zone }} as you → kept that {{ zone }}",
+    "matchDiffZone": "Different {{ zone }} → removed yours",
+    "matchSamePlace": "Same nearest place ({{ place }}) → kept the area around it",
+    "matchSame": "Same nearest place → kept that area",
+    "matchDiffPlace": "Hider's nearest isn't {{ place }} → removed the area around it",
+    "matchDiff": "Different nearest place → removed that area",
+    "zone": { "county": "county", "district": "district", "town": "town", "borough": "borough", "zone": "zone" }
+  },
+  "statusHint": {
+    "role_assignment": "Waiting for the host to assign roles…",
+    "hiding": "The hider is choosing a spot…",
+    "seeking": "Seekers are hunting — answer their questions and play curses.",
+    "endgame": "Final guesses!",
+    "round_end": "Round over.",
+    "finished": "Game over."
   }
 }

@@ -10,8 +10,8 @@ import { LocationTracker } from '../../core/services/location';
 import { PlayerStore } from '../../core/services/player-store';
 import { Realtime } from '../../core/services/realtime';
 import { SessionStore } from '../../core/services/session-store';
+import { TranslocoModule } from '@jsverse/transloco';
 import { computeGameTimer, GameTimer } from '../../core/util/game-timer';
-import { actionLabel } from '../../core/util/labels';
 import { DeductionMap } from '../map/deduction-map';
 import { CardDeck } from './card-deck';
 import { CurseAlert } from './curse-alert';
@@ -29,20 +29,14 @@ import { SeekerPanel } from './seeker-panel';
 // Actions with a dedicated panel — kept out of the generic button row.
 const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'start_thermometer', 'stop_thermometer', 'confirm_found', 'amend_answer', 'choose_disabled_categories', 'discard_card'];
 
-const STATUS_HINTS: Record<string, string> = {
-  role_assignment: 'Waiting for the host to assign roles…',
-  hiding: 'The hider is choosing a spot…',
-  seeking: 'Seekers are hunting — answer their questions and play curses.',
-  endgame: 'Final guesses!',
-  round_end: 'Round over.',
-  finished: 'Game over.',
-};
+// States that have a one-line status hint (the text lives in i18n under `statusHint.*`).
+const STATUS_HINT_STATES = new Set(['role_assignment', 'hiding', 'seeking', 'endgame', 'round_end', 'finished']);
 
 /** Premium full-screen game shell: a full-bleed map, a floating HUD, and a context side panel. */
 @Component({
   selector: 'app-session',
   host: { class: 'block h-[100dvh] w-full' },
-  imports: [RouterLink, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, DrawModal, CurseAlert, RoundResults],
+  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, DrawModal, CurseAlert, RoundResults],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -58,7 +52,6 @@ export class SessionView {
   readonly id = signal<string | undefined>(this.route.snapshot.paramMap.get('id') ?? undefined);
   readonly myId = signal<string | null>(null);
   readonly acting = signal(false);
-  readonly label = actionLabel;
   readonly devMode = !!environment.developerToken;
   readonly devPlacing = signal(false);
   readonly pickerOpen = signal(false);
@@ -196,12 +189,9 @@ export class SessionView {
     return { lat: q.ask.lat, lng: q.ask.lng, radiusM: q.params?.radius_m ?? null, label: q.title ?? 'Question asked here' };
   }
 
-  prettyState(state: string): string {
-    return state.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
-  }
-
+  /** i18n key for the current state's status hint, or '' if it has none. */
   statusHint(s: GameState): string {
-    return STATUS_HINTS[s.state] ?? '';
+    return STATUS_HINT_STATES.has(s.state) ? 'statusHint.' + s.state : '';
   }
 
   visibleActions(s: GameState): string[] {

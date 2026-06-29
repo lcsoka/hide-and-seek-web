@@ -30,7 +30,7 @@
     <!-- Side panel: desktop right column / mobile bottom sheet -->
     <aside class="pointer-events-none absolute inset-x-0 bottom-0 z-[600] flex max-h-[62%] flex-col
                   lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[400px] lg:pt-16">
-      <div class="pointer-events-auto m-2 flex-1 overflow-y-auto rounded-2xl bg-white/95 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3">
+      <div class="pointer-events-auto m-2 flex-1 overflow-y-auto rounded-2xl bg-white/95 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3" *transloco="let t">
         @if (s.state === 'lobby') {
           <app-lobby-panel [state]="s" [sessionId]="s.session_id" [isHost]="isHost(s)" />
         } @else if (s.state === 'role_assignment' && isHost(s)) {
@@ -42,11 +42,11 @@
         } @else if (role(s) === 'hider' && (s.state === 'seeking' || s.state === 'endgame')) {
           @if (s.relocating) {
             <div class="mb-3 rounded-lg bg-amber-100 p-3 dark:bg-amber-950">
-              <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">🚚 You played Move</p>
-              <p class="text-sm text-amber-700 dark:text-amber-400">Travel to your new spot, then confirm it.</p>
+              <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">{{ t('hider.relocated') }}</p>
+              <p class="text-sm text-amber-700 dark:text-amber-400">{{ t('hider.relocateTravel') }}</p>
               <button (click)="act('confirm_hidden')" [disabled]="acting()"
                       class="mt-2 rounded-lg bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50">
-                Confirm new spot
+                {{ t('hider.relocateConfirm') }}
               </button>
             </div>
           }
@@ -55,8 +55,8 @@
           <app-round-results [state]="s" [isHost]="isHost(s)" />
         } @else {
           <div class="space-y-1">
-            <h2 class="text-lg font-bold">{{ prettyState(s.state) }}</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">{{ statusHint(s) }}</p>
+            <h2 class="text-lg font-bold">{{ t('state.' + s.state) }}</h2>
+            @if (statusHint(s); as hint) { <p class="text-sm text-gray-500 dark:text-gray-400">{{ t(hint) }}</p> }
           </div>
         }
 
@@ -66,7 +66,7 @@
               @for (a of actions; track a) {
                 <button (click)="act(a)" [disabled]="acting()"
                         class="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50">
-                  {{ label(a) }}
+                  {{ t('action.' + a) }}
                 </button>
               }
             </div>

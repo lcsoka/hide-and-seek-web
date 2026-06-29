@@ -1,6 +1,9 @@
 import { Position, ResolvedQuestion } from '../models/models';
-import { answerLabel, categoryMeta } from '../util/categories';
+import { categoryMeta } from '../util/categories';
 import { formatDistance, Units } from '../util/units';
+
+/** Translate a key (with optional interpolation params) — Transloco's `translate`. */
+export type Translate = (key: string, params?: Record<string, unknown>) => string;
 
 /** A numbered, explained marker for an answered question on the deduction map. */
 export interface MapAnnotation {
@@ -24,17 +27,20 @@ function midpoint(a: Position, b: Position): Position {
   return { lat: (a.lat + b.lat) / 2, lng: (a.lng + b.lng) / 2 };
 }
 
-/** OSM admin level → friendly Hungarian zone name (mirrors the seeder's admin ladder). */
-function zoneName(level: number | null | undefined): string {
-  return { 6: 'county', 7: 'district', 8: 'town', 9: 'borough' }[level ?? -1] ?? 'zone';
+/** OSM admin level → localized zone name (mirrors the seeder's admin ladder). */
+function zoneName(level: number | null | undefined, t: Translate): string {
+  const key = { 6: 'county', 7: 'district', 8: 'town', 9: 'borough' }[level ?? -1] ?? 'zone';
+
+  return t('annot.zone.' + key);
 }
 
 /**
  * Build per-question annotations (numbered to match the history list). Each `effect` is a
  * short plain-language sentence explaining WHY the map was cut that way — kept (blue) vs
- * removed (red) — shown as the on-map label and in the history.
+ * removed (red) — shown as the on-map label and in the history. `t` localizes the sentences
+ * (so they re-render on a language switch when the caller depends on the lang signal).
  */
-export function buildAnnotations(questions: ResolvedQuestion[], units: Units): MapAnnotation[] {
+export function buildAnnotations(questions: ResolvedQuestion[], units: Units, t: Translate): MapAnnotation[] {
   return questions.map((q, i) => {
     const meta = categoryMeta(q.category);
     const answer = q.answer?.answer ?? '';
@@ -54,7 +60,7 @@ export function buildAnnotations(questions: ResolvedQuestion[], units: Units): M
         point: askPoint,
         radarKm: (q.ask.radius_m ?? 0) / 1000,
         within,
-        effect: within ? `Hider within ${dist} of here → kept this circle` : `Hider beyond ${dist} from here → removed this circle`,
+        effect: t(within ? 'annot.radarIn' : 'annot.radarOut', { dist }),
       };
     }
 
@@ -68,20 +74,20 @@ export function buildAnnotations(questions: ResolvedQuestion[], units: Units): M
         point: midpoint(a, b),
         thermo: { a, b },
         within: true,
-        effect: warmer ? 'Hider got warmer moving this way → kept the half toward here' : 'Hider got colder moving this way → kept the half behind the start',
+        effect: t(warmer ? 'annot.thermoWarm' : 'annot.thermoCold'),
       };
     }
 
     if (q.category === 'photo') {
-      return { ...base, point: askPoint, effect: 'Photo clue from the hider', photoUrl: q.answer?.photo_url };
+      return { ...base, point: askPoint, effect: t('annot.photo'), photoUrl: q.answer?.photo_url };
     }
 
     if (q.category === 'tentacles') {
       if (answer === 'out_of_range') {
-        return { ...base, point: askPoint, within: false, effect: `Hider outside this ${formatDistance(q.ask.radius_m ?? 0, units)} ring → removed it` };
+        return { ...base, point: askPoint, within: false, effect: t('annot.tentOut', { dist: formatDistance(q.ask.radius_m ?? 0, units) }) };
       }
 
-      return { ...base, point: askPoint, feature, within: true, effect: place ? `Hider's nearest is ${place} → kept ${place}'s area` : 'Hider in range → kept that cell' };
+      return { ...base, point: askPoint, feature, within: true, effect: place ? t('annot.tentInPlace', { place }) : t('annot.tentIn') };
     }
 
     if (q.category === 'measuring') {
@@ -93,16 +99,16 @@ export function buildAnnotations(questions: ResolvedQuestion[], units: Units): M
         feature,
         within: closer,
         effect: place
-          ? (closer ? `Hider closer to ${place} than you → kept inside that ring` : `Hider further from ${place} than you → kept outside that ring`)
-          : answerLabel(answer),
+          ? t(closer ? 'annot.measCloser' : 'annot.measFurther', { place })
+          : t('answer.' + (answer || 'none')),
       };
     }
 
     if (q.category === 'matching' && q.ask.admin_level != null) {
       const same = answer === 'yes';
-      const zone = zoneName(q.ask.admin_level);
+      const zone = zoneName(q.ask.admin_level, t);
 
-      return { ...base, point: askPoint, within: same, effect: same ? `Same ${zone} as you → kept that ${zone}` : `Different ${zone} → removed yours` };
+      return { ...base, point: askPoint, within: same, effect: t(same ? 'annot.matchSameZone' : 'annot.matchDiffZone', { zone }) };
     }
 
     if (q.category === 'matching') {
@@ -114,11 +120,11 @@ export function buildAnnotations(questions: ResolvedQuestion[], units: Units): M
         feature,
         within: same,
         effect: same
-          ? (place ? `Same nearest place (${place}) → kept the area around it` : 'Same nearest place → kept that area')
-          : (place ? `Hider's nearest isn't ${place} → removed the area around it` : 'Different nearest place → removed that area'),
+          ? (place ? t('annot.matchSamePlace', { place }) : t('annot.matchSame'))
+          : (place ? t('annot.matchDiffPlace', { place }) : t('annot.matchDiff')),
       };
     }
 
-    return { ...base, point: askPoint, feature, effect: answerLabel(answer) };
+    return { ...base, point: askPoint, feature, effect: t('answer.' + (answer || 'none')) };
   });
 }

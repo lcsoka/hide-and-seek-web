@@ -37,7 +37,10 @@
     "hideHere": "Itt bújtam el",
     "hiding": "Elbújás…",
     "pickDifferent": "Válassz másik megállót",
-    "none": "Nincs megálló a közelben. Menj közelebb egy megállóhoz."
+    "none": "Nincs megálló a közelben. Menj közelebb egy megállóhoz.",
+    "relocated": "🚚 Kijátszottad a Költözést",
+    "relocateTravel": "Menj az új helyedre, majd erősítsd meg.",
+    "relocateConfirm": "Új hely megerősítése"
   },
   "draw": {
     "title": "Húztál {{ drew }} lapot — tarts meg {{ keep }}-t",
@@ -199,5 +202,56 @@
     "back": "‹ vissza",
     "custom": "egyéni",
     "findingPlaces": "Közeli helyek keresése…"
+  },
+  "timer": {
+    "answering": "Bújó válaszol",
+    "seeking": "Keresés",
+    "hiding": "Elbújás"
+  },
+  "action": {
+    "start": "Játék indítása",
+    "assign_hider": "Bújó kijelölése",
+    "choose_station": "Megálló választása",
+    "confirm_hidden": "Elbújtam",
+    "ask_question": "Kérdés feltevése",
+    "answer_question": "Válasz",
+    "play_curse": "Átok kijátszása",
+    "declare_endgame": "Hajrá indítása",
+    "confirm_found": "Megtaláltam!",
+    "surrender": "Feladás",
+    "advance_round": "Következő kör",
+    "end_game": "Játék befejezése"
+  },
+  "map": {
+    "calculating": "Következtetés számítása…",
+    "fit": "Terület igazítása",
+    "fitTitle": "A kikövetkeztetett terület képernyőre igazítása"
+  },
+  "annot": {
+    "radarIn": "A bújó {{ dist }}-en belül van innen → kör megtartva",
+    "radarOut": "A bújó {{ dist }}-en kívül van innen → kör eltávolítva",
+    "thermoWarm": "A bújó melegebb lett erre haladva → az ide eső fél megtartva",
+    "thermoCold": "A bújó hidegebb lett erre haladva → a kiindulás mögötti fél megtartva",
+    "photo": "Fotós nyom a bújótól",
+    "tentOut": "A bújó a(z) {{ dist }} gyűrűn kívül → eltávolítva",
+    "tentInPlace": "A bújó legközelebbije: {{ place }} → {{ place }} környéke megtartva",
+    "tentIn": "A bújó hatótávon belül → cella megtartva",
+    "measCloser": "A bújó közelebb van ehhez: {{ place }}, mint te → gyűrűn belül megtartva",
+    "measFurther": "A bújó távolabb van ettől: {{ place }}, mint te → gyűrűn kívül megtartva",
+    "matchSameZone": "Ugyanaz a(z) {{ zone }}, mint nálad → {{ zone }} megtartva",
+    "matchDiffZone": "Más {{ zone }} → a tiéd eltávolítva",
+    "matchSamePlace": "Ugyanaz a legközelebbi hely ({{ place }}) → környéke megtartva",
+    "matchSame": "Ugyanaz a legközelebbi hely → terület megtartva",
+    "matchDiffPlace": "A bújó legközelebbije nem {{ place }} → környéke eltávolítva",
+    "matchDiff": "Más legközelebbi hely → terület eltávolítva",
+    "zone": { "county": "vármegye", "district": "kerület", "town": "település", "borough": "városrész", "zone": "terület" }
+  },
+  "statusHint": {
+    "role_assignment": "Várakozás a házigazdára a szereposztáshoz…",
+    "hiding": "A bújó helyet választ…",
+    "seeking": "A keresők vadásznak — válaszolj a kérdéseikre és játssz ki átkokat.",
+    "endgame": "Végső tippek!",
+    "round_end": "Kör vége.",
+    "finished": "Vége a játéknak."
   }
 }
