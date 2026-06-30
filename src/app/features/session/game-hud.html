@@ -17,6 +17,8 @@
   }
 
   <div class="pointer-events-auto flex items-center gap-2">
+    <button (click)="helpOpen.set(true)" [attr.aria-label]="tr('intro.howToPlay')"
+            class="grid h-9 w-9 place-items-center rounded-full bg-white/85 text-base font-bold text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">?</button>
     <app-lang-toggle />
     @if (role(); as r) {
       <span class="rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-lg backdrop-blur"
@@ -35,3 +37,5 @@
     </span>
   </div>
 }
+
+<app-how-to-play [open]="helpOpen()" (closeChange)="helpOpen.set($event)" />

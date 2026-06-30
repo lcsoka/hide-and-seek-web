@@ -31,6 +31,9 @@
     <aside class="pointer-events-none absolute inset-x-0 bottom-0 z-[600] flex max-h-[62%] flex-col
                   lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[400px] lg:pt-16">
       <div class="pointer-events-auto m-2 flex-1 overflow-y-auto rounded-2xl bg-white/95 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3" *transloco="let t">
+        @if (objective(s); as obj) {
+          <p class="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-200">{{ t(obj) }}</p>
+        }
         @if (s.state === 'lobby') {
           <app-lobby-panel [state]="s" [sessionId]="s.session_id" [isHost]="isHost(s)" />
         } @else if (s.state === 'role_assignment' && isHost(s)) {
@@ -88,6 +91,23 @@
                          (ask)="onAsk(s, $event)" (closeChange)="pickerOpen.set($event)" />
     <app-transit-picker [open]="boardOpen()" [seekerLat]="me(s)?.lat ?? null" [seekerLng]="me(s)?.lng ?? null"
                         [transitModes]="allTransitModes" (board)="onBoard(s, $event)" (closeChange)="boardOpen.set($event)" />
+
+    @if (showIntro(s)) {
+      <div class="fixed inset-0 z-[850] flex items-center justify-center bg-black/50 p-4" *transloco="let t">
+        <div class="w-full max-w-sm space-y-3 rounded-3xl bg-white p-5 text-center shadow-2xl dark:bg-gray-900">
+          @if (role(s) === 'hider') {
+            <h2 class="text-xl font-bold">{{ t('intro.hiderTitle') }}</h2>
+            <p class="text-sm font-medium text-rose-700 dark:text-rose-300">{{ t('intro.hiderGoal') }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('intro.hiderAction') }}</p>
+          } @else {
+            <h2 class="text-xl font-bold">{{ t('intro.seekerTitle') }}</h2>
+            <p class="text-sm font-medium text-rose-700 dark:text-rose-300">{{ t('intro.seekerGoal') }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('intro.seekerAction') }}</p>
+          }
+          <button (click)="introSeen.set(s.round)" class="w-full rounded-xl bg-rose-600 p-3 font-semibold text-white hover:bg-rose-700">{{ t('intro.gotIt') }}</button>
+        </div>
+      </div>
+    }
 
     @if (role(s) === 'hider' && s.pending_draw) {
       <app-draw-modal [sessionId]="s.session_id" [draw]="s.pending_draw" />

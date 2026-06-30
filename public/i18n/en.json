@@ -61,6 +61,8 @@
     "transportHint": "Denser networks (e.g. bus) make smaller hiding zones.",
     "zoneCarved": "Zone: carved (no other station inside)",
     "zoneCircle": "Zone: simple circle",
+    "revealSeekers": "Show seeker positions to the hider",
+    "revealSeekersHint": "Off = faithful (the hider can't see the seekers closing in). On = casual.",
     "openMap": "🗺 Open the deduction map",
     "createFailed": "Could not create the game.",
     "joinFailed": "Could not join — check the code.",
@@ -176,6 +178,8 @@
     "cursesInPlay": "Curses in play",
     "awaitingProof": "awaiting proof…",
     "banked": "Banked",
+    "hiddenFor": "Hidden for",
+    "curseNudge": "💡 Play a curse to slow the seekers.",
     "play": "Play",
     "noCards": "No cards yet — you draw cards as the seekers ask questions.",
     "yourAnswers": "Your answers",
@@ -272,5 +276,33 @@
     "noLines": "No lines found at this stop.",
     "boardLine": "Board line {{ line }}",
     "boardAnyway": "Board here anyway"
+  },
+  "intro": {
+    "hiderTitle": "You're the Hider 🙈",
+    "hiderGoal": "Stay hidden as long as you can — that's your score.",
+    "hiderAction": "Hide near a station, then answer questions and play curses to slow the seekers.",
+    "seekerTitle": "You're a Seeker 🔎",
+    "seekerGoal": "Find the hider as fast as you can.",
+    "seekerAction": "Ask questions to shrink the map, then ride toward the hider and catch them.",
+    "gotIt": "Got it",
+    "howToPlay": "How to play"
+  },
+  "objective": {
+    "hider_hiding": "🙈 Hide near a station and confirm your spot.",
+    "hider_seeking": "🙈 Stay hidden — answer questions and play curses to slow them.",
+    "hider_endgame": "🙈 Stay hidden — the seekers are closing in!",
+    "seeker_hiding": "⏳ The hider is hiding — get ready.",
+    "seeker_seeking": "🔎 Ask questions to shrink the map, then ride toward the hider.",
+    "seeker_endgame": "🎯 Final approach — reach the hider to catch them."
+  },
+  "howto": {
+    "title": "How to play",
+    "goalTitle": "Goal",
+    "goal": "One player hides, the rest seek. The hider's score is how long they survive; over several rounds, the longest survivor wins.",
+    "hiderTitle": "If you're the Hider 🙈",
+    "hider": "Hide near a transit station. Answer questions truthfully — but every question the seekers ask hands you a card. Play curses to slow them and bank time bonuses.",
+    "seekerTitle": "If you're a Seeker 🔎",
+    "seeker": "Ask questions to rule out parts of the map, then ride transit toward what's left. When close, declare endgame and reach the hider to catch them.",
+    "questionsTitle": "Question types"
   }
 }

@@ -33,6 +33,8 @@ const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidde
 
 // States that have a one-line status hint (the text lives in i18n under `statusHint.*`).
 const STATUS_HINT_STATES = new Set(['role_assignment', 'hiding', 'seeking', 'endgame', 'round_end', 'finished']);
+// role_state combinations that have a "what to do now" objective (i18n `objective.*`).
+const OBJECTIVE_STATES = new Set(['hider_hiding', 'hider_seeking', 'hider_endgame', 'seeker_hiding', 'seeker_seeking', 'seeker_endgame']);
 
 /** Premium full-screen game shell: a full-bleed map, a floating HUD, and a context side panel. */
 @Component({
@@ -136,6 +138,19 @@ export class SessionView {
 
   showDeductionMap(s: GameState): boolean {
     return this.role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame');
+  }
+
+  /** i18n key for the "what to do now" objective line, by role + phase (or '' if none). */
+  objective(s: GameState): string {
+    const r = this.role(s);
+    const key = `${r}_${s.state}`;
+    return r && OBJECTIVE_STATES.has(key) ? 'objective.' + key : '';
+  }
+
+  // A one-time role intro per round (dismissed → stores the round it was dismissed for).
+  readonly introSeen = signal<number>(-1);
+  showIntro(s: GameState): boolean {
+    return !!this.role(s) && (s.state === 'hiding' || s.state === 'seeking') && this.introSeen() !== s.round;
   }
 
   /** While the hider is picking a station, surface the candidates + choice on the map —

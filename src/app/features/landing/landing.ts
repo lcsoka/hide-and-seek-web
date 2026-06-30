@@ -67,6 +67,14 @@ import { LangToggle } from '../../shared/lang-toggle';
           <p class="text-xs text-gray-400">{{ t('landing.transportHint') }}</p>
         </div>
 
+        <label class="flex items-start gap-2 text-sm">
+          <input type="checkbox" [(ngModel)]="revealSeekers" class="mt-0.5 h-4 w-4 rounded border-gray-300" />
+          <span>
+            {{ t('landing.revealSeekers') }}
+            <span class="block text-xs text-gray-400">{{ t('landing.revealSeekersHint') }}</span>
+          </span>
+        </label>
+
         <button (click)="create()" [disabled]="busy()"
                 class="w-full rounded-lg bg-rose-600 p-3 font-medium text-white hover:bg-rose-700 disabled:opacity-50">
           {{ t('landing.createGame') }}
@@ -109,6 +117,7 @@ export class Landing {
   size = 'medium';
   units = 'metric';
   zoneRule = 'nearest';
+  revealSeekers = false; // casual: show seeker positions to the hider (faithful = off)
   joinCode = '';
 
   /** Toggle a transit mode, but never let the last one be removed (need ≥1 to hide at). */
@@ -119,7 +128,7 @@ export class Landing {
   async create(): Promise<void> {
     await this.run(async () => {
       await this.ensureToken();
-      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined, config: { units: this.units, transit_modes: this.modes(), hiding_zone_rule: this.zoneRule } });
+      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined, config: { units: this.units, transit_modes: this.modes(), hiding_zone_rule: this.zoneRule, reveal_seekers_to_hider: this.revealSeekers } });
       if (session.host_player_id) {
         this.players.set(session.id, session.host_player_id);
       }

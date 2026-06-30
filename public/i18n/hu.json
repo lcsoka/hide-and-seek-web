@@ -61,6 +61,8 @@
     "transportHint": "A sűrűbb hálózat (pl. busz) kisebb búvóhely-zónát eredményez.",
     "zoneCarved": "Zóna: kivágott (nincs benne másik megálló)",
     "zoneCircle": "Zóna: egyszerű kör",
+    "revealSeekers": "Mutasd a keresők helyzetét a bújónak",
+    "revealSeekersHint": "Ki = hűséges (a bújó nem látja a közeledő keresőket). Be = lazább.",
     "openMap": "🗺 Nyomozótérkép megnyitása",
     "createFailed": "Nem sikerült létrehozni a játékot.",
     "joinFailed": "Nem sikerült csatlakozni — ellenőrizd a kódot.",
@@ -176,6 +178,8 @@
     "cursesInPlay": "Aktív átkok",
     "awaitingProof": "bizonyítékra vár…",
     "banked": "Bankolva",
+    "hiddenFor": "Rejtve",
+    "curseNudge": "💡 Játssz ki egy átkot a keresők lassításához.",
     "play": "Kijátszás",
     "noCards": "Még nincs lapod — a keresők kérdéseivel húzol lapokat.",
     "yourAnswers": "A válaszaid",
@@ -272,5 +276,33 @@
     "noLines": "Nincs vonal ennél a megállónál.",
     "boardLine": "Felszállás: {{ line }}",
     "boardAnyway": "Felszállás mindenképp"
+  },
+  "intro": {
+    "hiderTitle": "Te vagy a Bújó 🙈",
+    "hiderGoal": "Maradj rejtve, ameddig csak tudsz — ez a pontszámod.",
+    "hiderAction": "Bújj el egy megálló közelében, majd válaszolj a kérdésekre és játssz ki átkokat, hogy lassítsd a keresőket.",
+    "seekerTitle": "Te vagy a Kereső 🔎",
+    "seekerGoal": "Találd meg a bújót, amilyen gyorsan csak tudod.",
+    "seekerAction": "Tegyél fel kérdéseket a térkép szűkítéséhez, majd menj a bújó felé és kapd el.",
+    "gotIt": "Értem",
+    "howToPlay": "Hogyan kell játszani"
+  },
+  "objective": {
+    "hider_hiding": "🙈 Bújj el egy megálló közelében, és erősítsd meg a helyed.",
+    "hider_seeking": "🙈 Maradj rejtve — válaszolj a kérdésekre és játssz ki átkokat, hogy lassítsd őket.",
+    "hider_endgame": "🙈 Maradj rejtve — a keresők egyre közelednek!",
+    "seeker_hiding": "⏳ A bújó éppen elrejtőzik — készülj fel.",
+    "seeker_seeking": "🔎 Tegyél fel kérdéseket a térkép szűkítéséhez, majd menj a bújó felé.",
+    "seeker_endgame": "🎯 Végső hajrá — érj a bújóhoz, hogy elkapd."
+  },
+  "howto": {
+    "title": "Hogyan kell játszani",
+    "goalTitle": "Cél",
+    "goal": "Az egyik játékos elbújik, a többiek keresik. A bújó pontszáma az, hogy meddig marad rejtve; több kör után a leghosszabb túlélő nyer.",
+    "hiderTitle": "Ha te vagy a Bújó 🙈",
+    "hider": "Bújj el egy megálló közelében. Válaszolj őszintén a kérdésekre — de minden feltett kérdés egy lapot ad neked. Játssz ki átkokat a lassításukra, és gyűjts időbónuszokat.",
+    "seekerTitle": "Ha te vagy a Kereső 🔎",
+    "seeker": "Tegyél fel kérdéseket a térkép egyes részeinek kizárásához, majd menj tömegközlekedéssel a maradék felé. Ha közel vagy, indítsd a hajrát, és érj a bújóhoz, hogy elkapd.",
+    "questionsTitle": "Kérdéstípusok"
   }
 }

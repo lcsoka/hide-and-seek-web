@@ -3,11 +3,12 @@ import { RouterLink } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
 import { GameTimer } from '../../core/util/game-timer';
 import { LangToggle } from '../../shared/lang-toggle';
+import { HowToPlay } from './how-to-play';
 
-/** Floating HUD: leave button, copyable invite code, the phase timer, and the role badge. */
+/** Floating HUD: leave button, copyable invite code, the phase timer, role badge, and help. */
 @Component({
   selector: 'app-game-hud',
-  imports: [RouterLink, TranslocoModule, LangToggle],
+  imports: [RouterLink, TranslocoModule, LangToggle, HowToPlay],
   templateUrl: './game-hud.html',
 })
 export class GameHud {
@@ -17,6 +18,7 @@ export class GameHud {
   readonly stateLabel = input('');
   readonly calculating = input(false); // hiding-zone (stations + carve) being fetched
   readonly copied = signal(false);
+  readonly helpOpen = signal(false);
 
   async copy(): Promise<void> {
     try {

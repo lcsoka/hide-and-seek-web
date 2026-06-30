@@ -81,6 +81,19 @@ export class CardDeck {
   readonly timeBonusMin = computed(() => Math.round((this.state().time_bonus_s ?? 0) / 60));
   readonly playedCurses = computed(() => this.state().curses.filter((c) => c.status === 'active'));
   readonly vetoCard = computed(() => this.hand().find((c) => c.type === 'powerup' && c.power === 'veto') ?? null);
+  // The hider's score is the time they survive — show it live (rough; the authoritative
+  // figure is computed server-side at round end).
+  readonly survivalText = computed(() => {
+    const start = this.state().timers?.seeking_started_at;
+    return start == null ? null : formatCountdown(Math.max(0, Math.floor(this.clock.nowMs() / 1000) - start));
+  });
+  // Nudge the hider to spend curses while the hunt is on and nothing is currently slowing it.
+  readonly showCurseNudge = computed(() =>
+    this.hand().some((c) => c.type === 'curse')
+    && this.playedCurses().length === 0
+    && (this.state().state === 'seeking' || this.state().state === 'endgame')
+    && !this.pending(),
+  );
 
   private readonly units = computed(() => unitsOf(this.state().config));
 
