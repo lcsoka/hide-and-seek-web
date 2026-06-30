@@ -1,8 +1,13 @@
 <div class="space-y-4" *transloco="let tr">
-  @if (canCatch()) {
+  @if (pendingClaim()) {
+    <div class="flex items-center gap-2 rounded-xl border-2 border-amber-400 bg-amber-50 p-3 dark:border-amber-600 dark:bg-amber-950">
+      <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-amber-400/40 border-t-amber-600"></span>
+      <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">{{ tr('seeker.claimPending') }}</p>
+    </div>
+  } @else if (canCatch()) {
     <div class="space-y-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 p-3 dark:border-emerald-500 dark:bg-emerald-950">
       <p class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">{{ tr('seeker.reached') }}</p>
-      <button (click)="confirmFound()" class="w-full rounded-lg bg-emerald-600 p-3 text-base font-semibold text-white hover:bg-emerald-700">
+      <button (click)="claimFound()" class="w-full rounded-lg bg-emerald-600 p-3 text-base font-semibold text-white hover:bg-emerald-700">
         {{ tr('seeker.iFound') }}
       </button>
     </div>

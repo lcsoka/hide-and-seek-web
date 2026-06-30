@@ -130,6 +130,7 @@
   "seeker": {
     "reached": "🎯 You've reached the hider!",
     "iFound": "I found them!",
+    "claimPending": "Waiting for the hider to confirm you caught them…",
     "endgameClose": "Endgame — close in on the hider to catch them.",
     "questions": "Questions",
     "onMap": "on the map",
@@ -180,6 +181,9 @@
     "banked": "Banked",
     "hiddenFor": "Hidden for",
     "curseNudge": "💡 Play a curse to slow the seekers.",
+    "foundClaim": "🔍 {{ name }} says they found you! Confirm to end the round.",
+    "confirmCaught": "✅ Yes, caught",
+    "notCaught": "✋ Not yet",
     "play": "Play",
     "noCards": "No cards yet — you draw cards as the seekers ask questions.",
     "yourAnswers": "Your answers",
@@ -224,7 +228,9 @@
     "declare_endgame": "Declare endgame",
     "board_transit": "Board transit",
     "alight_transit": "Get off transit",
-    "confirm_found": "I found them!",
+    "claim_found": "I found them!",
+    "confirm_caught": "Confirm caught",
+    "dispute_found": "Not caught",
     "surrender": "Surrender",
     "advance_round": "Next round",
     "end_game": "End game"

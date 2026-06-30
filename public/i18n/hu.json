@@ -130,6 +130,7 @@
   "seeker": {
     "reached": "🎯 Elérted a bújót!",
     "iFound": "Megtaláltam!",
+    "claimPending": "Várakozás a bújó megerősítésére, hogy elkaptad…",
     "endgameClose": "Hajrá — közelíts a bújóhoz, hogy elkapd!",
     "questions": "Kérdések",
     "onMap": "a térképen",
@@ -180,6 +181,9 @@
     "banked": "Bankolva",
     "hiddenFor": "Rejtve",
     "curseNudge": "💡 Játssz ki egy átkot a keresők lassításához.",
+    "foundClaim": "🔍 {{ name }} szerint megtaláltak! Erősítsd meg a kör lezárásához.",
+    "confirmCaught": "✅ Igen, elkaptak",
+    "notCaught": "✋ Még nem",
     "play": "Kijátszás",
     "noCards": "Még nincs lapod — a keresők kérdéseivel húzol lapokat.",
     "yourAnswers": "A válaszaid",
@@ -224,7 +228,9 @@
     "declare_endgame": "Hajrá indítása",
     "board_transit": "Felszállás",
     "alight_transit": "Leszállás",
-    "confirm_found": "Megtaláltam!",
+    "claim_found": "Megtaláltam!",
+    "confirm_caught": "Elkapás megerősítése",
+    "dispute_found": "Nem kaptak el",
     "surrender": "Feladás",
     "advance_round": "Következő kör",
     "end_game": "Játék befejezése"

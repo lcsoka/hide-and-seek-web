@@ -94,6 +94,8 @@ export class CardDeck {
     && (this.state().state === 'seeking' || this.state().state === 'endgame')
     && !this.pending(),
   );
+  // A seeker claims they found the hider — the round ends only once the hider confirms it.
+  readonly foundClaim = computed(() => this.state().found_claim);
 
   private readonly units = computed(() => unitsOf(this.state().config));
 
@@ -291,6 +293,16 @@ export class CardDeck {
   /** Drop a card from the hand to free a slot (manage the hand limit). */
   async discard(card: HandCard): Promise<void> {
     await this.act('discard_card', { card_uid: card.uid });
+  }
+
+  /** Confirm a seeker's catch claim — ends the round. */
+  async confirmCaught(): Promise<void> {
+    await this.act('confirm_caught', {});
+  }
+
+  /** Reject a catch claim (the seeker isn't actually here) — the round continues. */
+  async disputeFound(): Promise<void> {
+    await this.act('dispute_found', {});
   }
 
   /** Toggle a category in the Drained Brain pick (capped at the curse's count). */

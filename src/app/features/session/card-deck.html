@@ -1,4 +1,13 @@
 <div class="space-y-3" *transloco="let t">
+  @if (foundClaim(); as claim) {
+    <div class="space-y-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 p-3 dark:border-emerald-500 dark:bg-emerald-950">
+      <p class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">{{ t('deck.foundClaim', { name: claim.by_name }) }}</p>
+      <div class="flex gap-2">
+        <button (click)="confirmCaught()" [disabled]="busy()" class="flex-1 rounded-lg bg-emerald-600 p-3 font-semibold text-white hover:bg-emerald-700 disabled:opacity-50">{{ t('deck.confirmCaught') }}</button>
+        <button (click)="disputeFound()" [disabled]="busy()" class="rounded-lg border border-gray-300 px-3 font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:text-gray-200">{{ t('deck.notCaught') }}</button>
+      </div>
+    </div>
+  }
   @if (survivalText(); as surv) {
     <div class="flex items-center justify-between rounded-xl bg-rose-600 px-3 py-2 text-white">
       <span class="text-sm font-medium opacity-90">🙈 {{ t('deck.hiddenFor') }}</span>

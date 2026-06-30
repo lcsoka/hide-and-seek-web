@@ -33,8 +33,9 @@ export class SeekerPanel {
 
   readonly questionNotice = this.store.questionNotice;
   readonly canAsk = computed(() => this.state().available_actions.includes('ask_question'));
-  readonly canCatch = computed(() => this.state().available_actions.includes('confirm_found'));
-  readonly closingIn = computed(() => this.state().state === 'endgame' && !this.canCatch());
+  readonly canCatch = computed(() => this.state().available_actions.includes('claim_found'));
+  readonly pendingClaim = computed(() => this.state().found_claim);
+  readonly closingIn = computed(() => this.state().state === 'endgame' && !this.canCatch() && !this.pendingClaim());
   readonly running = computed(() => this.state().thermometer);
   readonly transit = computed(() => this.state().transit);
   readonly onTransit = computed(() => this.transit()?.on_transit ?? false);
@@ -114,8 +115,9 @@ export class SeekerPanel {
     this.store.refresh();
   }
 
-  async confirmFound(): Promise<void> {
-    await this.api.submitAction(this.sessionId(), 'confirm_found', {});
+  /** Claim the catch — the round ends only once the hider confirms it. */
+  async claimFound(): Promise<void> {
+    await this.api.submitAction(this.sessionId(), 'claim_found', {});
     this.store.refresh();
   }
 }

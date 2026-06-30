@@ -192,6 +192,12 @@ export interface GameState {
   time_bonus_s: number | null;
   thermometer: ThermometerRunning | null;
   transit: TransitState | null; // seeker-only: board/alight status + the team's journey log
+  found_claim: FoundClaim | null; // a seeker claims the catch; round ends once the hider confirms
+}
+
+export interface FoundClaim {
+  by: string | null;
+  by_name: string | null;
 }
 
 /** Seekers' public-transport status + journey log (seeker-only). */
