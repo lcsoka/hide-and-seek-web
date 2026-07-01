@@ -104,7 +104,7 @@
             <p class="text-sm font-medium text-rose-700 dark:text-rose-300">{{ t('intro.seekerGoal') }}</p>
             <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('intro.seekerAction') }}</p>
           }
-          <button (click)="introSeen.set(s.round)" class="w-full rounded-xl bg-rose-600 p-3 font-semibold text-white hover:bg-rose-700">{{ t('intro.gotIt') }}</button>
+          <button (click)="dismissIntro(s)" class="w-full rounded-xl bg-rose-600 p-3 font-semibold text-white hover:bg-rose-700">{{ t('intro.gotIt') }}</button>
         </div>
       </div>
     }

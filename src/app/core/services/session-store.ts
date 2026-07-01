@@ -1,4 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { ApiClient } from './api-client';
 
 export interface FeedEntry {
@@ -14,6 +15,7 @@ export interface FeedEntry {
 @Injectable({ providedIn: 'root' })
 export class SessionStore {
   private readonly api = inject(ApiClient);
+  private readonly transloco = inject(TranslocoService);
   private readonly sessionId = signal<string | undefined>(undefined);
   private readonly resource = this.api.stateResource(this.sessionId);
   // Live seeker positions from PlayerMoved events, overlaid on /state so the map moves
@@ -63,9 +65,9 @@ export class SessionStore {
     }
 
     if (type === 'QuestionVoided') {
-      this.notify("Your last question couldn't be answered — ask again.");
+      this.notify(this.transloco.translate('seeker.voidedNotice'));
     } else if (type === 'QuestionVetoed') {
-      this.notify('The hider vetoed your question — ask another.');
+      this.notify(this.transloco.translate('seeker.vetoedNotice'));
     }
 
     this.refresh();

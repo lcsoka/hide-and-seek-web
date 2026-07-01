@@ -147,10 +147,25 @@ export class SessionView {
     return r && OBJECTIVE_STATES.has(key) ? 'objective.' + key : '';
   }
 
-  // A one-time role intro per round (dismissed → stores the round it was dismissed for).
+  // A one-time role intro per round. Dismissal is persisted (per session+round) so a page
+  // reload mid-round doesn't re-show it; the signal makes the in-session dismissal reactive.
   readonly introSeen = signal<number>(-1);
+  private introKey(s: GameState): string {
+    return `jl_intro_${s.session_id}_${s.round}`;
+  }
   showIntro(s: GameState): boolean {
-    return !!this.role(s) && (s.state === 'hiding' || s.state === 'seeking') && this.introSeen() !== s.round;
+    if (!this.role(s) || !(s.state === 'hiding' || s.state === 'seeking')) {
+      return false;
+    }
+    return this.introSeen() !== s.round && localStorage.getItem(this.introKey(s)) === null;
+  }
+  dismissIntro(s: GameState): void {
+    this.introSeen.set(s.round);
+    try {
+      localStorage.setItem(this.introKey(s), '1');
+    } catch {
+      // storage unavailable — the in-memory signal still hides it this session
+    }
   }
 
   /** While the hider is picking a station, surface the candidates + choice on the map —
