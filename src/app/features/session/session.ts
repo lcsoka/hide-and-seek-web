@@ -296,8 +296,10 @@ export class SessionView {
   }
 
   openAsk(): void {
-    if (!this.catalog().length) {
-      void this.api.questionsCatalog().then((c) => this.catalog.set(c));
+    const sessionId = this.id();
+    if (!this.catalog().length && sessionId) {
+      // Session-scoped so the host's own custom questions are askable in their games.
+      void this.api.sessionQuestions(sessionId).then((c) => this.catalog.set(c));
     }
     this.pickerOpen.set(true);
   }

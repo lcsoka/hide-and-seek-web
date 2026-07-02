@@ -26,6 +26,24 @@ export interface ProfileStats {
   recent: { hide_time_s: number; won: boolean; players: number; at: number | null }[];
 }
 
+/** A user's own custom curse (joins the deck of games they host). */
+export interface CustomCurse {
+  id: string;
+  name: string;
+  cost: string;
+  description: string;
+  requires_proof: boolean;
+  blocks_asking: boolean;
+  duration_minutes: number | null;
+}
+
+/** A user's own custom (photo) question. */
+export interface CustomQuestion {
+  id: string;
+  title: string;
+  prompt: string;
+}
+
 export interface PlayerView {
   id: string;
   display_name: string;

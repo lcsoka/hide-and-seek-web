@@ -36,6 +36,25 @@
     "total": "Total hidden",
     "none": "No finished games yet — play one to build your stats."
   },
+  "content": {
+    "title": "My content",
+    "manage": "My curses & questions",
+    "blurb": "Your custom curses + questions appear only in the games you host.",
+    "curses": "Curses",
+    "questions": "Questions (photo)",
+    "curseName": "Curse name",
+    "cost": "Cost (what the seekers must do)",
+    "description": "Description (optional)",
+    "proof": "Photo proof",
+    "blocks": "Blocks asking",
+    "min": "min",
+    "addCurse": "Add curse",
+    "questionTitle": "Short title",
+    "questionPrompt": "Send a photo of…",
+    "addQuestion": "Add question",
+    "noCurses": "No custom curses yet.",
+    "noQuestions": "No custom questions yet."
+  },
   "role": { "hider": "Hider", "seeker": "Seeker" },
   "state": {
     "lobby": "Lobby",

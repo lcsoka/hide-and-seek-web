@@ -44,6 +44,14 @@
       </div>
     </div>
 
+    <!-- Custom content (registered only) -->
+    @if (!u.is_guest) {
+      <a routerLink="/content" class="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 dark:bg-gray-900 dark:ring-white/10 dark:hover:bg-white/5">
+        <span class="font-medium">🃏 {{ t('content.manage') }}</span>
+        <span class="text-gray-400">›</span>
+      </a>
+    }
+
     <!-- Stats -->
     @if (stats(); as st) {
       <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-white/10">

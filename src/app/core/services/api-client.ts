@@ -2,7 +2,7 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CurseCatalogItem, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models/models';
+import { CurseCatalogItem, CustomCurse, CustomQuestion, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models/models';
 
 /**
  * Typed wrapper over the REST contract. Reads use `httpResource` (signals);
@@ -87,6 +87,32 @@ export class ApiClient {
 
   questionsCatalog(): Promise<QuestionCatalogItem[]> {
     return firstValueFrom(this.http.get<QuestionCatalogItem[]>(`${this.base}/questions`));
+  }
+
+  /** The askable questions for a specific game (official + the host's custom). */
+  sessionQuestions(id: string): Promise<QuestionCatalogItem[]> {
+    return firstValueFrom(this.http.get<QuestionCatalogItem[]>(`${this.base}/sessions/${id}/questions`));
+  }
+
+  // ── User-generated content (own custom curses + questions) ─────────────────
+  myContent(): Promise<{ curses: CustomCurse[]; questions: CustomQuestion[] }> {
+    return firstValueFrom(this.http.get<{ curses: CustomCurse[]; questions: CustomQuestion[] }>(`${this.base}/my/content`));
+  }
+
+  createCurse(body: Partial<CustomCurse>): Promise<CustomCurse> {
+    return firstValueFrom(this.http.post<CustomCurse>(`${this.base}/my/curses`, body));
+  }
+
+  deleteCurse(id: string): Promise<unknown> {
+    return firstValueFrom(this.http.delete(`${this.base}/my/curses/${id}`));
+  }
+
+  createQuestion(body: { title: string; prompt: string }): Promise<CustomQuestion> {
+    return firstValueFrom(this.http.post<CustomQuestion>(`${this.base}/my/questions`, body));
+  }
+
+  deleteQuestion(id: string): Promise<unknown> {
+    return firstValueFrom(this.http.delete(`${this.base}/my/questions/${id}`));
   }
 
   cursesCatalog(): Promise<CurseCatalogItem[]> {

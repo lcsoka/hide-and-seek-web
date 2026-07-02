@@ -36,6 +36,25 @@
     "total": "Összes bújás",
     "none": "Még nincs befejezett játék — játssz eggyel a statisztikáért."
   },
+  "content": {
+    "title": "Saját tartalom",
+    "manage": "Saját átkok és kérdések",
+    "blurb": "A saját átkaid és kérdéseid csak az általad indított játékokban jelennek meg.",
+    "curses": "Átkok",
+    "questions": "Kérdések (fotó)",
+    "curseName": "Átok neve",
+    "cost": "Ár (mit kell tenniük a keresőknek)",
+    "description": "Leírás (opcionális)",
+    "proof": "Fotós bizonyíték",
+    "blocks": "Blokkolja a kérdezést",
+    "min": "perc",
+    "addCurse": "Átok hozzáadása",
+    "questionTitle": "Rövid cím",
+    "questionPrompt": "Küldj egy fotót erről…",
+    "addQuestion": "Kérdés hozzáadása",
+    "noCurses": "Még nincs saját átok.",
+    "noQuestions": "Még nincs saját kérdés."
+  },
   "role": { "hider": "Bújó", "seeker": "Kereső" },
   "state": {
     "lobby": "Váróterem",
