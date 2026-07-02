@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/* Landing hero: display wordmark + the "living map" marker pulses + entrance. */
+.font-display { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }
+
+@keyframes jl-ping {
+  0% { transform: scale(1); opacity: 0.5; }
+  70%, 100% { transform: scale(2.6); opacity: 0; }
+}
+.jl-pulse-dot::after {
+  content: ''; position: absolute; inset: 0; border-radius: 9999px;
+  background: inherit; animation: jl-ping 2.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes jl-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.jl-rise { animation: jl-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
 /* Map polish — gently pulse the candidate-area outline so the live deduction reads
    as "alive". (Leaflet renders its SVG outside Angular's view encapsulation, so this
    lives in the global sheet.) */

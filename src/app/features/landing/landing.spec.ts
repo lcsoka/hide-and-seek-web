@@ -30,7 +30,8 @@ describe('Landing', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('Jet Lag Hungary');
+    expect(text).toContain('Jet Lag');
+    expect(text).toContain('Budapest');
     expect(text).toContain('Start a game');
     expect(text).toContain('Join a game');
   });

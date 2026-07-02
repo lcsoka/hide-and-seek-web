@@ -52,6 +52,13 @@
   },
   "landing": {
     "yourName": "Your name",
+    "tagline": "Hide across the city. Hunt with questions. Outlast everyone.",
+    "badge": "Budapest · real transit",
+    "how": { "hide": "Hide near a station", "ask": "Narrow the map", "catch": "Catch the hider" },
+    "cityLabel": "City",
+    "sizeLabel": "Map size",
+    "unitsLabel": "Units",
+    "zoneLabel": "Hiding zone",
     "startGame": "Start a game",
     "createGame": "Create game",
     "joinTitle": "Join a game",

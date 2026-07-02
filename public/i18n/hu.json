@@ -52,6 +52,13 @@
   },
   "landing": {
     "yourName": "A neved",
+    "tagline": "Bújj el a városban. Vadássz kérdésekkel. Éld túl a többieket.",
+    "badge": "Budapest · valós tömegközlekedés",
+    "how": { "hide": "Bújj el egy megállónál", "ask": "Szűkítsd a térképet", "catch": "Kapd el a bújót" },
+    "cityLabel": "Város",
+    "sizeLabel": "Pálya mérete",
+    "unitsLabel": "Mértékegység",
+    "zoneLabel": "Búvóhely-zóna",
     "startGame": "Új játék",
     "createGame": "Játék létrehozása",
     "joinTitle": "Csatlakozás játékhoz",

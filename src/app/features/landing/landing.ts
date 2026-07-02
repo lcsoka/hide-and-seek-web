@@ -1,7 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import * as L from 'leaflet';
 import { TRANSIT_MODES } from '../../core/maps/overpass';
 import { ApiClient } from '../../core/services/api-client';
 import { PlayerStore } from '../../core/services/player-store';
@@ -11,91 +12,7 @@ import { LangToggle } from '../../shared/lang-toggle';
 @Component({
   selector: 'app-landing',
   imports: [FormsModule, RouterLink, TranslocoModule, LangToggle],
-  template: `
-    <main class="mx-auto w-full max-w-md space-y-6 p-4 sm:p-6" *transloco="let t">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold sm:text-3xl">Jet Lag Hungary</h1>
-        <app-lang-toggle />
-      </div>
-
-      @if (error(); as e) {
-        <p class="rounded-lg bg-red-100 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">{{ e }}</p>
-      }
-
-      <div class="space-y-1">
-        <label class="text-sm font-medium" for="name">{{ t('landing.yourName') }}</label>
-        <input id="name" [(ngModel)]="name" placeholder="Anna" autocomplete="off"
-               class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800" />
-      </div>
-
-      <section class="space-y-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-        <h2 class="font-semibold">{{ t('landing.startGame') }}</h2>
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <select [(ngModel)]="city" [attr.aria-label]="t('landing.startGame')"
-                  class="w-full rounded-lg border border-gray-300 bg-white p-3 capitalize dark:border-gray-600 dark:bg-gray-800">
-            @for (c of cities; track c) { <option [value]="c">{{ c }}</option> }
-          </select>
-          <select [(ngModel)]="size" aria-label="Map size"
-                  class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
-            @for (s of sizes; track s) { <option [value]="s">{{ t('landing.size.' + s) }}</option> }
-          </select>
-          <select [(ngModel)]="units" aria-label="Units"
-                  class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
-            <option value="metric">{{ t('landing.units.metric') }}</option>
-            <option value="imperial">{{ t('landing.units.imperial') }}</option>
-          </select>
-          <select [(ngModel)]="zoneRule" aria-label="Hiding zone"
-                  class="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
-            <option value="nearest">{{ t('landing.zoneCarved') }}</option>
-            <option value="circle">{{ t('landing.zoneCircle') }}</option>
-          </select>
-        </div>
-
-        <div class="space-y-1.5">
-          <div class="text-sm font-medium">{{ t('landing.transport') }}</div>
-          <div class="flex flex-wrap gap-2">
-            @for (m of allModes; track m.id) {
-              <button type="button" (click)="toggleMode(m.id)"
-                      class="rounded-full border px-3 py-1.5 text-sm font-medium transition"
-                      [class]="modes().includes(m.id)
-                        ? 'border-rose-500 bg-rose-50 text-rose-700 dark:border-rose-500 dark:bg-rose-950 dark:text-rose-300'
-                        : 'border-gray-300 text-gray-500 hover:border-gray-400 dark:border-gray-600 dark:text-gray-400'">
-                {{ t('mode.' + m.id) }}
-              </button>
-            }
-          </div>
-          <p class="text-xs text-gray-400">{{ t('landing.transportHint') }}</p>
-        </div>
-
-        <label class="flex items-start gap-2 text-sm">
-          <input type="checkbox" [(ngModel)]="revealSeekers" class="mt-0.5 h-4 w-4 rounded border-gray-300" />
-          <span>
-            {{ t('landing.revealSeekers') }}
-            <span class="block text-xs text-gray-400">{{ t('landing.revealSeekersHint') }}</span>
-          </span>
-        </label>
-
-        <button (click)="create()" [disabled]="busy()"
-                class="w-full rounded-lg bg-rose-600 p-3 font-medium text-white hover:bg-rose-700 disabled:opacity-50">
-          {{ t('landing.createGame') }}
-        </button>
-      </section>
-
-      <section class="space-y-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-        <h2 class="font-semibold">{{ t('landing.joinTitle') }}</h2>
-        <input [(ngModel)]="joinCode" [placeholder]="t('landing.joinCode')" autocapitalize="characters"
-               class="w-full rounded-lg border border-gray-300 bg-white p-3 uppercase dark:border-gray-600 dark:bg-gray-800" />
-        <button (click)="join()" [disabled]="busy() || !joinCode.trim()"
-                class="w-full rounded-lg border border-gray-300 p-3 font-medium hover:bg-gray-100 disabled:opacity-50 dark:border-gray-600 dark:hover:bg-gray-800">
-          {{ t('landing.joinBtn') }}
-        </button>
-      </section>
-
-      <p class="text-center text-sm">
-        <a routerLink="/map" class="text-rose-600 hover:underline">{{ t('landing.openMap') }}</a>
-      </p>
-    </main>
-  `,
+  templateUrl: './landing.html',
 })
 export class Landing {
   private readonly api = inject(ApiClient);
@@ -103,14 +20,19 @@ export class Landing {
   private readonly players = inject(PlayerStore);
   private readonly router = inject(Router);
   private readonly transloco = inject(TranslocoService);
+  private readonly destroyRef = inject(DestroyRef);
 
+  readonly mapEl = viewChild.required<ElementRef<HTMLElement>>('mapEl');
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
+  readonly createOpen = signal(false);
+  readonly joinOpen = signal(false);
 
   readonly cities = ['budapest', 'debrecen', 'szeged', 'miskolc', 'pecs', 'gyor', 'nyiregyhaza', 'kecskemet', 'szekesfehervar', 'szombathely'];
   readonly sizes = ['small', 'medium', 'large'];
   readonly allModes = TRANSIT_MODES;
   readonly modes = signal<string[]>(['metro', 'tram']);
+  readonly steps = [{ key: 'hide', icon: '🙈' }, { key: 'ask', icon: '🔎' }, { key: 'catch', icon: '🎯' }];
 
   name = '';
   city = 'budapest';
@@ -119,6 +41,39 @@ export class Landing {
   zoneRule = 'nearest';
   revealSeekers = false; // casual: show seeker positions to the hider (faithful = off)
   joinCode = '';
+
+  constructor() {
+    afterNextRender(() => this.initBackdrop());
+  }
+
+  /** A dark, non-interactive Budapest map that slowly drifts between landmarks — the hero
+   *  backdrop, with a hider (rose) + seeker (blue) marker pulsing to set the theme. */
+  private initBackdrop(): void {
+    const spots: L.LatLngExpression[] = [
+      [47.4979, 19.0402], [47.5003, 19.0836], [47.5106, 19.0567], [47.4874, 19.0700], [47.4813, 19.0561],
+    ];
+    const map = L.map(this.mapEl().nativeElement, {
+      center: spots[0], zoom: 13, zoomControl: false, attributionControl: false, dragging: false,
+      scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false, inertia: false,
+    });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 18 }).addTo(map);
+    const dot = (color: string) =>
+      L.divIcon({ className: '', iconSize: [14, 14], html: `<div class="jl-pulse-dot" style="width:14px;height:14px;border-radius:9999px;background:${color};box-shadow:0 0 0 3px rgba(2,6,23,.5)"></div>` });
+    L.marker([47.5003, 19.0836], { icon: dot('#f43f5e'), interactive: false }).addTo(map);
+    L.marker([47.4979, 19.0402], { icon: dot('#3b82f6'), interactive: false }).addTo(map);
+    L.marker([47.5106, 19.0567], { icon: dot('#3b82f6'), interactive: false }).addTo(map);
+    setTimeout(() => map.invalidateSize(), 200);
+
+    let i = 0;
+    const drift = setInterval(() => {
+      i = (i + 1) % spots.length;
+      map.flyTo(spots[i], 13, { duration: 7, easeLinearity: 0.25 });
+    }, 9000);
+    this.destroyRef.onDestroy(() => {
+      clearInterval(drift);
+      map.remove();
+    });
+  }
 
   /** Toggle a transit mode, but never let the last one be removed (need ≥1 to hide at). */
   toggleMode(id: string): void {
