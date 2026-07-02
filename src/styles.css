@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
-/* The game is dark end-to-end (consistent with the landing) — drive `dark:` off a `.dark`
-   class (set on <html>) instead of the OS preference, and render native controls dark. */
-@custom-variant dark (&:where(.dark, .dark *));
-html { color-scheme: dark; }
+/* Theme follows the OS. Tailwind v4's default `dark:` variant is already `prefers-color-scheme`,
+   and `color-scheme: light dark` lets native controls (form fields, scrollbars) match too. Both
+   the landing and the in-app game ship light + dark styling, so the whole app is consistent. */
+html { color-scheme: light dark; }
 
 /* Landing hero: display wordmark + the "living map" marker pulses + entrance. */
 .font-display { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }

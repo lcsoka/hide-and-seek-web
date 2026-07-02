@@ -1,14 +1,16 @@
-<div class="relative flex min-h-[100dvh] flex-col overflow-hidden bg-gray-950 text-white">
-  <!-- Living Budapest map backdrop (outside *transloco so the viewChild resolves on first render) -->
+<div class="relative flex min-h-[100dvh] flex-col overflow-hidden bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
+  <!-- Living Budapest map backdrop (outside *transloco so the viewChild resolves on first render).
+       The tile layer follows the OS theme (see landing.ts). -->
   <div #mapEl class="pointer-events-none absolute inset-0 z-0 opacity-70"></div>
-  <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-gray-950/55 via-gray-950/75 to-gray-950/95"></div>
-  <div class="pointer-events-none absolute inset-0 z-[1]" style="background: radial-gradient(115% 75% at 50% -5%, transparent 35%, rgba(2,6,23,0.9) 100%)"></div>
+  <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-gray-50/60 via-gray-50/75 to-gray-50/95 dark:from-gray-950/55 dark:via-gray-950/75 dark:to-gray-950/95"></div>
+  <div class="pointer-events-none absolute inset-0 z-[1] dark:hidden" style="background: radial-gradient(115% 75% at 50% -5%, transparent 35%, rgba(248,250,252,0.92) 100%)"></div>
+  <div class="pointer-events-none absolute inset-0 z-[1] hidden dark:block" style="background: radial-gradient(115% 75% at 50% -5%, transparent 35%, rgba(2,6,23,0.9) 100%)"></div>
 
   <ng-container *transloco="let t">
   <!-- Top bar -->
   <header class="relative z-10 flex items-center justify-between p-4 sm:p-6">
     <div class="font-display flex items-center gap-2 text-lg font-bold tracking-tight">
-      <span class="grid h-8 w-8 place-items-center rounded-lg bg-rose-600 text-sm">🚇</span> Hide <span class="text-rose-400">&amp;</span> Seek
+      <span class="grid h-8 w-8 place-items-center rounded-lg bg-rose-600 text-sm">🚇</span> Hide <span class="text-rose-500 dark:text-rose-400">&amp;</span> Seek
     </div>
     <app-lang-toggle />
   </header>
@@ -16,105 +18,105 @@
   <!-- Hero -->
   <main class="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-6 px-5 pb-8 sm:max-w-lg">
     @if (error(); as e) {
-      <p class="rounded-xl bg-red-500/90 p-3 text-sm shadow-lg">{{ e }}</p>
+      <p class="rounded-xl bg-red-500/90 p-3 text-sm text-white shadow-lg">{{ e }}</p>
     }
 
     <div class="jl-rise space-y-3">
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80 ring-1 ring-white/15 backdrop-blur">📍 {{ t('landing.badge') }}</span>
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-900/5 px-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-900/10 backdrop-blur dark:bg-white/10 dark:text-white/80 dark:ring-white/15">📍 {{ t('landing.badge') }}</span>
       <h1 class="font-display text-6xl font-bold leading-[0.95] tracking-tight sm:text-7xl">
         Hide <span class="text-rose-500">&amp;</span> Seek
       </h1>
-      <p class="max-w-sm text-base leading-relaxed text-white/70">{{ t('landing.tagline') }}</p>
+      <p class="max-w-sm text-base leading-relaxed text-gray-600 dark:text-white/70">{{ t('landing.tagline') }}</p>
     </div>
 
     <!-- Name + primary actions -->
     <div class="jl-rise space-y-3" style="animation-delay: 0.08s">
       <input [(ngModel)]="name" [placeholder]="t('landing.yourName')" autocomplete="off" maxlength="50"
-             class="w-full rounded-xl border border-white/15 bg-white/10 p-3.5 text-white placeholder-white/40 backdrop-blur focus:border-rose-400 focus:outline-none" />
+             class="w-full rounded-xl border border-gray-300 bg-white p-3.5 text-gray-900 placeholder-gray-400 shadow-sm backdrop-blur focus:border-rose-400 focus:outline-none dark:border-white/15 dark:bg-white/10 dark:text-white dark:placeholder-white/40 dark:shadow-none" />
       <button (click)="createOpen.set(true)" [disabled]="!name.trim()"
-              class="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 p-4 text-base font-semibold shadow-lg shadow-rose-950/50 transition hover:bg-rose-500 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-rose-600">
+              class="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 p-4 text-base font-semibold text-white shadow-lg shadow-rose-600/30 transition hover:bg-rose-500 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-rose-600 dark:shadow-rose-950/50">
         ▶ {{ t('landing.startGame') }}
       </button>
       <button (click)="joinOpen.set(true)" [disabled]="!name.trim()"
-              class="w-full rounded-xl border border-white/20 bg-white/5 p-3.5 font-medium backdrop-blur transition hover:bg-white/10 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/5">
+              class="w-full rounded-xl border border-gray-300 bg-white/70 p-3.5 font-medium text-gray-800 backdrop-blur transition hover:bg-white active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/70 dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:disabled:hover:bg-white/5">
         {{ t('landing.joinTitle') }}
       </button>
       @if (!name.trim()) {
-        <p class="text-center text-xs text-white/40">{{ t('landing.nameRequired') }}</p>
+        <p class="text-center text-xs text-gray-500 dark:text-white/40">{{ t('landing.nameRequired') }}</p>
       }
     </div>
 
     <!-- How it works -->
     <div class="jl-rise grid grid-cols-3 gap-2 text-center" style="animation-delay: 0.16s">
       @for (s of steps; track s.key) {
-        <div class="rounded-xl border border-white/10 bg-white/5 p-3 backdrop-blur">
+        <div class="rounded-xl border border-gray-200 bg-white/70 p-3 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:shadow-none">
           <div class="text-2xl">{{ s.icon }}</div>
-          <div class="mt-1 text-xs font-medium leading-snug text-white/75">{{ t('landing.how.' + s.key) }}</div>
+          <div class="mt-1 text-xs font-medium leading-snug text-gray-600 dark:text-white/75">{{ t('landing.how.' + s.key) }}</div>
         </div>
       }
     </div>
 
-    <p class="text-center text-[11px] text-white/40">
-      © OpenStreetMap, © CARTO · <a routerLink="/map" class="underline transition hover:text-white/70">{{ t('landing.openMap') }}</a>
+    <p class="text-center text-[11px] text-gray-500 dark:text-white/40">
+      © OpenStreetMap, © CARTO · <a routerLink="/map" class="underline transition hover:text-gray-800 dark:hover:text-white/70">{{ t('landing.openMap') }}</a>
     </p>
   </main>
 
   <!-- Create-game sheet -->
   @if (createOpen()) {
     <div class="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center" (click)="createOpen.set(false)">
-      <div class="max-h-[88vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-t-3xl bg-gray-900 p-5 text-white ring-1 ring-white/10 sm:m-3 sm:rounded-3xl" (click)="$event.stopPropagation()">
+      <div class="max-h-[88vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-t-3xl bg-white p-5 text-gray-900 shadow-2xl ring-1 ring-gray-200 sm:m-3 sm:rounded-3xl dark:bg-gray-900 dark:text-white dark:ring-white/10" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between">
           <h2 class="font-display text-xl font-bold">{{ t('landing.startGame') }}</h2>
-          <button (click)="createOpen.set(false)" class="text-xl text-white/50 hover:text-white">✕</button>
+          <button (click)="createOpen.set(false)" class="text-xl text-gray-400 hover:text-gray-700 dark:text-white/50 dark:hover:text-white">✕</button>
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label class="space-y-1 text-xs font-medium text-white/60">{{ t('landing.cityLabel') }}
-            <select [(ngModel)]="city" class="w-full rounded-lg border border-white/15 bg-white/10 p-3 capitalize text-white">
-              @for (c of cities; track c) { <option class="text-gray-900" [value]="c">{{ c }}</option> }
+          <label class="space-y-1 text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.cityLabel') }}
+            <select [(ngModel)]="city" class="w-full rounded-lg border border-gray-300 bg-white p-3 capitalize text-gray-900 dark:border-white/15 dark:bg-white/10 dark:text-white">
+              @for (c of cities; track c) { <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" [value]="c">{{ c }}</option> }
             </select>
           </label>
-          <label class="space-y-1 text-xs font-medium text-white/60">{{ t('landing.sizeLabel') }}
-            <select [(ngModel)]="size" class="w-full rounded-lg border border-white/15 bg-white/10 p-3 text-white">
-              @for (s of sizes; track s) { <option class="text-gray-900" [value]="s">{{ t('landing.size.' + s) }}</option> }
+          <label class="space-y-1 text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.sizeLabel') }}
+            <select [(ngModel)]="size" class="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 dark:border-white/15 dark:bg-white/10 dark:text-white">
+              @for (s of sizes; track s) { <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" [value]="s">{{ t('landing.size.' + s) }}</option> }
             </select>
           </label>
-          <label class="space-y-1 text-xs font-medium text-white/60">{{ t('landing.unitsLabel') }}
-            <select [(ngModel)]="units" class="w-full rounded-lg border border-white/15 bg-white/10 p-3 text-white">
-              <option class="text-gray-900" value="metric">{{ t('landing.units.metric') }}</option>
-              <option class="text-gray-900" value="imperial">{{ t('landing.units.imperial') }}</option>
+          <label class="space-y-1 text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.unitsLabel') }}
+            <select [(ngModel)]="units" class="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 dark:border-white/15 dark:bg-white/10 dark:text-white">
+              <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" value="metric">{{ t('landing.units.metric') }}</option>
+              <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" value="imperial">{{ t('landing.units.imperial') }}</option>
             </select>
           </label>
-          <label class="space-y-1 text-xs font-medium text-white/60">{{ t('landing.zoneLabel') }}
-            <select [(ngModel)]="zoneRule" class="w-full rounded-lg border border-white/15 bg-white/10 p-3 text-white">
-              <option class="text-gray-900" value="nearest">{{ t('landing.zoneCarved') }}</option>
-              <option class="text-gray-900" value="circle">{{ t('landing.zoneCircle') }}</option>
+          <label class="space-y-1 text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.zoneLabel') }}
+            <select [(ngModel)]="zoneRule" class="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 dark:border-white/15 dark:bg-white/10 dark:text-white">
+              <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" value="nearest">{{ t('landing.zoneCarved') }}</option>
+              <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" value="circle">{{ t('landing.zoneCircle') }}</option>
             </select>
           </label>
         </div>
 
         <div class="space-y-1.5">
-          <div class="text-xs font-medium text-white/60">{{ t('landing.transport') }}</div>
+          <div class="text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.transport') }}</div>
           <div class="flex flex-wrap gap-2">
             @for (m of allModes; track m.id) {
               <button type="button" (click)="toggleMode(m.id)"
                       class="rounded-full border px-3 py-1.5 text-sm font-medium transition"
-                      [class]="modes().includes(m.id) ? 'border-rose-500 bg-rose-500/20 text-rose-300' : 'border-white/15 text-white/50 hover:border-white/30'">
+                      [class]="modes().includes(m.id) ? 'border-rose-500 bg-rose-500/10 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300' : 'border-gray-300 text-gray-500 hover:border-gray-400 dark:border-white/15 dark:text-white/50 dark:hover:border-white/30'">
                 {{ t('mode.' + m.id) }}
               </button>
             }
           </div>
-          <p class="text-xs text-white/40">{{ t('landing.transportHint') }}</p>
+          <p class="text-xs text-gray-500 dark:text-white/40">{{ t('landing.transportHint') }}</p>
         </div>
 
         <label class="flex items-start gap-2 text-sm">
-          <input type="checkbox" [(ngModel)]="revealSeekers" class="mt-0.5 h-4 w-4 rounded border-white/30 bg-white/10" />
-          <span>{{ t('landing.revealSeekers') }}<span class="block text-xs text-white/40">{{ t('landing.revealSeekersHint') }}</span></span>
+          <input type="checkbox" [(ngModel)]="revealSeekers" class="mt-0.5 h-4 w-4 rounded border-gray-300 text-rose-600 dark:border-white/30 dark:bg-white/10" />
+          <span>{{ t('landing.revealSeekers') }}<span class="block text-xs text-gray-500 dark:text-white/40">{{ t('landing.revealSeekersHint') }}</span></span>
         </label>
 
-        @if (error(); as e) { <p class="rounded-lg bg-red-500/90 p-2.5 text-sm">{{ e }}</p> }
+        @if (error(); as e) { <p class="rounded-lg bg-red-500/90 p-2.5 text-sm text-white">{{ e }}</p> }
         <button (click)="create()" [disabled]="busy()"
-                class="w-full rounded-xl bg-rose-600 p-3.5 font-semibold text-white shadow-lg shadow-rose-950/50 transition hover:bg-rose-500 disabled:opacity-50">
+                class="w-full rounded-xl bg-rose-600 p-3.5 font-semibold text-white shadow-lg shadow-rose-600/30 transition hover:bg-rose-500 disabled:opacity-50 dark:shadow-rose-950/50">
           {{ t('landing.createGame') }}
         </button>
       </div>
@@ -124,14 +126,14 @@
   <!-- Join sheet -->
   @if (joinOpen()) {
     <div class="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center" (click)="joinOpen.set(false)">
-      <div class="w-full max-w-md space-y-4 rounded-t-3xl bg-gray-900 p-5 text-white ring-1 ring-white/10 sm:m-3 sm:rounded-3xl" (click)="$event.stopPropagation()">
+      <div class="w-full max-w-md space-y-4 rounded-t-3xl bg-white p-5 text-gray-900 shadow-2xl ring-1 ring-gray-200 sm:m-3 sm:rounded-3xl dark:bg-gray-900 dark:text-white dark:ring-white/10" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between">
           <h2 class="font-display text-xl font-bold">{{ t('landing.joinTitle') }}</h2>
-          <button (click)="joinOpen.set(false)" class="text-xl text-white/50 hover:text-white">✕</button>
+          <button (click)="joinOpen.set(false)" class="text-xl text-gray-400 hover:text-gray-700 dark:text-white/50 dark:hover:text-white">✕</button>
         </div>
         <input [(ngModel)]="joinCode" [placeholder]="t('landing.joinCode')" autocapitalize="characters" maxlength="8"
-               class="w-full rounded-xl border border-white/15 bg-white/10 p-4 text-center font-mono text-2xl uppercase tracking-[0.3em] text-white placeholder-white/30 focus:border-rose-400 focus:outline-none" />
-        @if (error(); as e) { <p class="rounded-lg bg-red-500/90 p-2.5 text-sm">{{ e }}</p> }
+               class="w-full rounded-xl border border-gray-300 bg-white p-4 text-center font-mono text-2xl uppercase tracking-[0.3em] text-gray-900 placeholder-gray-400 focus:border-rose-400 focus:outline-none dark:border-white/15 dark:bg-white/10 dark:text-white dark:placeholder-white/30" />
+        @if (error(); as e) { <p class="rounded-lg bg-red-500/90 p-2.5 text-sm text-white">{{ e }}</p> }
         <button (click)="join()" [disabled]="busy() || !joinCodeValid()"
                 class="w-full rounded-xl bg-rose-600 p-3.5 font-semibold text-white transition hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-40">
           {{ t('landing.joinBtn') }}

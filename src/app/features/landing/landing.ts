@@ -46,8 +46,9 @@ export class Landing {
     afterNextRender(() => this.initBackdrop());
   }
 
-  /** A dark, non-interactive Budapest map that slowly drifts between landmarks — the hero
-   *  backdrop, with a hider (rose) + seeker (blue) marker pulsing to set the theme. */
+  /** A non-interactive Budapest map that slowly drifts between landmarks — the hero backdrop,
+   *  with a hider (rose) + seeker (blue) marker pulsing to set the theme. Tiles follow the OS
+   *  colour scheme (voyager when light, dark_all when dark) and swap live if the OS toggles. */
   private initBackdrop(): void {
     const spots: L.LatLngExpression[] = [
       [47.4979, 19.0402], [47.5003, 19.0836], [47.5106, 19.0567], [47.4874, 19.0700], [47.4813, 19.0561],
@@ -56,7 +57,17 @@ export class Landing {
       center: spots[0], zoom: 13, zoomControl: false, attributionControl: false, dragging: false,
       scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false, inertia: false,
     });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 18 }).addTo(map);
+    const tileUrl = (dark: boolean) =>
+      dark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    const scheme = window.matchMedia('(prefers-color-scheme: dark)');
+    let tiles = L.tileLayer(tileUrl(scheme.matches), { subdomains: 'abcd', maxZoom: 18 }).addTo(map);
+    const onSchemeChange = (e: MediaQueryListEvent) => {
+      map.removeLayer(tiles);
+      tiles = L.tileLayer(tileUrl(e.matches), { subdomains: 'abcd', maxZoom: 18 }).addTo(map);
+    };
+    scheme.addEventListener('change', onSchemeChange);
     const dot = (color: string) =>
       L.divIcon({ className: '', iconSize: [14, 14], html: `<div class="jl-pulse-dot" style="width:14px;height:14px;border-radius:9999px;background:${color};box-shadow:0 0 0 3px rgba(2,6,23,.5)"></div>` });
     L.marker([47.5003, 19.0836], { icon: dot('#f43f5e'), interactive: false }).addTo(map);
@@ -71,6 +82,7 @@ export class Landing {
     }, 9000);
     this.destroyRef.onDestroy(() => {
       clearInterval(drift);
+      scheme.removeEventListener('change', onSchemeChange);
       map.remove();
     });
   }
