@@ -1,4 +1,4 @@
-import { Position } from '../models/models';
+import { Position } from '../models';
 import { SimulatedLocationSource } from './simulated-location-source';
 
 describe('SimulatedLocationSource', () => {

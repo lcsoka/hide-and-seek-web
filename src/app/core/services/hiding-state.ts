@@ -2,7 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { distance, point } from '@turf/turf';
 import { Feature, Point } from 'geojson';
 import { OverpassService } from '../maps/overpass';
-import { Position } from '../models/models';
+import { Position } from '../models';
 import { classifyStop } from '../util/transit';
 
 export interface NearbyStation {

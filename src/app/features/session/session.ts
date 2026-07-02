@@ -1,7 +1,7 @@
 import { Component, computed, DestroyRef, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models/models';
+import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models';
 import { ALL_TRANSIT_MODES } from '../../core/maps/overpass';
 import { unitsOf } from '../../core/util/units';
 import { ApiClient } from '../../core/services/api-client';

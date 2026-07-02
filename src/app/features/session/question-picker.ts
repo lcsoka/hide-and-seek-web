@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { FeatureCollection, Point } from 'geojson';
 import { distance, point } from '@turf/turf';
 import { TranslocoModule } from '@jsverse/transloco';
-import { QuestionCatalogItem } from '../../core/models/models';
+import { QuestionCatalogItem } from '../../core/models';
 import { FEATURE_TAGS } from '../../core/maps/osm-deduction';
 import { OverpassService } from '../../core/maps/overpass';
 import { categoryMeta, questionIcon, questionShortLabel } from '../../core/util/categories';

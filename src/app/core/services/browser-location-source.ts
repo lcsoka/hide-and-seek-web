@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Position } from '../models/models';
+import { Position } from '../models';
 import { LocationSource } from './location-source';
 
 /** Real device location via the browser Geolocation API. */

@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { ActiveCurse } from '../../core/models/models';
+import { ActiveCurse } from '../../core/models';
 
 /** Full-screen flash shown to a seeker the moment a new curse lands on them. */
 @Component({

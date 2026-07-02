@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, input, output } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
-import { ActiveCurse, GameState } from '../../core/models/models';
+import { ActiveCurse, GameState } from '../../core/models';
 import { ALL_TRANSIT_MODES } from '../../core/maps/overpass';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';

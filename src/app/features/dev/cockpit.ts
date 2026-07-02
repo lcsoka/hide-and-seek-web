@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { GodView, Position } from '../../core/models/models';
+import { GodView, Position } from '../../core/models';
 import { DebugApi } from '../../core/services/debug-api';
 import { stepTowards } from '../../core/util/geo';
 import { DevMap } from './dev-map';

@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, input, signal } from '@angular/cor
 import { FEATURE_TAGS } from '../../core/maps/osm-deduction';
 import { OverpassService } from '../../core/maps/overpass';
 import { distanceMeters } from '../../core/util/geo';
-import { ActiveCurse, GameState, HandCard, PendingQuestion, PlayerView, ResolvedQuestion } from '../../core/models/models';
+import { ActiveCurse, GameState, HandCard, PendingQuestion, PlayerView, ResolvedQuestion } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
 import { SessionStore } from '../../core/services/session-store';

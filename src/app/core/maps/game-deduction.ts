@@ -1,4 +1,4 @@
-import { ResolvedQuestion } from '../models/models';
+import { ResolvedQuestion } from '../models';
 import { DeductionQuestion } from './deduction';
 
 /**

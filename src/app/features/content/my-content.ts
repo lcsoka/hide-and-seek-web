@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
-import { CustomCurse, CustomQuestion } from '../../core/models/models';
+import { CustomCurse, CustomQuestion } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 
 /** Manage your own custom curses + questions (they join the games you host). */

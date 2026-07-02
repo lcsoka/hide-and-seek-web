@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { Profile } from '../models/models';
+import { Profile } from '../models';
 import { ApiClient } from './api-client';
 import { TokenStore } from './token-store';
 

@@ -5,7 +5,7 @@ import { hidingZoneViz } from '../../core/maps/deduction';
 import { disperse } from '../../core/maps/spread';
 import { HidingState } from '../../core/services/hiding-state';
 import { TransitRoutes } from '../../core/services/transit-routes';
-import { HidingZone, PlayerView, Position } from '../../core/models/models';
+import { HidingZone, PlayerView, Position } from '../../core/models';
 import { transitMeta } from '../../core/util/transit';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];

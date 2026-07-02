@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
-import { GameState } from '../../core/models/models';
+import { GameState } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { HidingState } from '../../core/services/hiding-state';
 import { SessionStore } from '../../core/services/session-store';

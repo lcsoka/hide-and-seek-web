@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { GodView } from '../models/models';
+import { GodView } from '../models';
 
 /**
  * Client for the developer/debug API (gated by EnsureDebugAccess on the backend).

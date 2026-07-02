@@ -1,4 +1,4 @@
-import { Position, ResolvedQuestion } from '../models/models';
+import { Position, ResolvedQuestion } from '../models';
 import { categoryMeta } from '../util/categories';
 import { formatDistance, Units } from '../util/units';
 

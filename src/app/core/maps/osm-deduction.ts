@@ -1,5 +1,5 @@
 import { bbox, booleanPointInPolygon, circle, distance, nearestPoint, point, voronoi } from '@turf/turf';
-import { ResolvedQuestion } from '../models/models';
+import { ResolvedQuestion } from '../models';
 import { tentacleRegion } from './deduction';
 import { Poly } from './operators';
 import { OverpassService } from './overpass';

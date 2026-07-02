@@ -1,6 +1,6 @@
 import { afterNextRender, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
-import { GodPlayer, Position } from '../../core/models/models';
+import { GodPlayer, Position } from '../../core/models';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
 

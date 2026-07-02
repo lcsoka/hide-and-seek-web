@@ -10,7 +10,7 @@ import { holedMask, Poly } from '../../core/maps/operators';
 import { disperse } from '../../core/maps/spread';
 import { TransitRoutes } from '../../core/services/transit-routes';
 import { transitMeta } from '../../core/util/transit';
-import { PlayerView, Position } from '../../core/models/models';
+import { PlayerView, Position } from '../../core/models';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
 

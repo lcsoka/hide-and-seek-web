@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { ActiveCurse } from '../../core/models/models';
+import { ActiveCurse } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { SessionStore } from '../../core/services/session-store';
 

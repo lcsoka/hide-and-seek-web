@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Position } from '../models/models';
+import { Position } from '../models';
 import { stepTowards } from '../util/geo';
 import { LocationSource } from './location-source';
 

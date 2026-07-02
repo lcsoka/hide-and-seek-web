@@ -7,7 +7,7 @@ import { CITIES } from '../../core/maps/cities';
 import { applyQuestions, DeductionQuestion, measuringRegionToBorder, playArea, tentacleRegion } from '../../core/maps/deduction';
 import { Poly } from '../../core/maps/operators';
 import { OverpassService, POI_TYPES, TRANSIT_MODES } from '../../core/maps/overpass';
-import { Position } from '../../core/models/models';
+import { Position } from '../../core/models';
 import { DeductionMap } from './deduction-map';
 
 type Mode = 'idle' | 'radar' | 'thermo' | 'border' | 'zone' | 'tentacle';

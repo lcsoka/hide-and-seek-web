@@ -2,7 +2,7 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CurseCatalogItem, CustomCurse, CustomQuestion, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models/models';
+import { CurseCatalogItem, CustomCurse, CustomQuestion, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models';
 
 /**
  * Typed wrapper over the REST contract. Reads use `httpResource` (signals);

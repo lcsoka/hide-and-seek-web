@@ -1,4 +1,4 @@
-import { Position } from '../models/models';
+import { Position } from '../models';
 
 /** Great-circle distance between two points, in metres (Haversine). */
 export function distanceMeters(a: Position, b: Position): number {

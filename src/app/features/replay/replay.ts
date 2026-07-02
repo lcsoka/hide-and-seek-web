@@ -5,7 +5,7 @@ import { applyQuestions, DeductionQuestion, playArea, RegionQuestion } from '../
 import { resolvedQuestionsToDeduction } from '../../core/maps/game-deduction';
 import { isOsmCategory, osmRegion } from '../../core/maps/osm-deduction';
 import { OverpassService } from '../../core/maps/overpass';
-import { GodView, ResolvedQuestion } from '../../core/models/models';
+import { GodView, ResolvedQuestion } from '../../core/models';
 import { DebugApi } from '../../core/services/debug-api';
 import { actionLabel } from '../../core/util/labels';
 import { formatDistance, unitsOf } from '../../core/util/units';

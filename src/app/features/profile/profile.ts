@@ -2,7 +2,7 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
-import { ProfileStats } from '../../core/models/models';
+import { ProfileStats } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { AuthStore } from '../../core/services/auth-store';
 

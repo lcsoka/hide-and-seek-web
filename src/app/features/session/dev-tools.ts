@@ -1,6 +1,6 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { GameState } from '../../core/models/models';
+import { GameState } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { DebugApi } from '../../core/services/debug-api';
 import { SessionStore } from '../../core/services/session-store';

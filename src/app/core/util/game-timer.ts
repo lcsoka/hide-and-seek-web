@@ -1,4 +1,4 @@
-import { GameState } from '../models/models';
+import { GameState } from '../models';
 
 export interface GameTimer {
   label: string;

@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Position } from '../models/models';
+import { Position } from '../models';
 
 /** A source of the device's position — real (browser) or simulated (tests / dev). */
 export interface LocationSource {

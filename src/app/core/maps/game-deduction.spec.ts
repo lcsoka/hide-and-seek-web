@@ -1,4 +1,4 @@
-import { ResolvedQuestion } from '../models/models';
+import { ResolvedQuestion } from '../models';
 import { resolvedQuestionsToDeduction } from './game-deduction';
 
 function resolved(partial: Partial<ResolvedQuestion>): ResolvedQuestion {
