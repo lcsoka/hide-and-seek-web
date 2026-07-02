@@ -28,6 +28,14 @@
     "createAccount": "Fiók létrehozása",
     "logOut": "Kilépés"
   },
+  "stats": {
+    "title": "Statisztika",
+    "games": "Játékok",
+    "wins": "Győzelmek",
+    "best": "Legjobb bújás",
+    "total": "Összes bújás",
+    "none": "Még nincs befejezett játék — játssz eggyel a statisztikáért."
+  },
   "role": { "hider": "Bújó", "seeker": "Kereső" },
   "state": {
     "lobby": "Váróterem",

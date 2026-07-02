@@ -2,7 +2,7 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CurseCatalogItem, GameState, GuestAuth, PlayerView, Profile, QuestionCatalogItem, SessionSummary } from '../models/models';
+import { CurseCatalogItem, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models/models';
 
 /**
  * Typed wrapper over the REST contract. Reads use `httpResource` (signals);
@@ -32,6 +32,10 @@ export class ApiClient {
 
   me(): Promise<Profile> {
     return firstValueFrom(this.http.get<Profile>(`${this.base}/auth/me`));
+  }
+
+  profileStats(): Promise<ProfileStats> {
+    return firstValueFrom(this.http.get<ProfileStats>(`${this.base}/profile/stats`));
   }
 
   updateProfile(body: { name?: string }): Promise<Profile> {

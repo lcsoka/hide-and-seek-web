@@ -18,6 +18,14 @@ export interface Profile {
   is_guest: boolean;
 }
 
+export interface ProfileStats {
+  games_played: number;
+  wins: number;
+  total_hide_time_s: number;
+  best_hide_time_s: number;
+  recent: { hide_time_s: number; won: boolean; players: number; at: number | null }[];
+}
+
 export interface PlayerView {
   id: string;
   display_name: string;

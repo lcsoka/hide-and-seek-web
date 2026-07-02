@@ -28,6 +28,14 @@
     "createAccount": "Create account",
     "logOut": "Log out"
   },
+  "stats": {
+    "title": "Stats",
+    "games": "Games",
+    "wins": "Wins",
+    "best": "Best hide",
+    "total": "Total hidden",
+    "none": "No finished games yet — play one to build your stats."
+  },
   "role": { "hider": "Hider", "seeker": "Seeker" },
   "state": {
     "lobby": "Lobby",
