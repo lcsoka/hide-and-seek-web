@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* The game is dark end-to-end (consistent with the landing) — drive `dark:` off a `.dark`
+   class (set on <html>) instead of the OS preference, and render native controls dark. */
+@custom-variant dark (&:where(.dark, .dark *));
+html { color-scheme: dark; }
+
 /* Landing hero: display wordmark + the "living map" marker pulses + entrance. */
 .font-display { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }
 
