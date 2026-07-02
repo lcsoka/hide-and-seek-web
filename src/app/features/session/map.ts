@@ -177,7 +177,7 @@ export class MapView {
     const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
     for (const p of disperse(located)) {
       const color = p.role === 'hider' ? '#e11d48' : colorFor(p.id);
-      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, color, p.role === 'hider') })
+      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, color, p.role === 'hider', p.avatar) })
         .bindTooltip(p.display_name)
         .addTo(this.overlay);
     }

@@ -39,7 +39,26 @@ export function markerIcon(content: string, opts: { color: string; emphasis?: bo
   return L.divIcon({ html, className: 'jl-marker', iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
 }
 
-/** A circular avatar marker showing the player's initials. `emphasis` rings + enlarges it. */
-export function avatarIcon(name: string | null | undefined, color: string, emphasis = false): L.DivIcon {
+/**
+ * A circular player marker. When the player has an uploaded avatar it shows the photo (with a
+ * role-coloured ring so hider/seeker stays readable); otherwise it falls back to their initials.
+ * `emphasis` rings + enlarges it (the seeker's own marker / the hider).
+ */
+export function avatarIcon(name: string | null | undefined, color: string, emphasis = false, avatarUrl?: string | null): L.DivIcon {
+  if (avatarUrl) {
+    return photoMarker(avatarUrl, color, emphasis);
+  }
+
   return markerIcon(initials(name), { color, emphasis });
+}
+
+/** A circular marker filled with the player's avatar photo, kept inside a white + role-coloured ring. */
+function photoMarker(url: string, color: string, emphasis: boolean): L.DivIcon {
+  const size = emphasis ? 36 : 28;
+  // white inner ring + role-coloured outer ring so the photo still reads as hider/seeker.
+  const ring = emphasis ? `0 0 0 3px #fff, 0 0 0 5px ${color}` : `0 0 0 2px #fff, 0 0 0 4px ${color}`;
+  const safe = String(url).replace(/["'\\]/g, '');
+  const html = `<div style="width:${size}px;height:${size}px;border-radius:9999px;background:${color} center/cover no-repeat url('${safe}');box-shadow:${ring}"></div>`;
+
+  return L.divIcon({ html, className: 'jl-marker', iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
 }

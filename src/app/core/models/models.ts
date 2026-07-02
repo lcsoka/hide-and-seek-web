@@ -47,6 +47,7 @@ export interface CustomQuestion {
 export interface PlayerView {
   id: string;
   display_name: string;
+  avatar?: string | null;
   role: string | null;
   is_host: boolean;
   team_id: string | null;

@@ -288,7 +288,7 @@ export class DeductionMap {
     const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
     for (const p of disperse(located)) {
       const isMe = p.id === this.meId();
-      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, isMe ? '#2563eb' : colorFor(p.id), isMe) })
+      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, isMe ? '#2563eb' : colorFor(p.id), isMe, p.avatar) })
         .bindTooltip(isMe ? 'You' : p.display_name, isMe ? { permanent: true, direction: 'top', offset: [0, -20] } : {})
         .addTo(this.overlay);
     }
