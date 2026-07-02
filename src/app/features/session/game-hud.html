@@ -26,6 +26,10 @@
     } @else {
       <span class="rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">{{ tr('state.' + stateLabel()) }}</span>
     }
+    @if (canEndGame()) {
+      <button (click)="endGame.emit()" [attr.aria-label]="tr('action.end_game')" [title]="tr('action.end_game')"
+              class="grid h-9 w-9 place-items-center rounded-full bg-white/85 text-base text-red-600 shadow-lg backdrop-blur transition hover:bg-red-600 hover:text-white dark:bg-gray-900/80 dark:text-red-400">⏹</button>
+    }
   </div>
 </div>
 

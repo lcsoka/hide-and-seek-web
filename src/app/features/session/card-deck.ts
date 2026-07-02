@@ -95,13 +95,6 @@ export class CardDeck {
     const start = this.state().timers?.seeking_started_at;
     return start == null ? null : formatCountdown(Math.max(0, Math.floor(this.clock.nowMs() / 1000) - start));
   });
-  // Nudge the hider to spend curses while the hunt is on and nothing is currently slowing it.
-  readonly showCurseNudge = computed(() =>
-    this.hand().some((c) => c.type === 'curse')
-    && this.playedCurses().length === 0
-    && (this.state().state === 'seeking' || this.state().state === 'endgame')
-    && !this.pending(),
-  );
   // A seeker claims they found the hider — the round ends only once the hider confirms it.
   readonly foundClaim = computed(() => this.state().found_claim);
 

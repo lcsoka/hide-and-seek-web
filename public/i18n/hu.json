@@ -94,6 +94,7 @@
     "random": "🎲 Véletlen bújó"
   },
   "hud": { "calculating": "Búvóhely-zóna számítása…", "hide": "Elbújás", "questions": "Kérdések", "hand": "Kéz", "ask": "Kérdés", "transit": "Közlekedés", "info": "Infó", "recenter": "Hol vagyok" },
+  "endGame": { "title": "Befejezed a játékot?", "body": "Ez mindenkinek befejezi a játékot és megmutatja az eredményeket.", "confirm": "Befejezés" },
   "results": {
     "gameOver": "🏁 Vége a játéknak",
     "roundOver": "🔚 Kör vége",

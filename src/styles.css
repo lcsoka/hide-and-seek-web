@@ -22,6 +22,27 @@ html { color-scheme: light dark; }
 }
 .jl-rise { animation: jl-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 
+/* Bottom-sheet drawers slide up from the edge; their scrim fades in. Small pop for chips/bars. */
+@keyframes jl-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+.jl-sheet { animation: jl-sheet-up 0.28s cubic-bezier(0.2, 0.9, 0.2, 1) both; }
+@keyframes jl-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.jl-fade { animation: jl-fade 0.2s ease both; }
+@keyframes jl-pop {
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+.jl-pop { animation: jl-pop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jl-sheet, .jl-fade, .jl-pop, .jl-rise { animation: none; }
+}
+
 /* Map polish — gently pulse the candidate-area outline so the live deduction reads
    as "alive". (Leaflet renders its SVG outside Angular's view encapsulation, so this
    lives in the global sheet.) */

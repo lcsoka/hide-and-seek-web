@@ -69,6 +69,8 @@ export class SessionView {
   });
   // Which mobile drawer is open (icon-button HUD). Desktop shows the full side panel instead.
   readonly mobileDrawer = signal<'hide' | 'questions' | 'hand' | 'seeker' | null>(null);
+  // Host's End-game confirmation (a single HUD control, not a per-panel button).
+  readonly confirmEnd = signal(false);
   private readonly deductionMap = viewChild(DeductionMap);
   private readonly hiderMap = viewChild(MapView);
   // Seekers may board ANY mode (not just the game's hiding modes), so the picker offers all.
@@ -268,7 +270,18 @@ export class SessionView {
   }
 
   visibleActions(s: GameState): string[] {
-    return s.available_actions.filter((a) => !PANEL_ACTIONS.includes(a));
+    // end_game has its own confirmed HUD control, so keep it out of the panel action rows.
+    return s.available_actions.filter((a) => !PANEL_ACTIONS.includes(a) && a !== 'end_game');
+  }
+
+  /** Host can end the game (has the action) mid-play — gates the single HUD End-game control. */
+  canEndGame(s: GameState): boolean {
+    return s.available_actions.includes('end_game');
+  }
+
+  async confirmEndGame(): Promise<void> {
+    this.confirmEnd.set(false);
+    await this.act('end_game');
   }
 
   askUnits(s: GameState): 'metric' | 'imperial' {
