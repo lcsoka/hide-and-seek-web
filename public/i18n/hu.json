@@ -7,11 +7,14 @@
     "copied": "Másolva!",
     "error": "Valami hiba történt."
   },
-  "connection": { "reconnecting": "Újracsatlakozás…" },
+  "connection": {
+    "reconnecting": "Újracsatlakozás…"
+  },
   "auth": {
     "logIn": "Belépés",
     "signUp": "Regisztráció",
     "loginTitle": "Üdv újra!",
+    "loginTagline": "Jelentkezz be, és folytasd ott, ahol abbahagytad.",
     "registerTitle": "Fiók létrehozása",
     "registerBlurb": "Őrizd meg a játékaidat, statisztikáidat és a neved az eszközök között. Fiók nélkül is játszhatsz vendégként.",
     "email": "E-mail",
@@ -33,6 +36,7 @@
     "sendReset": "Visszaállító link küldése",
     "forgotSent": "Ha ez az e-mail regisztrálva van, úton van a visszaállító link. Nézd meg a postaládád.",
     "backToLogin": "Vissza a belépéshez",
+    "continueAsGuest": "Tovább vendégként",
     "resetTitle": "Új jelszó beállítása",
     "resetInvalid": "Ez a visszaállító link érvénytelen vagy lejárt.",
     "resetDone": "A jelszavad visszaállítottuk. Most már beléphetsz.",
@@ -66,7 +70,10 @@
     "noCurses": "Még nincs saját átok.",
     "noQuestions": "Még nincs saját kérdés."
   },
-  "role": { "hider": "Bújó", "seeker": "Kereső" },
+  "role": {
+    "hider": "Bújó",
+    "seeker": "Kereső"
+  },
   "state": {
     "lobby": "Váróterem",
     "role_assignment": "Szereposztás",
@@ -115,7 +122,11 @@
     "playingAs": "{{ name }} néven játszol",
     "tagline": "Bújj el a városban. Vadássz kérdésekkel. Éld túl a többieket.",
     "badge": "10 magyar város · valós tömegközlekedés",
-    "how": { "hide": "Bújj el egy megállónál", "ask": "Szűkítsd a térképet", "catch": "Kapd el a bújót" },
+    "how": {
+      "hide": "Bújj el egy megállónál",
+      "ask": "Szűkítsd a térképet",
+      "catch": "Kapd el a bújót"
+    },
     "cityLabel": "Város",
     "sizeLabel": "Pálya mérete",
     "unitsLabel": "Mértékegység",
@@ -134,8 +145,15 @@
     "openMap": "🗺 Nyomozótérkép megnyitása",
     "createFailed": "Nem sikerült létrehozni a játékot.",
     "joinFailed": "Nem sikerült csatlakozni — ellenőrizd a kódot.",
-    "size": { "small": "Kicsi", "medium": "Közepes", "large": "Nagy" },
-    "units": { "metric": "Metrikus (km)", "imperial": "Angolszász (mérföld)" }
+    "size": {
+      "small": "Kicsi",
+      "medium": "Közepes",
+      "large": "Nagy"
+    },
+    "units": {
+      "metric": "Metrikus (km)",
+      "imperial": "Angolszász (mérföld)"
+    }
   },
   "lobby": {
     "title": "Váróterem",
@@ -152,8 +170,21 @@
     "make": "Legyen ő a bújó",
     "random": "🎲 Véletlen bújó"
   },
-  "hud": { "calculating": "Búvóhely-zóna számítása…", "hide": "Elbújás", "questions": "Kérdések", "hand": "Kéz", "ask": "Kérdés", "transit": "Közlekedés", "info": "Infó", "recenter": "Hol vagyok" },
-  "endGame": { "title": "Befejezed a játékot?", "body": "Ez mindenkinek befejezi a játékot és megmutatja az eredményeket.", "confirm": "Befejezés" },
+  "hud": {
+    "calculating": "Búvóhely-zóna számítása…",
+    "hide": "Elbújás",
+    "questions": "Kérdések",
+    "hand": "Kéz",
+    "ask": "Kérdés",
+    "transit": "Közlekedés",
+    "info": "Infó",
+    "recenter": "Hol vagyok"
+  },
+  "endGame": {
+    "title": "Befejezed a játékot?",
+    "body": "Ez mindenkinek befejezi a játékot és megmutatja az eredményeket.",
+    "confirm": "Befejezés"
+  },
   "results": {
     "gameOver": "🏁 Vége a játéknak",
     "roundOver": "🔚 Kör vége",
@@ -332,7 +363,13 @@
     "matchSame": "Ugyanaz a legközelebbi hely → terület megtartva",
     "matchDiffPlace": "A bújó legközelebbije nem {{ place }} → környéke eltávolítva",
     "matchDiff": "Más legközelebbi hely → terület eltávolítva",
-    "zone": { "county": "vármegye", "district": "kerület", "town": "település", "borough": "városrész", "zone": "terület" }
+    "zone": {
+      "county": "vármegye",
+      "district": "kerület",
+      "town": "település",
+      "borough": "városrész",
+      "zone": "terület"
+    }
   },
   "statusHint": {
     "role_assignment": "Várakozás a házigazdára a szereposztáshoz…",

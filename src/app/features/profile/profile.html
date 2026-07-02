@@ -95,9 +95,9 @@
     @if (u.is_guest) {
       <div class="space-y-2 rounded-2xl bg-rose-50 p-4 dark:bg-rose-950/40">
         <p class="text-sm text-rose-800 dark:text-rose-200">{{ t('auth.guestUpsell') }}</p>
-        <button (click)="authOpen.set(true)" class="w-full rounded-xl bg-rose-600 p-3 font-semibold text-white shadow-lg shadow-rose-600/30 transition hover:bg-rose-500">
+        <a routerLink="/auth" [queryParams]="{ mode: 'register' }" class="block w-full rounded-xl bg-rose-600 p-3 text-center font-semibold text-white shadow-lg shadow-rose-600/30 transition hover:bg-rose-500">
           {{ t('auth.createAccount') }}
-        </button>
+        </a>
       </div>
     } @else {
       <button (click)="logout()" class="w-full rounded-xl border border-gray-300 p-3 font-medium text-gray-700 transition hover:bg-gray-100 dark:border-white/15 dark:text-gray-200 dark:hover:bg-white/5">
@@ -107,6 +107,4 @@
   } @else {
     <div class="grid flex-1 place-items-center text-gray-400">{{ t('common.loading') }}</div>
   }
-
-  <app-auth-modal [open]="authOpen()" startMode="register" (closeChange)="authOpen.set($event)" />
 </div>

@@ -7,11 +7,14 @@
     "copied": "Copied!",
     "error": "Something went wrong."
   },
-  "connection": { "reconnecting": "Reconnecting…" },
+  "connection": {
+    "reconnecting": "Reconnecting…"
+  },
   "auth": {
     "logIn": "Log in",
     "signUp": "Sign up",
     "loginTitle": "Welcome back",
+    "loginTagline": "Log in to pick up where you left off.",
     "registerTitle": "Create your account",
     "registerBlurb": "Keep your games, stats and name across devices. You can keep playing as a guest without one.",
     "email": "Email",
@@ -33,6 +36,7 @@
     "sendReset": "Send reset link",
     "forgotSent": "If that email is registered, a reset link is on its way. Check your inbox.",
     "backToLogin": "Back to log in",
+    "continueAsGuest": "Continue as guest",
     "resetTitle": "Set a new password",
     "resetInvalid": "This reset link is invalid or has expired.",
     "resetDone": "Your password has been reset. You can log in now.",
@@ -66,7 +70,10 @@
     "noCurses": "No custom curses yet.",
     "noQuestions": "No custom questions yet."
   },
-  "role": { "hider": "Hider", "seeker": "Seeker" },
+  "role": {
+    "hider": "Hider",
+    "seeker": "Seeker"
+  },
   "state": {
     "lobby": "Lobby",
     "role_assignment": "Roles",
@@ -115,7 +122,11 @@
     "playingAs": "Playing as {{ name }}",
     "tagline": "Hide across the city. Hunt with questions. Outlast everyone.",
     "badge": "10 Hungarian cities · real transit",
-    "how": { "hide": "Hide near a station", "ask": "Narrow the map", "catch": "Catch the hider" },
+    "how": {
+      "hide": "Hide near a station",
+      "ask": "Narrow the map",
+      "catch": "Catch the hider"
+    },
     "cityLabel": "City",
     "sizeLabel": "Map size",
     "unitsLabel": "Units",
@@ -134,8 +145,15 @@
     "openMap": "🗺 Open the deduction map",
     "createFailed": "Could not create the game.",
     "joinFailed": "Could not join — check the code.",
-    "size": { "small": "Small", "medium": "Medium", "large": "Large" },
-    "units": { "metric": "Metric (km)", "imperial": "Imperial (mi)" }
+    "size": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
+    },
+    "units": {
+      "metric": "Metric (km)",
+      "imperial": "Imperial (mi)"
+    }
   },
   "lobby": {
     "title": "Waiting room",
@@ -152,8 +170,21 @@
     "make": "Make hider",
     "random": "🎲 Pick a random hider"
   },
-  "hud": { "calculating": "Calculating hiding zone…", "hide": "Hide", "questions": "Questions", "hand": "Hand", "ask": "Ask", "transit": "Transit", "info": "Info", "recenter": "Find me" },
-  "endGame": { "title": "End the game?", "body": "This ends the game for everyone and shows the results.", "confirm": "End game" },
+  "hud": {
+    "calculating": "Calculating hiding zone…",
+    "hide": "Hide",
+    "questions": "Questions",
+    "hand": "Hand",
+    "ask": "Ask",
+    "transit": "Transit",
+    "info": "Info",
+    "recenter": "Find me"
+  },
+  "endGame": {
+    "title": "End the game?",
+    "body": "This ends the game for everyone and shows the results.",
+    "confirm": "End game"
+  },
   "results": {
     "gameOver": "🏁 Game over",
     "roundOver": "🔚 Round over",
@@ -332,7 +363,13 @@
     "matchSame": "Same nearest place → kept that area",
     "matchDiffPlace": "Hider's nearest isn't {{ place }} → removed the area around it",
     "matchDiff": "Different nearest place → removed that area",
-    "zone": { "county": "county", "district": "district", "town": "town", "borough": "borough", "zone": "zone" }
+    "zone": {
+      "county": "county",
+      "district": "district",
+      "town": "town",
+      "borough": "borough",
+      "zone": "zone"
+    }
   },
   "statusHint": {
     "role_assignment": "Waiting for the host to assign roles…",

@@ -5,13 +5,12 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { ProfileStats } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { AuthStore } from '../../core/services/auth-store';
-import { AuthModal } from '../auth/auth-modal';
 
 /** Account screen: display name, email, avatar; register (if guest), or log out. */
 @Component({
   selector: 'app-profile',
   host: { class: 'block min-h-[100dvh] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white' },
-  imports: [RouterLink, FormsModule, TranslocoModule, AuthModal],
+  imports: [RouterLink, FormsModule, TranslocoModule],
   templateUrl: './profile.html',
 })
 export class ProfilePage {
@@ -22,7 +21,6 @@ export class ProfilePage {
   readonly user = this.auth.user;
   readonly stats = signal<ProfileStats | null>(null);
   readonly busy = signal(false);
-  readonly authOpen = signal(false);
   name = '';
   private synced = false;
 

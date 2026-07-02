@@ -1,0 +1,89 @@
+<div class="relative flex min-h-[100dvh] flex-col overflow-hidden bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
+  <!-- Living Budapest map backdrop (outside *transloco so its viewChild resolves on first render). -->
+  <app-map-backdrop />
+  <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-gray-50/70 via-gray-50/80 to-gray-50/95 dark:from-gray-950/70 dark:via-gray-950/80 dark:to-gray-950/95"></div>
+  <div class="pointer-events-none absolute inset-0 z-[1] dark:hidden" style="background: radial-gradient(120% 80% at 50% 30%, transparent 30%, rgba(248,250,252,0.9) 100%)"></div>
+  <div class="pointer-events-none absolute inset-0 z-[1] hidden dark:block" style="background: radial-gradient(120% 80% at 50% 30%, transparent 30%, rgba(2,6,23,0.9) 100%)"></div>
+
+  <ng-container *transloco="let t">
+    <!-- Top bar -->
+    <header class="relative z-10 flex items-center justify-between p-4 sm:p-6">
+      <a routerLink="/" class="font-display flex items-center gap-2 text-lg font-bold tracking-tight">
+        <span class="grid h-8 w-8 place-items-center rounded-lg bg-rose-600 text-sm">🚇</span> Hide <span class="text-rose-500 dark:text-rose-400">&amp;</span> Seek
+      </a>
+      <app-lang-toggle />
+    </header>
+
+    <!-- Centered auth card -->
+    <main class="relative z-10 flex flex-1 items-center justify-center px-4 pb-10">
+      <div class="jl-rise w-full max-w-sm rounded-3xl bg-white/95 p-6 shadow-2xl shadow-gray-900/10 ring-1 ring-gray-200 backdrop-blur-xl sm:p-7 dark:bg-gray-900/90 dark:shadow-black/40 dark:ring-white/10">
+        <!-- Heading -->
+        <div class="mb-5 text-center">
+          <h1 class="font-display text-2xl font-black tracking-tight">
+            {{ mode() === 'forgot' ? t('auth.forgotTitle') : (mode() === 'register' ? t('auth.registerTitle') : t('auth.loginTitle')) }}
+          </h1>
+          <p class="mx-auto mt-1.5 max-w-[17rem] text-sm text-gray-500 dark:text-gray-400">
+            {{ mode() === 'forgot' ? t('auth.forgotBlurb') : (mode() === 'register' ? t('auth.registerBlurb') : t('auth.loginTagline')) }}
+          </p>
+        </div>
+
+        <!-- Segmented Log in / Sign up switch (hidden during the forgot sub-flow) -->
+        @if (mode() !== 'forgot') {
+          <div class="relative mb-5 grid grid-cols-2 rounded-xl bg-gray-100 p-1 text-sm font-semibold dark:bg-white/5">
+            <div class="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5 transition-transform duration-300 ease-out dark:bg-rose-600 dark:ring-0"
+                 [class.translate-x-full]="mode() === 'register'"></div>
+            <button type="button" (click)="setMode('login')"
+                    class="relative z-10 rounded-lg py-2 transition-colors"
+                    [class]="mode() === 'login' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'">
+              {{ t('auth.logIn') }}
+            </button>
+            <button type="button" (click)="setMode('register')"
+                    class="relative z-10 rounded-lg py-2 transition-colors"
+                    [class]="mode() === 'register' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'">
+              {{ t('auth.signUp') }}
+            </button>
+          </div>
+        }
+
+        @if (error(); as e) {
+          <p class="jl-fade mb-3 rounded-lg bg-red-500/90 p-2.5 text-sm text-white">{{ e }}</p>
+        }
+
+        @if (mode() === 'forgot' && sent()) {
+          <p class="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">{{ t('auth.forgotSent') }}</p>
+          <button (click)="setMode('login')" class="mt-4 w-full text-center text-sm font-medium text-rose-600 hover:underline dark:text-rose-400">‹ {{ t('auth.backToLogin') }}</button>
+        } @else {
+          <form (ngSubmit)="submit()" class="space-y-3">
+            @if (mode() === 'register') {
+              <input [(ngModel)]="name" name="name" [placeholder]="t('auth.displayName')" autocomplete="nickname" maxlength="50"
+                     class="w-full rounded-xl border border-gray-300 bg-white p-3 text-gray-900 placeholder-gray-400 transition focus:border-rose-400 focus:ring-2 focus:ring-rose-500/20 focus:outline-none dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder-white/40" />
+            }
+            <input [(ngModel)]="email" name="email" type="email" [placeholder]="t('auth.email')" autocomplete="email" required
+                   class="w-full rounded-xl border border-gray-300 bg-white p-3 text-gray-900 placeholder-gray-400 transition focus:border-rose-400 focus:ring-2 focus:ring-rose-500/20 focus:outline-none dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder-white/40" />
+            @if (mode() !== 'forgot') {
+              <input [(ngModel)]="password" name="password" type="password" [placeholder]="t('auth.password')"
+                     [attr.autocomplete]="mode() === 'register' ? 'new-password' : 'current-password'" required
+                     class="w-full rounded-xl border border-gray-300 bg-white p-3 text-gray-900 placeholder-gray-400 transition focus:border-rose-400 focus:ring-2 focus:ring-rose-500/20 focus:outline-none dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder-white/40" />
+            }
+            @if (mode() === 'register') {
+              <p class="px-1 text-xs text-gray-400">{{ t('auth.passwordHint') }}</p>
+            }
+            @if (mode() === 'login') {
+              <button type="button" (click)="setMode('forgot')" class="block px-1 text-left text-xs font-medium text-gray-500 hover:text-rose-600 dark:text-gray-400 dark:hover:text-rose-400">{{ t('auth.forgotLink') }}</button>
+            }
+            <button type="submit" [disabled]="busy() || !email.trim() || (mode() !== 'forgot' && !password)"
+                    class="mt-1 w-full rounded-xl bg-rose-600 p-3.5 font-semibold text-white shadow-lg shadow-rose-600/30 transition hover:bg-rose-500 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40">
+              {{ busy() ? t('common.loading') : (mode() === 'forgot' ? t('auth.sendReset') : (mode() === 'register' ? t('auth.signUp') : t('auth.logIn'))) }}
+            </button>
+          </form>
+
+          @if (mode() === 'forgot') {
+            <button (click)="setMode('login')" class="mt-4 w-full text-center text-sm font-medium text-rose-600 hover:underline dark:text-rose-400">‹ {{ t('auth.backToLogin') }}</button>
+          } @else {
+            <a routerLink="/" class="mt-5 block text-center text-sm text-gray-500 transition hover:text-gray-800 dark:text-gray-400 dark:hover:text-white">{{ t('auth.continueAsGuest') }} →</a>
+          }
+        }
+      </div>
+    </main>
+  </ng-container>
+</div>

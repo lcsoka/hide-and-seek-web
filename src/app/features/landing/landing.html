@@ -1,7 +1,6 @@
 <div class="relative flex min-h-[100dvh] flex-col overflow-hidden bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
-  <!-- Living Budapest map backdrop (outside *transloco so the viewChild resolves on first render).
-       The tile layer follows the OS theme (see landing.ts). -->
-  <div #mapEl class="pointer-events-none absolute inset-0 z-0 opacity-70"></div>
+  <!-- Living Budapest map backdrop (outside *transloco so its viewChild resolves on first render). -->
+  <app-map-backdrop />
   <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-gray-50/60 via-gray-50/75 to-gray-50/95 dark:from-gray-950/55 dark:via-gray-950/75 dark:to-gray-950/95"></div>
   <div class="pointer-events-none absolute inset-0 z-[1] dark:hidden" style="background: radial-gradient(115% 75% at 50% -5%, transparent 35%, rgba(248,250,252,0.92) 100%)"></div>
   <div class="pointer-events-none absolute inset-0 z-[1] hidden dark:block" style="background: radial-gradient(115% 75% at 50% -5%, transparent 35%, rgba(2,6,23,0.9) 100%)"></div>
@@ -21,7 +20,7 @@
           <span class="truncate">{{ auth.user()!.name }}</span>
         </a>
       } @else {
-        <button (click)="authOpen.set(true)" class="rounded-full bg-gray-900/5 px-3 py-1.5 text-sm font-medium text-gray-700 ring-1 ring-gray-900/10 backdrop-blur transition hover:bg-gray-900/10 dark:bg-white/10 dark:text-white dark:ring-white/15 dark:hover:bg-white/20">{{ t('auth.logIn') }}</button>
+        <a routerLink="/auth" class="rounded-full bg-gray-900/5 px-3 py-1.5 text-sm font-medium text-gray-700 ring-1 ring-gray-900/10 backdrop-blur transition hover:bg-gray-900/10 dark:bg-white/10 dark:text-white dark:ring-white/15 dark:hover:bg-white/20">{{ t('auth.logIn') }}</a>
       }
       <app-lang-toggle />
     </div>
@@ -164,6 +163,5 @@
     </div>
   }
 
-  <app-auth-modal [open]="authOpen()" (closeChange)="authOpen.set($event)" />
   </ng-container>
 </div>
