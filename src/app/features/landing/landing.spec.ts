@@ -30,7 +30,7 @@ describe('Landing', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('Bújó');
+    expect(text).toContain('Hide');
     expect(text).toContain('Start a game');
     expect(text).toContain('Join a game');
   });
