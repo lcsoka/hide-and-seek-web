@@ -17,9 +17,10 @@ export class AuthModal {
   readonly closeChange = output<boolean>();
   readonly done = output<void>(); // emitted on a successful login/register
 
-  readonly mode = signal<'login' | 'register'>('login');
+  readonly mode = signal<'login' | 'register' | 'forgot'>('login');
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
+  readonly sent = signal(false); // "check your email" after a forgot-password request
   email = '';
   password = '';
   name = '';
@@ -30,17 +31,28 @@ export class AuthModal {
       if (this.open()) {
         this.mode.set(this.startMode());
         this.error.set(null);
+        this.sent.set(false);
         this.password = '';
       }
     });
   }
 
-  toggle(): void {
-    this.mode.update((m) => (m === 'login' ? 'register' : 'login'));
+  setMode(mode: 'login' | 'register' | 'forgot'): void {
+    this.mode.set(mode);
     this.error.set(null);
+    this.sent.set(false);
+  }
+
+  toggle(): void {
+    this.setMode(this.mode() === 'login' ? 'register' : 'login');
   }
 
   async submit(): Promise<void> {
+    if (this.mode() === 'forgot') {
+      await this.sendReset();
+
+      return;
+    }
     if (!this.email.trim() || this.password.length < (this.mode() === 'register' ? 8 : 1)) {
       return;
     }
@@ -54,6 +66,22 @@ export class AuthModal {
       }
       this.done.emit();
       this.close();
+    } catch (e: unknown) {
+      this.error.set(this.messageOf(e));
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  private async sendReset(): Promise<void> {
+    if (!this.email.trim()) {
+      return;
+    }
+    this.busy.set(true);
+    this.error.set(null);
+    try {
+      await this.auth.forgotPassword(this.email.trim());
+      this.sent.set(true); // always succeeds (server doesn't reveal whether the email exists)
     } catch (e: unknown) {
       this.error.set(this.messageOf(e));
     } finally {

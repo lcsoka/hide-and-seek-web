@@ -26,7 +26,18 @@
     "guestBadge": "Vendég",
     "guestUpsell": "Vendégként játszol. Hozz létre fiókot, hogy megőrizd az előzményeidet és több eszközön játszhass.",
     "createAccount": "Fiók létrehozása",
-    "logOut": "Kilépés"
+    "logOut": "Kilépés",
+    "forgotLink": "Elfelejtetted a jelszót?",
+    "forgotTitle": "Jelszó visszaállítása",
+    "forgotBlurb": "Add meg az e-mail-címed, és küldünk egy visszaállító linket.",
+    "sendReset": "Visszaállító link küldése",
+    "forgotSent": "Ha ez az e-mail regisztrálva van, úton van a visszaállító link. Nézd meg a postaládád.",
+    "backToLogin": "Vissza a belépéshez",
+    "resetTitle": "Új jelszó beállítása",
+    "resetInvalid": "Ez a visszaállító link érvénytelen vagy lejárt.",
+    "resetDone": "A jelszavad visszaállítottuk. Most már beléphetsz.",
+    "newPassword": "Új jelszó",
+    "resetBtn": "Jelszó visszaállítása"
   },
   "stats": {
     "title": "Statisztika",

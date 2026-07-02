@@ -30,6 +30,14 @@ export class ApiClient {
     return firstValueFrom(this.http.post(`${this.base}/auth/logout`, {}));
   }
 
+  forgotPassword(email: string): Promise<{ message: string }> {
+    return firstValueFrom(this.http.post<{ message: string }>(`${this.base}/auth/forgot-password`, { email }));
+  }
+
+  resetPassword(body: { token: string; email: string; password: string }): Promise<{ message: string }> {
+    return firstValueFrom(this.http.post<{ message: string }>(`${this.base}/auth/reset-password`, body));
+  }
+
   me(): Promise<Profile> {
     return firstValueFrom(this.http.get<Profile>(`${this.base}/auth/me`));
   }

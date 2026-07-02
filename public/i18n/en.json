@@ -26,7 +26,18 @@
     "guestBadge": "Guest",
     "guestUpsell": "You're playing as a guest. Create an account to keep your history and play across devices.",
     "createAccount": "Create account",
-    "logOut": "Log out"
+    "logOut": "Log out",
+    "forgotLink": "Forgot password?",
+    "forgotTitle": "Reset your password",
+    "forgotBlurb": "Enter your email and we'll send you a reset link.",
+    "sendReset": "Send reset link",
+    "forgotSent": "If that email is registered, a reset link is on its way. Check your inbox.",
+    "backToLogin": "Back to log in",
+    "resetTitle": "Set a new password",
+    "resetInvalid": "This reset link is invalid or has expired.",
+    "resetDone": "Your password has been reset. You can log in now.",
+    "newPassword": "New password",
+    "resetBtn": "Reset password"
   },
   "stats": {
     "title": "Stats",

@@ -47,6 +47,14 @@ export class AuthStore {
     return res;
   }
 
+  forgotPassword(email: string): Promise<{ message: string }> {
+    return this.api.forgotPassword(email);
+  }
+
+  resetPassword(token: string, email: string, password: string): Promise<{ message: string }> {
+    return this.api.resetPassword({ token, email, password });
+  }
+
   async logout(): Promise<void> {
     try {
       await this.api.logout();
