@@ -54,7 +54,7 @@
     "yourName": "Your name",
     "nameRequired": "Enter your name to start",
     "tagline": "Hide across the city. Hunt with questions. Outlast everyone.",
-    "badge": "Budapest · real transit",
+    "badge": "10 Hungarian cities · real transit",
     "how": { "hide": "Hide near a station", "ask": "Narrow the map", "catch": "Catch the hider" },
     "cityLabel": "City",
     "sizeLabel": "Map size",
