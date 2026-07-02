@@ -102,8 +102,17 @@ export class SessionView {
       // In a dev build the position is driven by the debug tools (map tap / presets),
       // so don't let the browser GPS overwrite the simulated location.
       if (!this.devMode) {
-        this.location.start(sessionId);
+        this.location.start(sessionId, this.myId());
       }
+
+      // Fallback poll: while the realtime socket is down, refresh /state periodically so
+      // positions/state don't go stale during a Reverb outage (events resume on reconnect).
+      const poll = setInterval(() => {
+        if (!this.realtime.connected()) {
+          this.store.refresh();
+        }
+      }, 15000);
+      destroyRef.onDestroy(() => clearInterval(poll));
 
       // Browsers suspend backgrounded tabs (locked phones) and can silently drop the socket.
       // On return to the foreground / regaining connectivity, catch up on missed events.

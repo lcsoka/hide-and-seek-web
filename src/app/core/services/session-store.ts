@@ -55,6 +55,12 @@ export class SessionStore {
     this.resource.reload();
   }
 
+  /** Overlay a live position on the polled state (from a PlayerMoved event, or optimistically
+   *  from the player's own GPS so their marker moves instantly without a server round-trip). */
+  setLivePosition(playerId: string, lat: number, lng: number): void {
+    this.livePositions.update((m) => ({ ...m, [playerId]: { lat, lng } }));
+  }
+
   /** A realtime event arrived: log it. PlayerMoved just patches a position (cheap);
    *  everything else re-hydrates authoritative state. */
   onEvent(type: string, data?: unknown): void {
@@ -64,7 +70,7 @@ export class SessionStore {
     if (type === 'PlayerMoved') {
       const move = data as { player_id?: string; lat?: number; lng?: number } | undefined;
       if (move?.player_id && move.lat != null && move.lng != null) {
-        this.livePositions.update((m) => ({ ...m, [move.player_id!]: { lat: move.lat!, lng: move.lng! } }));
+        this.setLivePosition(move.player_id, move.lat, move.lng);
       }
       return;
     }
