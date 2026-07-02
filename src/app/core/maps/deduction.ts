@@ -1,6 +1,8 @@
 import { bbox, buffer, circle, difference, featureCollection, intersect, point, pointToPolygonDistance, simplify, voronoi } from '@turf/turf';
 import { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from 'geojson';
-import { modifyMapData, Poly } from './operators';
+import { modifyMapData } from './operators';
+import { Poly } from './map.model';
+import { DeductionQuestion, HidingZoneViz, RadarQuestion, RegionQuestion, ThermometerQuestion, ZoneCut } from './deduction.model';
 
 /**
  * Client-side deduction engine, ported from taibeled/JetLagHideAndSeek.
@@ -8,42 +10,6 @@ import { modifyMapData, Poly } from './operators';
  * per answered question: radar keeps inside/outside a circle, thermometer keeps
  * the half-plane on the warmer side. `null` answers are skipped.
  */
-
-export interface RadarQuestion {
-  id: string;
-  type: 'radar';
-  lat: number;
-  lng: number;
-  radiusKm: number;
-  within: boolean | null;
-}
-
-export interface ThermometerQuestion {
-  id: string;
-  type: 'thermometer';
-  aLat: number;
-  aLng: number;
-  bLat: number;
-  bLng: number;
-  warmer: boolean | null; // true = getting warmer travelling A → B
-}
-
-/**
- * A question whose region is precomputed elsewhere (e.g. a measuring buffer to the
- * country border, or an administrative-zone match) — the engine just keeps inside
- * or outside it. Lets async/OSM-derived geometry plug into the sync engine.
- */
-export interface RegionQuestion {
-  id: string;
-  type: 'region';
-  label: string;
-  region: Poly;
-  within: boolean | null;
-  yesLabel?: string; // answer label for within=true (default "Inside")
-  noLabel?: string; //  answer label for within=false (default "Outside")
-}
-
-export type DeductionQuestion = RadarQuestion | ThermometerQuestion | RegionQuestion;
 
 /**
  * Measuring region for "is the hider closer to the country border than the seeker?".
@@ -92,19 +58,6 @@ export function hidingZone(center: { lat: number; lng: number }, radiusM: number
   }
 
   return zone;
-}
-
-/** A station that forms an edge of the carved zone: the boundary is the halfway line to it. */
-export interface ZoneCut {
-  station: { lat: number; lng: number };
-  mid: { lat: number; lng: number }; // the halfway point (on the carved boundary) — where it cuts
-}
-
-export interface HidingZoneViz {
-  original: Poly; // the full radius circle (before carving)
-  carved: Poly; // the final hiding zone
-  removed: Poly | null; // the slices cut away (original − carved), to shade differently
-  cuts: ZoneCut[]; // the stations whose halfway line forms a zone edge (what makes it small)
 }
 
 /**

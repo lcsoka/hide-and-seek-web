@@ -1,16 +1,10 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
-import { RouteLine } from '../../core/maps/overpass';
-import { NearbyStop, TransitRoutes } from '../../core/services/transit-routes';
+import { RouteLine } from '../../core/maps/overpass.model';
+import { TransitRoutes } from '../../core/services/transit-routes';
+import { TransitStop } from '../../core/services/transit.model';
 import { transitMeta } from '../../core/util/transit';
-
-export interface BoardChoice {
-  stop_name: string;
-  stop_lat: number;
-  stop_lng: number;
-  line: string;
-  mode: string;
-}
+import { BoardChoice } from './transit-picker.model';
 
 /** Board flow: pick the nearest stop, then a line; tapping a line draws its route on the map. */
 @Component({
@@ -33,7 +27,7 @@ export class TransitPicker {
   readonly busy = this.transit.busy;
   readonly mode = transitMeta;
 
-  readonly selectedStop = signal<NearbyStop | null>(null);
+  readonly selectedStop = signal<TransitStop | null>(null);
   readonly selectedLine = signal<RouteLine | null>(null);
 
   constructor() {
@@ -45,7 +39,7 @@ export class TransitPicker {
     });
   }
 
-  pickStop(stop: NearbyStop): void {
+  pickStop(stop: TransitStop): void {
     this.selectedStop.set(stop);
     this.selectedLine.set(null);
     this.transit.clearDisplayed();

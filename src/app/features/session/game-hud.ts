@@ -1,7 +1,7 @@
 import { Component, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
-import { GameTimer } from '../../core/util/game-timer';
+import { GameTimer } from '../../core/util/game-timer.model';
 import { LangToggle } from '../../shared/lang-toggle';
 import { HowToPlay } from './how-to-play';
 

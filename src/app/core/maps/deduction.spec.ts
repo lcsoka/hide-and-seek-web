@@ -1,5 +1,6 @@
 import { area, booleanPointInPolygon, featureCollection, point } from '@turf/turf';
-import { applyQuestions, hidingZone, hidingZoneViz, measuringRegionToBorder, playArea, RadarQuestion, RegionQuestion, tentacleRegion, ThermometerQuestion } from './deduction';
+import { applyQuestions, hidingZone, hidingZoneViz, measuringRegionToBorder, playArea, tentacleRegion } from './deduction';
+import { RadarQuestion, RegionQuestion, ThermometerQuestion } from './deduction.model';
 import { Feature, FeatureCollection, Point, Polygon } from 'geojson';
 
 const BUD = { lat: 47.4979, lng: 19.0402 };

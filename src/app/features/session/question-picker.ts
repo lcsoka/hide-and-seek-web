@@ -6,7 +6,8 @@ import { QuestionCatalogItem } from '../../core/models';
 import { FEATURE_TAGS } from '../../core/maps/osm-deduction';
 import { OverpassService } from '../../core/maps/overpass';
 import { categoryMeta, questionIcon, questionShortLabel } from '../../core/util/categories';
-import { DistancePreset, RADAR_PRESETS, THERMO_PRESETS, Units } from '../../core/util/units';
+import { RADAR_PRESETS, THERMO_PRESETS } from '../../core/util/units';
+import { DistancePreset, Units } from '../../core/util/units.model';
 
 interface NearbyPlace {
   name: string;

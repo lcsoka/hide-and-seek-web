@@ -1,23 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { distance, point } from '@turf/turf';
 import { Feature, Point } from 'geojson';
-import { OverpassService, RouteLine } from '../maps/overpass';
+import { OverpassService } from '../maps/overpass';
+import { RouteLine } from '../maps/overpass.model';
 import { classifyStop } from '../util/transit';
-
-export interface NearbyStop {
-  name: string;
-  lat: number;
-  lng: number;
-  distM: number;
-  modes: string[];
-}
-
-/** A route's path being shown on the map (one polyline per member way). */
-export interface DisplayedRoute {
-  ref: string;
-  mode: string;
-  lines: { lat: number; lng: number }[][];
-}
+import { DisplayedRoute, TransitStop } from './transit.model';
 
 /**
  * Seeker's transit boarding helper: the nearby stops to board at, the lines serving the
@@ -28,7 +15,7 @@ export interface DisplayedRoute {
 export class TransitRoutes {
   private readonly overpass = inject(OverpassService);
 
-  readonly stops = signal<NearbyStop[] | null>(null);
+  readonly stops = signal<TransitStop[] | null>(null);
   readonly routes = signal<RouteLine[] | null>(null); // lines at the selected stop
   readonly displayed = signal<DisplayedRoute | null>(null); // drawn on the map
   private readonly inflight = signal(0);
@@ -63,7 +50,7 @@ export class TransitRoutes {
   }
 
   /** Lines serving a stop, deduped to one entry per ref+direction. */
-  async loadRoutes(stop: NearbyStop, modeIds?: string[]): Promise<void> {
+  async loadRoutes(stop: TransitStop, modeIds?: string[]): Promise<void> {
     this.routes.set(null);
     this.inflight.update((n) => n + 1);
     try {

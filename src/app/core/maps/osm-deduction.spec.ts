@@ -1,6 +1,7 @@
 import { area, booleanPointInPolygon, point } from '@turf/turf';
 import { Feature, Point } from 'geojson';
-import { applyQuestions, DeductionQuestion, playArea, RegionQuestion } from './deduction';
+import { applyQuestions, playArea } from './deduction';
+import { DeductionQuestion, RegionQuestion } from './deduction.model';
 import { osmRegion } from './osm-deduction';
 
 /** A fake OverpassService returning fixed features for around()/pois(). */

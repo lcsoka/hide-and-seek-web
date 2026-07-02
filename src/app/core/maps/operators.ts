@@ -1,7 +1,6 @@
 import { difference, featureCollection, intersect } from '@turf/turf';
-import { Feature, MultiPolygon, Polygon } from 'geojson';
-
-export type Poly = Feature<Polygon | MultiPolygon>;
+import { Feature, Polygon } from 'geojson';
+import { Poly } from './map.model';
 
 /** Near-global rectangle used to invert a region (kept just inside the poles for safety). */
 export const WORLD: Feature<Polygon> = {

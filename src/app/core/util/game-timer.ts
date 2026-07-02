@@ -1,10 +1,5 @@
 import { GameState } from '../models';
-
-export interface GameTimer {
-  label: string;
-  text: string;
-  urgent: boolean;
-}
+import { GameTimer } from './game-timer.model';
 
 function fmt(seconds: number): string {
   const s = Math.max(0, Math.floor(seconds));

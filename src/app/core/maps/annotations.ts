@@ -1,27 +1,8 @@
 import { Position, ResolvedQuestion } from '../models';
 import { categoryMeta } from '../util/categories';
-import { formatDistance, Units } from '../util/units';
-
-/** Translate a key (with optional interpolation params) — Transloco's `translate`. */
-export type Translate = (key: string, params?: Record<string, unknown>) => string;
-
-/** A numbered, explained marker for an answered question on the deduction map. */
-export interface MapAnnotation {
-  n: number;
-  seq: number;
-  category: string;
-  icon: string;
-  answer: string;
-  /** Short explanation of how this question cut the map. */
-  effect: string;
-  point: Position | null;
-  radarKm?: number;
-  within?: boolean;
-  thermo?: { a: Position; b: Position };
-  photoUrl?: string;
-  /** The reference OSM feature (matching/measuring/tentacles) — shown as a labelled pin. */
-  feature?: { lat: number; lng: number; name: string | null };
-}
+import { formatDistance } from '../util/units';
+import { Units } from '../util/units.model';
+import { MapAnnotation, Translate } from './map.model';
 
 function midpoint(a: Position, b: Position): Position {
   return { lat: (a.lat + b.lat) / 2, lng: (a.lng + b.lng) / 2 };

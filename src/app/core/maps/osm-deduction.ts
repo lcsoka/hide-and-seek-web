@@ -1,7 +1,7 @@
 import { bbox, booleanPointInPolygon, circle, distance, nearestPoint, point, voronoi } from '@turf/turf';
 import { ResolvedQuestion } from '../models';
 import { tentacleRegion } from './deduction';
-import { Poly } from './operators';
+import { Poly } from './map.model';
 import { OverpassService } from './overpass';
 
 /** Feature key → Overpass tag filter (mirrors config/game.php `overpass.features`). */

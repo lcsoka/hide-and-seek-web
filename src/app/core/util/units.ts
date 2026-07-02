@@ -1,9 +1,4 @@
-export type Units = 'metric' | 'imperial';
-
-export interface DistancePreset {
-  label: string;
-  meters: number;
-}
+import { DistancePreset, Units } from './units.model';
 
 /** Radar distance presets per unit system (the ask only sends metres). */
 export const RADAR_PRESETS: Record<Units, DistancePreset[]> = {

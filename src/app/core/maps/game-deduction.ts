@@ -1,5 +1,5 @@
 import { ResolvedQuestion } from '../models';
-import { DeductionQuestion } from './deduction';
+import { DeductionQuestion } from './deduction.model';
 
 /**
  * Convert the game's answered questions into deduction questions for the map.

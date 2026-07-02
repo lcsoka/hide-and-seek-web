@@ -1,9 +1,4 @@
-export interface City {
-  slug: string;
-  name: string;
-  lat: number;
-  lng: number;
-}
+import { City } from './map.model';
 
 /** The Hungarian cities the game supports, with centres for boundary lookups. */
 export const CITIES: City[] = [

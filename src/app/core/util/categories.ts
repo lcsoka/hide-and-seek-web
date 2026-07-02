@@ -1,8 +1,4 @@
-export interface CategoryMeta {
-  icon: string;
-  label: string;
-  hint: string;
-}
+import { CategoryMeta } from './categories.model';
 
 /** Display metadata per question category (icon, label, one-line hint). */
 export const CATEGORY_META: Record<string, CategoryMeta> = {

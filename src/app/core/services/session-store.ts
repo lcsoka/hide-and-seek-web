@@ -1,11 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { ApiClient } from './api-client';
-
-export interface FeedEntry {
-  type: string;
-  at: number;
-}
+import { FeedEntry } from './feed.model';
 
 /**
  * Single source of truth for the active session. Hydrates from GET /state (a

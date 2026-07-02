@@ -4,14 +4,7 @@ import { Feature, Point } from 'geojson';
 import { OverpassService } from '../maps/overpass';
 import { Position } from '../models';
 import { classifyStop } from '../util/transit';
-
-export interface NearbyStation {
-  name: string;
-  lat: number;
-  lng: number;
-  distM: number;
-  modes: string[]; // transit modes serving the stop (metro/tram/bus/…), most-specific first
-}
+import { TransitStop } from './transit.model';
 
 /**
  * Shared hiding selection: the nearby transit stops and the chosen one. Used by the
@@ -21,9 +14,9 @@ export interface NearbyStation {
 export class HidingState {
   private readonly overpass = inject(OverpassService);
 
-  readonly stations = signal<NearbyStation[] | null>(null); // the 8 nearest, for the picker
+  readonly stations = signal<TransitStop[] | null>(null); // the 8 nearest, for the picker
   readonly allStops = signal<{ lat: number; lng: number }[] | null>(null); // every nearby stop, for the map's carve
-  readonly selected = signal<NearbyStation | null>(null);
+  readonly selected = signal<TransitStop | null>(null);
   private loadedKey: string | null = null;
 
   // > 0 while the nearby-stops fetch is in flight, so the UI can show a "calculating…"
@@ -96,9 +89,9 @@ export class HidingState {
    * the carve draws a perpendicular bisector toward the twin platform and eats half the zone.
    * Input is sorted nearest-first, so the kept representative is the closest platform.
    */
-  private collapseDirectionalStops(stops: NearbyStation[]): NearbyStation[] {
+  private collapseDirectionalStops(stops: TransitStop[]): TransitStop[] {
     const SAME_STATION_M = 90;
-    const kept: NearbyStation[] = [];
+    const kept: TransitStop[] = [];
     for (const s of stops) {
       const twin =
         s.name !== 'Unnamed stop'

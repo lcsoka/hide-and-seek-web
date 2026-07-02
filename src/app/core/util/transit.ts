@@ -1,12 +1,7 @@
-export interface TransitMode {
-  id: string;
-  label: string;
-  icon: string;
-  color: string;
-}
+import { TransitMeta } from './transit.model';
 
 /** Display metadata per transit mode (label, icon, colour for chips + map markers). */
-export const TRANSIT_META: Record<string, TransitMode> = {
+export const TRANSIT_META: Record<string, TransitMeta> = {
   metro: { id: 'metro', label: 'Metro', icon: '🚇', color: '#6366f1' }, // indigo
   tram: { id: 'tram', label: 'Tram', icon: '🚊', color: '#f59e0b' }, // amber
   train: { id: 'train', label: 'Train', icon: '🚆', color: '#2563eb' }, // blue
@@ -16,7 +11,7 @@ export const TRANSIT_META: Record<string, TransitMode> = {
   stop: { id: 'stop', label: 'Stop', icon: '📍', color: '#64748b' }, // slate fallback
 };
 
-export function transitMeta(id: string): TransitMode {
+export function transitMeta(id: string): TransitMeta {
   return TRANSIT_META[id] ?? TRANSIT_META['stop'];
 }
 

@@ -2,12 +2,7 @@ import { Injectable } from '@angular/core';
 import { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from 'geojson';
 import osmtogeojson from 'osmtogeojson';
 import { environment } from '../../../environments/environment';
-
-export interface TransitMode {
-  id: string;
-  label: string;
-  filters: string[]; // Overpass tag filters, e.g. '[railway=tram_stop]'
-}
+import { PoiType, RouteLine, TransitMode } from './overpass.model';
 
 /** Public-transport modes. Metro + tram are the game default; the rest are opt-in. */
 export const TRANSIT_MODES: TransitMode[] = [
@@ -23,16 +18,6 @@ export const DEFAULT_TRANSIT_MODES = ['metro', 'tram'];
 /** Every transit mode id — the seeker may board ANY of these (independent of the game's hiding modes). */
 export const ALL_TRANSIT_MODES = TRANSIT_MODES.map((m) => m.id);
 
-/** A public-transport line serving a stop (one OSM `type=route` relation = one direction). */
-export interface RouteLine {
-  id: string; // relation id, for fetching geometry
-  ref: string; // line label, e.g. "47", "M2"
-  mode: string; // our mode id (tram/metro/light_rail/rail/bus/trolleybus)
-  name: string;
-  to: string; // terminus (the route's `to` tag), to tell the two directions apart
-  colour?: string; // OSM `colour` tag, e.g. "#FFD700"
-}
-
 /** our mode id → the OSM `route` relation value; and the reverse. */
 const ROUTE_VALUE: Record<string, string> = {
   metro: 'subway', tram: 'tram', light_rail: 'light_rail', rail: 'train', bus: 'bus', trolleybus: 'trolleybus',
@@ -40,13 +25,6 @@ const ROUTE_VALUE: Record<string, string> = {
 const MODE_OF_ROUTE: Record<string, string> = {
   subway: 'metro', tram: 'tram', light_rail: 'light_rail', train: 'rail', railway: 'rail', bus: 'bus', trolleybus: 'trolleybus',
 };
-
-export interface PoiType {
-  id: string;
-  label: string;
-  filter: string;
-  defaultRadiusKm: number;
-}
 
 /** Tentacle POI categories (from the original game): ~15 mi for big attractions, ~1 mi for the rest. */
 export const POI_TYPES: PoiType[] = [
