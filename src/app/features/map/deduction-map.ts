@@ -301,6 +301,21 @@ export class DeductionMap {
     }
   }
 
+  /** Centre on the player's own position (a "find me" button). Falls back to re-framing the
+   *  deduction area if we don't have the player's location. */
+  recenterOnSelf(): void {
+    const me = this.players().find((p) => p.id === this.meId() && p.lat != null && p.lng != null);
+    if (!this.map || !me) {
+      this.fitToCandidate();
+
+      return;
+    }
+    this.userMoved = true; // an explicit recenter shouldn't be undone by the next auto-fit
+    this.programmaticMove = true;
+    this.map.setView([me.lat!, me.lng!], 15, { animate: true, duration: 0.5 });
+    setTimeout(() => (this.programmaticMove = false), 600);
+  }
+
   /** Re-frame the map to the current candidate area (and re-enable auto-fit). */
   fitToCandidate(): void {
     const cand = this.candidate();

@@ -18,6 +18,7 @@ const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
 export class MapView {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
   readonly players = input<PlayerView[]>([]);
+  readonly meId = input<string | null>(null);
   readonly zone = input<HidingZone | null>(null);
   readonly stations = input<{ lat: number; lng: number; name?: string; modes?: string[] }[]>([]); // nearby stops to pick from
   readonly highlight = input<Position | null>(null); // the chosen/nearest station
@@ -77,6 +78,14 @@ export class MapView {
         void this.hiding.loadFor(committed.center.lat, committed.center.lng, this.transitModes(), committed.radius_m);
       }
     });
+  }
+
+  /** Centre on the player's own position (a "find me" button on the hider's map). */
+  recenterOnSelf(): void {
+    const me = this.players().find((p) => (p.id === this.meId() || p.role === 'hider') && p.lat != null && p.lng != null);
+    if (this.map && me) {
+      this.map.setView([me.lat!, me.lng!], 15, { animate: true, duration: 0.5 });
+    }
   }
 
   private metresBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {

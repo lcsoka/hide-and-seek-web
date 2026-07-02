@@ -93,7 +93,7 @@
     "make": "Legyen ő a bújó",
     "random": "🎲 Véletlen bújó"
   },
-  "hud": { "calculating": "Búvóhely-zóna számítása…" },
+  "hud": { "calculating": "Búvóhely-zóna számítása…", "hide": "Elbújás", "questions": "Kérdések", "hand": "Kéz", "ask": "Kérdés", "transit": "Közlekedés", "info": "Infó", "recenter": "Hol vagyok" },
   "results": {
     "gameOver": "🏁 Vége a játéknak",
     "roundOver": "🔚 Kör vége",

@@ -49,6 +49,14 @@ export class CardDeck {
 
   readonly state = input.required<GameState>();
   readonly sessionId = input.required<string>();
+  // Which slice to render: 'all' (desktop/one panel), 'question' (the incoming-question view)
+  // or 'hand' (cards + history). Cross-cutting prompts (catch claim, curse-choice/confirm) show
+  // in every slice so they're never missed.
+  readonly section = input<'all' | 'question' | 'hand'>('all');
+
+  show(part: 'question' | 'hand'): boolean {
+    return this.section() === 'all' || this.section() === part;
+  }
 
   readonly busy = signal(false);
   readonly animatingFrom = signal(Number.MAX_SAFE_INTEGER);

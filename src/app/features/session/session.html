@@ -17,7 +17,7 @@
                            [players]="s.players" [meId]="myId()"
                            [autoZoom]="!devPlacing()" (mapClick)="onMapClick($event)" />
       } @else {
-        <app-map class="block h-full" [players]="s.players" [zone]="s.hiding_zone"
+        <app-map class="block h-full" [players]="s.players" [meId]="myId()" [zone]="s.hiding_zone"
                  [stations]="hidingStations(s)" [highlight]="hidingHighlight(s)" [previewZone]="hidingPreviewZone(s)"
                  [questionMarker]="hiderQuestionMarker(s)" [reveal]="revealMarker(s)" [transitModes]="transitModes(s)" [zoneRule]="zoneRule(s)" (mapClick)="onMapClick($event)" />
       }
@@ -49,9 +49,10 @@
       </div>
     }
 
-    <!-- Side panel: desktop right column / mobile bottom sheet -->
-    <aside class="pointer-events-none absolute inset-x-0 bottom-0 z-[600] flex max-h-[62%] flex-col
-                  lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[400px] lg:pt-16">
+    <!-- Side panel: desktop right column always; mobile bottom sheet only when NOT in active play
+         (during hiding/seeking/endgame the mobile UI is the icon-button HUD below, so the map stays
+         visible). -->
+    <aside [class]="'pointer-events-none absolute inset-x-0 bottom-0 z-[600] flex max-h-[62%] flex-col lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[400px] lg:pt-16' + (activePlay(s) ? ' max-lg:hidden' : '')">
       <div class="pointer-events-auto m-2 flex-1 overflow-y-auto rounded-2xl bg-white/95 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3" *transloco="let t">
         @if (objective(s); as obj) {
           <p class="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-200">{{ t(obj) }}</p>
@@ -102,6 +103,66 @@
         }
       </div>
     </aside>
+
+    <!-- Mobile icon-button HUD (active play): each opens a drawer so the map stays visible. -->
+    @if (activePlay(s)) {
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 z-[700] flex items-end justify-center gap-3 p-4 lg:hidden" *transloco="let t">
+        @if (role(s) === 'hider') {
+          @if (s.state === 'hiding') {
+            <button (click)="mobileDrawer.set('hide')" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
+              <span class="text-2xl leading-none">🙈</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.hide') }}</span>
+            </button>
+          } @else {
+            <button (click)="mobileDrawer.set('questions')" class="pointer-events-auto relative flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
+              <span class="text-2xl leading-none">💬</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.questions') }}</span>
+              @if (s.pending_question) { <span class="absolute -right-0.5 -top-0.5 h-3 w-3 animate-pulse rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900"></span> }
+            </button>
+            <button (click)="mobileDrawer.set('hand')" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
+              <span class="text-2xl leading-none">🃏</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.hand') }}</span>
+            </button>
+          }
+        } @else if (role(s) === 'seeker') {
+          <button (click)="openAsk()" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
+            <span class="text-2xl leading-none">💭</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.ask') }}</span>
+          </button>
+          <button (click)="boardOpen.set(true)" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
+            <span class="text-2xl leading-none">🚆</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.transit') }}</span>
+          </button>
+          <button (click)="mobileDrawer.set('seeker')" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
+            <span class="text-2xl leading-none">📋</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.info') }}</span>
+          </button>
+        }
+        <button (click)="recenter()" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
+          <span class="text-2xl leading-none">📍</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.recenter') }}</span>
+        </button>
+      </div>
+
+      @if (mobileDrawer(); as d) {
+        <div class="fixed inset-0 z-[800] flex items-end bg-black/50 backdrop-blur-sm lg:hidden" (click)="mobileDrawer.set(null)">
+          <div class="max-h-[80vh] w-full overflow-y-auto rounded-t-3xl bg-white p-4 shadow-2xl dark:bg-gray-900" (click)="$event.stopPropagation()" *transloco="let t">
+            <div class="mb-2 flex justify-end"><button (click)="mobileDrawer.set(null)" class="text-xl text-gray-400 hover:text-gray-600">✕</button></div>
+            @if (objective(s); as obj) {
+              <p class="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-200">{{ t(obj) }}</p>
+            }
+            @switch (d) {
+              @case ('hide') { <app-hider-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" /> }
+              @case ('questions') { <app-card-deck [state]="s" [sessionId]="s.session_id" [section]="'question'" /> }
+              @case ('hand') { <app-card-deck [state]="s" [sessionId]="s.session_id" [section]="'hand'" /> }
+              @case ('seeker') { <app-seeker-panel [state]="s" [sessionId]="s.session_id" (openPicker)="mobileDrawer.set(null); openAsk()" (openBoard)="mobileDrawer.set(null); boardOpen.set(true)" /> }
+            }
+            @if (visibleActions(s); as actions) {
+              @if (actions.length) {
+                <div class="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+                  @for (a of actions; track a) {
+                    <button (click)="act(a)" [disabled]="acting()" class="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50">{{ t('action.' + a) }}</button>
+                  }
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+    }
 
     @if (devMode) {
       <app-dev-tools [state]="s" [sessionId]="s.session_id" [placing]="devPlacing()" (placingChange)="devPlacing.set($event)" />

@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models/models';
@@ -67,6 +67,10 @@ export class SessionView {
 
     return p ? { lat: p.lat, lng: p.lng, radiusM: p.radiusM } : null;
   });
+  // Which mobile drawer is open (icon-button HUD). Desktop shows the full side panel instead.
+  readonly mobileDrawer = signal<'hide' | 'questions' | 'hand' | 'seeker' | null>(null);
+  private readonly deductionMap = viewChild(DeductionMap);
+  private readonly hiderMap = viewChild(MapView);
   // Seekers may board ANY mode (not just the game's hiding modes), so the picker offers all.
   readonly allTransitModes = ALL_TRANSIT_MODES;
   readonly catalog = signal<QuestionCatalogItem[]>([]);
@@ -303,6 +307,17 @@ export class SessionView {
 
   cancelRadar(): void {
     this.radarPreview.set(null);
+  }
+
+  /** Live-play states where the map is the focus and the panel becomes openable drawers on mobile. */
+  activePlay(s: GameState): boolean {
+    return s.state === 'hiding' || s.state === 'seeking' || s.state === 'endgame';
+  }
+
+  /** Centre whichever map is showing on the player's own position. */
+  recenter(): void {
+    this.deductionMap()?.recenterOnSelf();
+    this.hiderMap()?.recenterOnSelf();
   }
 
   /** The seeker chose a stop + line in the board picker — record the boarding. */

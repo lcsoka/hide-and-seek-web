@@ -8,7 +8,7 @@
       </div>
     </div>
   }
-  @if (survivalText(); as surv) {
+  @if (show('question') && survivalText(); as surv) {
     <div class="flex items-center justify-between rounded-xl bg-rose-600 px-3 py-2 text-white">
       <span class="text-sm font-medium opacity-90">🙈 {{ t('deck.hiddenFor') }}</span>
       <div class="flex items-baseline gap-2">
@@ -17,15 +17,17 @@
       </div>
     </div>
   }
-  <div class="flex items-center justify-between">
-    <h2 class="text-lg font-bold">{{ t('deck.yourHand') }} <span class="text-sm font-medium" [class]="handFull() ? 'text-rose-500' : 'text-gray-400'">{{ hand().length }}/{{ handLimit() }}</span></h2>
-    @if (timeBonusMin() > 0) {
-      <span class="rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white">⏱️ +{{ timeBonusMin() }} {{ t('deck.minBanked') }}</span>
-    }
-  </div>
+  @if (show('hand')) {
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-bold">{{ t('deck.yourHand') }} <span class="text-sm font-medium" [class]="handFull() ? 'text-rose-500' : 'text-gray-400'">{{ hand().length }}/{{ handLimit() }}</span></h2>
+      @if (timeBonusMin() > 0) {
+        <span class="rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white">⏱️ +{{ timeBonusMin() }} {{ t('deck.minBanked') }}</span>
+      }
+    </div>
 
-  @if (showCurseNudge()) {
-    <p class="rounded-lg bg-amber-100 px-3 py-2 text-sm font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">{{ t('deck.curseNudge') }}</p>
+    @if (showCurseNudge()) {
+      <p class="rounded-lg bg-amber-100 px-3 py-2 text-sm font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">{{ t('deck.curseNudge') }}</p>
+    }
   }
 
   @if (curseChoice(); as choice) {
@@ -68,7 +70,7 @@
     </div>
   }
 
-  @if (pending(); as q) {
+  @if (show('question') && pending(); as q) {
     <div class="space-y-2 rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-950">
       <div class="flex items-center gap-2">
         <span class="text-xl">{{ meta(q.category ?? '').icon }}</span>
@@ -157,7 +159,7 @@
     </div>
   }
 
-  @if (amendLast(); as last) {
+  @if (show('question') && amendLast(); as last) {
     @if (amendOptions(last.category); as opts) {
       @if (opts.length) {
         <div class="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950">
@@ -178,7 +180,7 @@
     }
   }
 
-  @if (playedCurses().length) {
+  @if (show('hand') && playedCurses().length) {
     <div class="space-y-2">
       <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300">{{ t('deck.cursesInPlay') }}</h3>
       @for (c of playedCurses(); track c.uid) {
@@ -202,6 +204,7 @@
     </div>
   }
 
+  @if (show('hand')) {
   @if (hand().length) {
     <div class="grid grid-cols-2 gap-2">
       @for (c of hand(); track c.uid; let i = $index) {
@@ -227,8 +230,9 @@
   } @else {
     <p class="text-sm text-gray-400">{{ t('deck.noCards') }}</p>
   }
+  }
 
-  @if (history().length) {
+  @if (show('hand') && history().length) {
     <div class="space-y-2 border-t border-gray-100 pt-3 dark:border-gray-800">
       <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300">{{ t('deck.yourAnswers') }}</h3>
       @for (q of history(); track q.seq) {
