@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, input, signal } from '@angular/cor
 import { FEATURE_TAGS } from '../../core/maps/osm-deduction';
 import { OverpassService } from '../../core/maps/overpass';
 import { distanceMeters } from '../../core/util/geo';
-import { ActiveCurse, GameState, HandCard, PendingQuestion, ResolvedQuestion } from '../../core/models/models';
+import { ActiveCurse, GameState, HandCard, PendingQuestion, PlayerView, ResolvedQuestion } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
 import { SessionStore } from '../../core/services/session-store';
@@ -10,6 +10,7 @@ import { answerPositive, categoryMeta } from '../../core/util/categories';
 import { formatDistance, unitsOf } from '../../core/util/units';
 import { TranslocoModule } from '@jsverse/transloco';
 import { ImageUpload } from './image-upload';
+import { PlayerAvatar } from '../../shared/player-avatar';
 
 interface TentaclePlace {
   name: string;
@@ -21,7 +22,7 @@ interface TentaclePlace {
 /** The hider's hand: see the full pending question, confirm the answer, play cards. */
 @Component({
   selector: 'app-card-deck',
-  imports: [ImageUpload, TranslocoModule],
+  imports: [ImageUpload, TranslocoModule, PlayerAvatar],
   templateUrl: './card-deck.html',
   styles: [
     `
@@ -356,6 +357,11 @@ export class CardDeck {
 
   cancelPlay(): void {
     this.confirmCard.set(null);
+  }
+
+  /** The seeker who asked a past question (for the answer-history author row), or null. */
+  asker(q: ResolvedQuestion): PlayerView | null {
+    return this.state().players.find((p) => p.id === q.asked_by) ?? null;
   }
 
   /** The question's range / feature, so the hider sees the full question (not just "radar"). */

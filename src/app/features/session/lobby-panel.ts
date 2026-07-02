@@ -3,11 +3,12 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { GameState } from '../../core/models/models';
 import { ApiClient } from '../../core/services/api-client';
 import { SessionStore } from '../../core/services/session-store';
+import { PlayerAvatar } from '../../shared/player-avatar';
 
 /** Pre-game waiting room: roster + the host's start button. */
 @Component({
   selector: 'app-lobby-panel',
-  imports: [TranslocoModule],
+  imports: [TranslocoModule, PlayerAvatar],
   templateUrl: './lobby-panel.html',
 })
 export class LobbyPanel {

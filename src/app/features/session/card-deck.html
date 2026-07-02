@@ -237,7 +237,15 @@
           <span class="text-base">{{ meta(q.category).icon }}</span>
           <div class="min-w-0 flex-1">
             <div class="truncate text-sm font-medium">{{ t('category.' + q.category) }}</div>
-            @if (questionInfo(q); as info) { <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ info }}</div> }
+            @if (asker(q); as who) {
+              <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                <app-player-avatar [name]="who.display_name" [avatar]="who.avatar" [seed]="who.id" [size]="14" />
+                <span class="truncate">{{ who.display_name }}</span>
+                @if (questionInfo(q); as info) { <span class="shrink-0">· {{ info }}</span> }
+              </div>
+            } @else if (questionInfo(q); as info) {
+              <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ info }}</div>
+            }
           </div>
           @if (q.answer?.answer === 'photo' && q.answer?.photo_url) {
             <a [href]="q.answer!.photo_url!" target="_blank" rel="noopener" class="shrink-0">

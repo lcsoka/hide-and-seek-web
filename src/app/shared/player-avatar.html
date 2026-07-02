@@ -1,0 +1,8 @@
+<span class="inline-grid shrink-0 place-items-center overflow-hidden rounded-full font-bold leading-none text-white"
+      [style.width.px]="size()" [style.height.px]="size()" [style.background]="bg()" [style.fontSize.px]="size() * 0.4">
+  @if (avatar()) {
+    <img [src]="avatar()" alt="" class="h-full w-full object-cover" />
+  } @else {
+    {{ label() }}
+  }
+</span>

@@ -7,7 +7,7 @@
   <ul class="space-y-1">
     @for (p of state().players; track p.id) {
       <li class="flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm dark:bg-gray-800">
-        <span class="grid h-7 w-7 place-items-center rounded-full bg-rose-600 text-xs font-bold text-white">{{ p.display_name.charAt(0) }}</span>
+        <app-player-avatar [name]="p.display_name" [avatar]="p.avatar" [seed]="p.id" [size]="28" />
         <span class="font-medium">{{ p.display_name }}</span>
         @if (p.is_host) { <span class="ml-auto text-xs text-gray-400">{{ t('lobby.host') }}</span> }
       </li>

@@ -7,7 +7,7 @@
     @for (p of state().players; track p.id) {
       <li class="flex items-center justify-between gap-2">
         <span class="flex items-center gap-2">
-          <span class="grid h-7 w-7 place-items-center rounded-full bg-gray-300 text-xs font-bold text-gray-700 dark:bg-gray-700 dark:text-gray-200">{{ p.display_name.charAt(0) }}</span>
+          <app-player-avatar [name]="p.display_name" [avatar]="p.avatar" [seed]="p.id" [size]="28" />
           {{ p.display_name }}@if (p.is_host) { <span class="text-gray-400"> {{ t('host.you') }}</span> }
         </span>
         <button (click)="assign(p.id)" [disabled]="busy()"
