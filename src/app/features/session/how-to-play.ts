@@ -1,6 +1,6 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
-import { categoryMeta } from '../../core/util/categories';
+import { CategoryService } from '../../core/services/category.service';
 
 /** A "How to play" reference sheet: the goal, each role, and the question types. */
 @Component({
@@ -46,8 +46,9 @@ import { categoryMeta } from '../../core/util/categories';
   `,
 })
 export class HowToPlay {
+  private readonly category = inject(CategoryService);
   readonly open = input(false);
   readonly closeChange = output<boolean>();
   readonly cats = ['radar', 'thermometer', 'matching', 'measuring', 'tentacles', 'photo'];
-  readonly meta = categoryMeta;
+  readonly meta = (c: string) => this.category.categoryMeta(c);
 }

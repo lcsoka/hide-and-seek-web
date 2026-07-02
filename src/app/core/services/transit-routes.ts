@@ -3,7 +3,7 @@ import { distance, point } from '@turf/turf';
 import { Feature, Point } from 'geojson';
 import { OverpassService } from '../maps/overpass';
 import { RouteLine } from '../maps/overpass.model';
-import { classifyStop } from '../util/transit';
+import { TransitService } from './transit.service';
 import { DisplayedRoute, TransitStop } from './transit.model';
 
 /**
@@ -14,6 +14,7 @@ import { DisplayedRoute, TransitStop } from './transit.model';
 @Injectable({ providedIn: 'root' })
 export class TransitRoutes {
   private readonly overpass = inject(OverpassService);
+  private readonly transitService = inject(TransitService);
 
   readonly stops = signal<TransitStop[] | null>(null);
   readonly routes = signal<RouteLine[] | null>(null); // lines at the selected stop
@@ -36,7 +37,7 @@ export class TransitRoutes {
             lat: flat,
             lng: flng,
             distM: Math.round(distance(here, f as Feature<Point>, { units: 'kilometers' }) * 1000),
-            modes: classifyStop(f.properties ?? {}),
+            modes: this.transitService.classifyStop(f.properties ?? {}),
           };
         })
         .sort((a, b) => a.distM - b.distM)

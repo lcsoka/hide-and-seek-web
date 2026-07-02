@@ -7,8 +7,8 @@ import { Clock, formatCountdown } from '../../core/services/clock';
 import { DeductionState } from '../../core/services/deduction-state';
 import { SessionStore } from '../../core/services/session-store';
 import { TransitRoutes } from '../../core/services/transit-routes';
-import { answerPositive } from '../../core/util/categories';
-import { transitMeta } from '../../core/util/transit';
+import { CategoryService } from '../../core/services/category.service';
+import { TransitService } from '../../core/services/transit.service';
 import { DiceRoller } from './dice-roller';
 import { ImageUpload } from './image-upload';
 
@@ -23,13 +23,15 @@ export class SeekerPanel {
   private readonly store = inject(SessionStore);
   private readonly clock = inject(Clock);
   private readonly transitRoutes = inject(TransitRoutes);
+  private readonly category = inject(CategoryService);
+  private readonly transitService = inject(TransitService);
   readonly deduction = inject(DeductionState);
 
   readonly state = input.required<GameState>();
   readonly sessionId = input.required<string>();
   readonly openPicker = output<void>();
   readonly openBoard = output<void>();
-  readonly mode = transitMeta;
+  readonly mode = (id: string) => this.transitService.transitMeta(id);
 
   readonly questionNotice = this.store.questionNotice;
   readonly canAsk = computed(() => this.state().available_actions.includes('ask_question'));
@@ -85,7 +87,7 @@ export class SeekerPanel {
   }
 
   chipClass(answer: string): string {
-    const positive = answerPositive(answer);
+    const positive = this.category.answerPositive(answer);
     if (positive === true) {
       return 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300';
     }

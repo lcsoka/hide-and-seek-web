@@ -1,13 +1,13 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
-import { buildAnnotations } from '../maps/annotations';
+import { AnnotationsService } from '../maps/annotations.service';
 import { applyQuestions, playArea } from '../deduction/deduction';
 import { DeductionQuestion, RegionQuestion } from '../deduction/deduction.model';
 import { resolvedQuestionsToDeduction } from '../deduction/game-deduction';
-import { isOsmCategory, osmRegion } from '../deduction/osm-deduction';
+import { isOsmCategory, OsmDeductionService } from '../deduction/osm-deduction.service';
 import { OverpassService } from '../maps/overpass';
 import { Poly } from '../maps/map.model';
-import { unitsOf } from '../util/units';
+import { UnitsService } from './units.service';
 import { Language } from './language';
 import { SessionStore } from './session-store';
 
@@ -22,6 +22,9 @@ export class DeductionState {
   private readonly store = inject(SessionStore);
   private readonly transloco = inject(TranslocoService);
   private readonly language = inject(Language);
+  private readonly annotationsService = inject(AnnotationsService);
+  private readonly osmDeduction = inject(OsmDeductionService);
+  private readonly unitsService = inject(UnitsService);
 
   private readonly osmRegions = signal<Map<number, RegionQuestion>>(new Map());
   private readonly osmSeen = new Set<number>();
@@ -68,9 +71,9 @@ export class DeductionState {
   readonly annotations = computed(() => {
     this.language.lang(); // re-localize the effect sentences when the language switches
     this.language.loaded(); // …and once the active language's file finishes loading
-    return buildAnnotations(
+    return this.annotationsService.build(
       this.store.state()?.questions ?? [],
-      unitsOf(this.store.state()?.config),
+      this.unitsService.unitsOf(this.store.state()?.config),
       (key, params) => this.transloco.translate(key, params),
     );
   });
@@ -147,7 +150,7 @@ export class DeductionState {
       const watchdog = setTimeout(settle, 10000);
       void Promise.all(
         fresh.map((q) =>
-          osmRegion(this.overpass, q)
+          this.osmDeduction.region(q)
             .then((r) => {
               // Commit each region as it lands so a late one (post-watchdog) still applies.
               if (r) {

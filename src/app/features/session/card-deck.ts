@@ -1,13 +1,13 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { FEATURE_TAGS } from '../../core/deduction/osm-deduction';
+import { FEATURE_TAGS } from '../../core/deduction/osm-deduction.service';
 import { OverpassService } from '../../core/maps/overpass';
 import { distanceMeters } from '../../core/geo/geo';
 import { ActiveCurse, GameState, HandCard, PendingQuestion, PlayerView, ResolvedQuestion } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';
 import { SessionStore } from '../../core/services/session-store';
-import { answerPositive, categoryMeta } from '../../core/util/categories';
-import { formatDistance, unitsOf } from '../../core/util/units';
+import { CategoryService } from '../../core/services/category.service';
+import { UnitsService } from '../../core/services/units.service';
 import { TranslocoModule } from '@jsverse/transloco';
 import { ImageUpload } from './image-upload';
 import { PlayerAvatar } from '../../shared/player-avatar';
@@ -47,6 +47,8 @@ export class CardDeck {
   private readonly store = inject(SessionStore);
   private readonly clock = inject(Clock);
   private readonly overpass = inject(OverpassService);
+  private readonly category = inject(CategoryService);
+  private readonly unitsService = inject(UnitsService);
 
   readonly state = input.required<GameState>();
   readonly sessionId = input.required<string>();
@@ -63,7 +65,7 @@ export class CardDeck {
   readonly animatingFrom = signal(Number.MAX_SAFE_INTEGER);
   private prevLen = 0;
 
-  readonly meta = categoryMeta;
+  readonly meta = (c: string) => this.category.categoryMeta(c);
   readonly confirmCard = signal<HandCard | null>(null);
 
   // A 'choose' curse (The Drained Brain) awaiting the hider's category picks.
@@ -99,7 +101,7 @@ export class CardDeck {
   // A seeker claims they found the hider — the round ends only once the hider confirms it.
   readonly foundClaim = computed(() => this.state().found_claim);
 
-  private readonly units = computed(() => unitsOf(this.state().config));
+  private readonly units = computed(() => this.unitsService.unitsOf(this.state().config));
 
   /** A short human summary of the question's parameters (radius / feature). */
   readonly questionParams = computed(() => {
@@ -109,7 +111,7 @@ export class CardDeck {
     }
     const parts: string[] = [];
     if (p.radius_m) {
-      parts.push(`within ${formatDistance(p.radius_m, this.units())}`);
+      parts.push(`within ${this.unitsService.formatDistance(p.radius_m, this.units())}`);
     }
     if (p.feature) {
       parts.push(`nearest ${p.feature.replace(/_/g, ' ')}`);
@@ -119,7 +121,7 @@ export class CardDeck {
   });
 
   readonly previewColor = computed(() => {
-    const positive = answerPositive(this.preview()?.answer);
+    const positive = this.category.answerPositive(this.preview()?.answer);
     if (positive === true) {
       return 'text-green-600 dark:text-green-400';
     }
@@ -202,7 +204,7 @@ export class CardDeck {
   }
 
   placeDistance(m: number | undefined): string {
-    return m == null ? '' : formatDistance(m, this.units());
+    return m == null ? '' : this.unitsService.formatDistance(m, this.units());
   }
 
   cardClass(card: HandCard): string {
@@ -368,7 +370,7 @@ export class CardDeck {
   questionInfo(q: ResolvedQuestion): string | null {
     const parts: string[] = [];
     if (q.ask?.radius_m) {
-      parts.push(formatDistance(q.ask.radius_m, this.units()));
+      parts.push(this.unitsService.formatDistance(q.ask.radius_m, this.units()));
     }
     if (q.ask?.feature) {
       parts.push(q.ask.feature.replace(/_/g, ' '));
@@ -379,7 +381,7 @@ export class CardDeck {
 
   /** A coloured chip for an answer in the hider's past-answers list. */
   historyChip(q: ResolvedQuestion): string {
-    const positive = answerPositive(q.answer?.answer);
+    const positive = this.category.answerPositive(q.answer?.answer);
     if (positive === true) {
       return 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300';
     }

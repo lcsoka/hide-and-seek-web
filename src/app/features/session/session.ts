@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models';
 import { ALL_TRANSIT_MODES } from '../../core/maps/overpass';
-import { unitsOf } from '../../core/util/units';
+import { UnitsService } from '../../core/services/units.service';
 import { ApiClient } from '../../core/services/api-client';
 import { DeductionState } from '../../core/services/deduction-state';
 import { HidingState } from '../../core/services/hiding-state';
@@ -12,8 +12,8 @@ import { PlayerStore } from '../../core/services/player-store';
 import { Realtime } from '../../core/services/realtime';
 import { SessionStore } from '../../core/services/session-store';
 import { TranslocoModule } from '@jsverse/transloco';
-import { computeGameTimer } from '../../core/util/game-timer';
-import { GameTimer } from '../../core/util/game-timer.model';
+import { GameTimerService } from '../../core/services/game-timer.service';
+import { GameTimer } from '../../core/services/game-timer.model';
 import { DeductionMap } from '../map/deduction-map';
 import { CardDeck } from './card-deck';
 import { CurseAlert } from './curse-alert';
@@ -54,6 +54,8 @@ export class SessionView {
   readonly store = inject(SessionStore);
   readonly deduction = inject(DeductionState);
   readonly hiding = inject(HidingState);
+  private readonly unitsService = inject(UnitsService);
+  private readonly gameTimer = inject(GameTimerService);
 
   readonly id = signal<string | undefined>(this.route.snapshot.paramMap.get('id') ?? undefined);
   readonly myId = signal<string | null>(null);
@@ -99,7 +101,7 @@ export class SessionView {
     this.tick();
     const s = this.store.state();
 
-    return s ? computeGameTimer(s, this.offset) : null;
+    return s ? this.gameTimer.computeGameTimer(s, this.offset) : null;
   });
 
   constructor() {
@@ -294,7 +296,7 @@ export class SessionView {
   }
 
   askUnits(s: GameState): 'metric' | 'imperial' {
-    return unitsOf(s.config);
+    return this.unitsService.unitsOf(s.config);
   }
 
   openAsk(): void {

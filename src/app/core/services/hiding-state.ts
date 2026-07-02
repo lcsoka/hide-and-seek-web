@@ -3,7 +3,7 @@ import { distance, point } from '@turf/turf';
 import { Feature, Point } from 'geojson';
 import { OverpassService } from '../maps/overpass';
 import { Position } from '../models';
-import { classifyStop } from '../util/transit';
+import { TransitService } from './transit.service';
 import { TransitStop } from './transit.model';
 
 /**
@@ -13,6 +13,7 @@ import { TransitStop } from './transit.model';
 @Injectable({ providedIn: 'root' })
 export class HidingState {
   private readonly overpass = inject(OverpassService);
+  private readonly transitService = inject(TransitService);
 
   readonly stations = signal<TransitStop[] | null>(null); // the 8 nearest, for the picker
   readonly allStops = signal<{ lat: number; lng: number }[] | null>(null); // every nearby stop, for the map's carve
@@ -64,7 +65,7 @@ export class HidingState {
             lat: flat,
             lng: flng,
             distM: Math.round(distance(here, f as Feature<Point>, { units: 'kilometers' }) * 1000),
-            modes: classifyStop(f.properties ?? {}),
+            modes: this.transitService.classifyStop(f.properties ?? {}),
           };
         })
         .sort((a, b) => a.distM - b.distM);

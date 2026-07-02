@@ -10,7 +10,7 @@ import { holedMask } from '../../core/deduction/operators';
 import { Poly } from '../../core/maps/map.model';
 import { disperse } from '../../core/geo/spread';
 import { TransitRoutes } from '../../core/services/transit-routes';
-import { transitMeta } from '../../core/util/transit';
+import { TransitService } from '../../core/services/transit.service';
 import { PlayerView, Position } from '../../core/models';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
@@ -63,6 +63,7 @@ export class DeductionMap {
   readonly mapClick = output<Position>();
 
   private readonly transitRoutes = inject(TransitRoutes);
+  private readonly transitService = inject(TransitService);
   private map?: L.Map;
   private overlay?: L.LayerGroup;
   private resize?: ResizeObserver;
@@ -139,7 +140,7 @@ export class DeductionMap {
     // in its mode colour with a white halo so it reads over the candidate mask + tiles.
     const route = this.transitRoutes.displayed();
     if (route) {
-      const color = transitMeta(route.mode).color;
+      const color = this.transitService.transitMeta(route.mode).color;
       for (const seg of route.lines) {
         if (seg.length > 1) {
           const latlngs = seg.map((p) => [p.lat, p.lng] as L.LatLngTuple);

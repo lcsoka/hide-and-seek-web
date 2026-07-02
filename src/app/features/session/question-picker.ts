@@ -3,11 +3,11 @@ import { FeatureCollection, Point } from 'geojson';
 import { distance, point } from '@turf/turf';
 import { TranslocoModule } from '@jsverse/transloco';
 import { QuestionCatalogItem } from '../../core/models';
-import { FEATURE_TAGS } from '../../core/deduction/osm-deduction';
+import { FEATURE_TAGS } from '../../core/deduction/osm-deduction.service';
 import { OverpassService } from '../../core/maps/overpass';
-import { categoryMeta, questionIcon, questionShortLabel } from '../../core/util/categories';
-import { RADAR_PRESETS, THERMO_PRESETS } from '../../core/util/units';
-import { DistancePreset, Units } from '../../core/util/units.model';
+import { CategoryService } from '../../core/services/category.service';
+import { UnitsService } from '../../core/services/units.service';
+import { DistancePreset, Units } from '../../core/services/units.model';
 
 interface NearbyPlace {
   name: string;
@@ -24,6 +24,8 @@ interface NearbyPlace {
 })
 export class QuestionPicker {
   private readonly overpass = inject(OverpassService);
+  private readonly category = inject(CategoryService);
+  private readonly unitsService = inject(UnitsService);
 
   readonly catalog = input<QuestionCatalogItem[]>([]);
   readonly units = input<Units>('metric');
@@ -42,9 +44,9 @@ export class QuestionPicker {
 
   readonly selected = signal<string | null>(null);
   readonly custom = signal('');
-  readonly meta = categoryMeta;
-  readonly qIcon = (q: QuestionCatalogItem) => questionIcon(`${q.title} ${q.key}`, q.category);
-  readonly qLabel = questionShortLabel;
+  readonly meta = (c: string) => this.category.categoryMeta(c);
+  readonly qIcon = (q: QuestionCatalogItem) => this.category.questionIcon(`${q.title} ${q.key}`, q.category);
+  readonly qLabel = (title: string) => this.category.questionShortLabel(title);
   /** Distance-based categories get inline chips; the rest get a grid of subject tiles. */
   readonly isParametric = computed(() => this.selected() === 'radar' || this.selected() === 'thermometer');
 
@@ -53,8 +55,8 @@ export class QuestionPicker {
 
   readonly categories = computed(() => [...new Set(this.catalog().map((q) => q.category))]);
   readonly categoryQuestions = computed(() => this.catalog().filter((q) => q.category === this.selected()));
-  readonly radarPresets = computed(() => RADAR_PRESETS[this.units()]);
-  readonly thermoPresets = computed(() => THERMO_PRESETS[this.units()]);
+  readonly radarPresets = computed(() => this.unitsService.radarPresets[this.units()]);
+  readonly thermoPresets = computed(() => this.unitsService.thermoPresets[this.units()]);
   readonly unitLabel = computed(() => (this.units() === 'imperial' ? 'mi' : 'km'));
 
   isDisabled(category: string): boolean {

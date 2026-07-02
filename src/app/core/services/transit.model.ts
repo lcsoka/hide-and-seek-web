@@ -1,3 +1,11 @@
+/** Display metadata for a transit mode (label, icon, colour for chips + map markers). */
+export interface TransitMeta {
+  id: string;
+  label: string;
+  icon: string;
+  color: string;
+}
+
 /**
  * A nearby public-transport stop. A single real stop (its two directional platforms already
  * collapsed) that the hider can hide at or the seeker can board from.

@@ -3,7 +3,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { RouteLine } from '../../core/maps/overpass.model';
 import { TransitRoutes } from '../../core/services/transit-routes';
 import { TransitStop } from '../../core/services/transit.model';
-import { transitMeta } from '../../core/util/transit';
+import { TransitService } from '../../core/services/transit.service';
 import { BoardChoice } from './transit-picker.model';
 
 /** Board flow: pick the nearest stop, then a line; tapping a line draws its route on the map. */
@@ -14,6 +14,7 @@ import { BoardChoice } from './transit-picker.model';
 })
 export class TransitPicker {
   private readonly transit = inject(TransitRoutes);
+  private readonly transitService = inject(TransitService);
 
   readonly open = input(false);
   readonly seekerLat = input<number | null>(null);
@@ -25,7 +26,7 @@ export class TransitPicker {
   readonly stops = this.transit.stops;
   readonly routes = this.transit.routes;
   readonly busy = this.transit.busy;
-  readonly mode = transitMeta;
+  readonly mode = (id: string) => this.transitService.transitMeta(id);
 
   readonly selectedStop = signal<TransitStop | null>(null);
   readonly selectedLine = signal<RouteLine | null>(null);

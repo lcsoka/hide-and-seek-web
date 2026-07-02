@@ -4,12 +4,11 @@ import { FeatureCollection, Point } from 'geojson';
 import { applyQuestions, playArea } from '../../core/deduction/deduction';
 import { DeductionQuestion, RegionQuestion } from '../../core/deduction/deduction.model';
 import { resolvedQuestionsToDeduction } from '../../core/deduction/game-deduction';
-import { isOsmCategory, osmRegion } from '../../core/deduction/osm-deduction';
-import { OverpassService } from '../../core/maps/overpass';
+import { isOsmCategory, OsmDeductionService } from '../../core/deduction/osm-deduction.service';
 import { GodView, ResolvedQuestion } from '../../core/models';
 import { DebugApi } from '../../core/services/debug-api';
-import { actionLabel } from '../../core/util/labels';
-import { formatDistance, unitsOf } from '../../core/util/units';
+import { LabelService } from '../../core/services/label.service';
+import { UnitsService } from '../../core/services/units.service';
 import { DeductionMap } from '../map/deduction-map';
 
 interface TimelineEntry {
@@ -72,7 +71,9 @@ interface TimelineEntry {
 export class Replay {
   private readonly route = inject(ActivatedRoute);
   private readonly debug = inject(DebugApi);
-  private readonly overpass = inject(OverpassService);
+  private readonly osmDeduction = inject(OsmDeductionService);
+  private readonly label = inject(LabelService);
+  private readonly unitsService = inject(UnitsService);
 
   readonly id = this.route.snapshot.paramMap.get('id') ?? '';
   readonly god = signal<GodView | null>(null);
@@ -80,7 +81,7 @@ export class Replay {
   readonly osmRegions = signal<Map<number, RegionQuestion>>(new Map());
   private readonly osmSeen = new Set<number>();
 
-  readonly units = computed(() => unitsOf(this.god()?.config));
+  readonly units = computed(() => this.unitsService.unitsOf(this.god()?.config));
   readonly markerQuestions = computed(() => resolvedQuestionsToDeduction(this.god()?.questions ?? []));
 
   readonly candidate = computed(() => {
@@ -124,7 +125,7 @@ export class Replay {
       for (const q of g.questions) {
         if (isOsmCategory(q.category) && q.ask.lat != null && q.ask.feature && !this.osmSeen.has(q.seq)) {
           this.osmSeen.add(q.seq);
-          void osmRegion(this.overpass, q).then((r) => {
+          void this.osmDeduction.region(q).then((r) => {
             if (r) {
               this.osmRegions.update((m) => new Map(m).set(q.seq, { id: `q${q.seq}`, type: 'region', label: q.category, region: r.region, within: r.within }));
             }
@@ -162,7 +163,7 @@ export class Replay {
     }
     const text = { yes: 'Yes', no: 'No', hotter: 'Hotter', colder: 'Colder', closer: 'Closer', further: 'Further', out_of_range: 'Out of range' }[a] ?? a;
 
-    return q.category === 'radar' && q.ask.radius_m ? `${text} (≤ ${formatDistance(q.ask.radius_m, this.units())})` : text;
+    return q.category === 'radar' && q.ask.radius_m ? `${text} (≤ ${this.unitsService.formatDistance(q.ask.radius_m, this.units())})` : text;
   }
 
   private buildTimeline(): TimelineEntry[] {
@@ -176,7 +177,7 @@ export class Replay {
 
     for (const l of g.action_logs) {
       if (!skip.has(l.type) && l.at != null) {
-        entries.push({ at: l.at, kind: 'step', who: this.playerName(l.player_id), text: actionLabel(l.type) });
+        entries.push({ at: l.at, kind: 'step', who: this.playerName(l.player_id), text: this.label.actionLabel(l.type) });
       }
     }
     for (const q of g.questions) {
