@@ -23,17 +23,40 @@ export class AuthStore {
   }
 
   async loadMe(): Promise<void> {
+    if (!this.tokens.token()) {
+      this.user.set(null);
+
+      return;
+    }
     try {
       this.user.set(await this.api.me());
-    } catch {
-      this.user.set(null); // stale/invalid token — treated as signed-out
+    } catch (e: unknown) {
+      // A stale/invalid token (e.g. its guest was pruned, or it was revoked): drop it so the
+      // next guest/register flow mints a fresh one instead of reusing a dead token.
+      if (this.isUnauthorized(e)) {
+        this.tokens.clear();
+      }
+      this.user.set(null);
     }
   }
 
   /** Register the current guest (minting one first if the visitor hasn't played yet). */
   async register(email: string, password: string, name?: string): Promise<Profile> {
     await this.ensureGuestToken();
-    const profile = await this.api.register({ email, password, name: name || undefined });
+    const body = { email, password, name: name || undefined };
+
+    let profile: Profile;
+    try {
+      profile = await this.api.register(body);
+    } catch (e: unknown) {
+      if (!this.isUnauthorized(e)) {
+        throw e;
+      }
+      // The stored token was stale — mint a fresh guest and promote that one instead.
+      this.tokens.clear();
+      await this.ensureGuestToken();
+      profile = await this.api.register(body);
+    }
     this.user.set(profile);
 
     return profile;
@@ -78,5 +101,9 @@ export class AuthStore {
       const auth = await this.api.guest();
       this.tokens.set(auth.token);
     }
+  }
+
+  private isUnauthorized(e: unknown): boolean {
+    return (e as { status?: number })?.status === 401;
   }
 }
