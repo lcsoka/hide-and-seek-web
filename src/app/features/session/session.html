@@ -14,7 +14,7 @@
       @if (showDeductionMap(s)) {
         <app-deduction-map class="block h-full" [candidate]="deduction.candidate()" [annotations]="deduction.annotations()"
                            [loading]="deduction.computing()" [thermoMarker]="thermoMarker(s)" [radarPreview]="radarPreviewMarker()"
-                           [players]="s.players" [meId]="myId()"
+                           [refPreview]="refPreviewMarker()" [players]="s.players" [meId]="myId()"
                            [autoZoom]="!devPlacing()" (mapClick)="onMapClick($event)" />
       } @else {
         <app-map class="block h-full" [players]="s.players" [meId]="myId()" [zone]="s.hiding_zone"
@@ -60,6 +60,17 @@
           <span class="text-sm font-semibold">📡 {{ rp.label }}</span>
           <button (click)="cancelRadar()" class="rounded-full px-3 py-1.5 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-white">{{ 'common.cancel' | transloco }}</button>
           <button (click)="confirmRadar(s)" class="rounded-full bg-rose-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-rose-700">{{ 'picker.confirmAsk' | transloco }}</button>
+        </div>
+      </div>
+    }
+
+    <!-- Reference preview (measuring/matching): the reference place is pinned on the map; confirm to ask. -->
+    @if (refPreview(); as rp) {
+      <div class="pointer-events-none absolute inset-x-0 top-28 z-[750] flex justify-center px-4">
+        <div class="jl-pop pointer-events-auto flex items-center gap-2 rounded-full bg-white/95 py-1.5 pl-4 pr-1.5 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10">
+          <span class="max-w-[9rem] truncate text-sm font-semibold">📍 {{ rp.name }}</span>
+          <button (click)="cancelRef()" class="rounded-full px-3 py-1.5 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-white">{{ 'common.cancel' | transloco }}</button>
+          <button (click)="confirmRef(s)" class="rounded-full bg-rose-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-rose-700">{{ 'picker.confirmAsk' | transloco }}</button>
         </div>
       </div>
     }
@@ -177,7 +188,7 @@
     <app-question-picker [catalog]="catalog()" [units]="askUnits(s)" [open]="pickerOpen()"
                          [seekerLat]="me(s)?.lat ?? null" [seekerLng]="me(s)?.lng ?? null"
                          [disabledCategories]="s.disabled_categories" [onTransit]="s.transit?.on_transit ?? false"
-                         (ask)="onAsk(s, $event)" (preview)="onRadarPreview(s, $event)" (closeChange)="pickerOpen.set($event)" />
+                         (ask)="onAsk(s, $event)" (preview)="onRadarPreview(s, $event)" (refPreview)="onRefPreview(s, $event)" (closeChange)="pickerOpen.set($event)" />
     <app-transit-picker [open]="boardOpen()" [seekerLat]="me(s)?.lat ?? null" [seekerLng]="me(s)?.lng ?? null"
                         [transitModes]="allTransitModes" (board)="onBoard(s, $event)" (closeChange)="boardOpen.set($event)" />
 

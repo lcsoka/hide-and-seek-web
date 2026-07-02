@@ -54,6 +54,9 @@ export class DeductionMap {
   readonly thermoMarker = input<{ lat: number; lng: number; radiusM?: number | null; label?: string } | null>(null);
   // A radar radius the seeker is previewing before committing to ask (two-step: preview → confirm).
   readonly radarPreview = input<{ lat: number; lng: number; radiusM: number } | null>(null);
+  // A reference place the seeker is previewing for a measuring/matching question (with a dashed
+  // line from their own position) before committing to ask.
+  readonly refPreview = input<{ lat: number; lng: number; fromLat?: number | null; fromLng?: number | null; label?: string } | null>(null);
   readonly players = input<PlayerView[]>([]); // visible players (seekers see themselves + teammates)
   readonly meId = input<string | null>(null);
   readonly mapClick = output<Position>();
@@ -67,6 +70,7 @@ export class DeductionMap {
   private lastFitSig = '';
   private lastRouteSig = '';
   private lastPreviewSig = '';
+  private lastRefSig = '';
   private userMoved = false;
   private programmaticMove = false;
 
@@ -82,6 +86,7 @@ export class DeductionMap {
       this.loading();
       this.thermoMarker();
       this.radarPreview();
+      this.refPreview();
       this.players();
       this.transitRoutes.displayed();
       this.render();
@@ -249,6 +254,33 @@ export class DeductionMap {
       }
     } else {
       this.lastPreviewSig = '';
+    }
+
+    // A reference place the seeker is previewing for a measuring/matching question — a cyan
+    // pin, with a dashed line from their own position, framed once so they can judge it.
+    const ref = this.refPreview();
+    const refSig = ref ? `${ref.lat}:${ref.lng}` : '';
+    if (ref) {
+      L.marker([ref.lat, ref.lng], { icon: markerIcon('📍', { color: '#0891b2', size: 28 }) })
+        .bindTooltip(ref.label ?? 'reference', { permanent: true, direction: 'top', offset: [0, -14], opacity: 0.95 })
+        .addTo(this.overlay);
+      const pts: L.LatLngExpression[] = [[ref.lat, ref.lng]];
+      if (ref.fromLat != null && ref.fromLng != null) {
+        L.polyline([[ref.fromLat, ref.fromLng], [ref.lat, ref.lng]], { color: '#0891b2', weight: 2, dashArray: '6 6', opacity: 0.85 }).addTo(this.overlay);
+        pts.push([ref.fromLat, ref.fromLng]);
+      }
+      if (refSig !== this.lastRefSig) {
+        this.lastRefSig = refSig;
+        try {
+          this.programmaticMove = true;
+          this.map.fitBounds(L.latLngBounds(pts).pad(0.35), { maxZoom: 16, animate: true, duration: 0.5 });
+          setTimeout(() => (this.programmaticMove = false), 600);
+        } catch {
+          this.programmaticMove = false;
+        }
+      }
+    } else {
+      this.lastRefSig = '';
     }
 
     // Visible players (the seeker themselves + teammates; the hider is concealed by

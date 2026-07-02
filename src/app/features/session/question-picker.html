@@ -25,33 +25,6 @@
             </button>
           }
         </div>
-      } @else if (matchQ(); as mq) {
-        <!-- Matching: confirm which place is actually the seeker's closest. -->
-        <button (click)="back()" class="mb-2 text-sm text-gray-400 hover:text-gray-600">{{ t('picker.back') }}</button>
-        <p class="mb-2 text-sm font-medium">{{ t('picker.whichClosest', { label: qLabel(mq.title) }) }}</p>
-        @if (places() === null) {
-          <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('picker.findingPlaces') }}</p>
-        } @else if (places()!.length) {
-          <ul class="mb-3 max-h-64 space-y-1 overflow-y-auto">
-            @for (p of places()!; track p.name + p.distM) {
-              <li>
-                <button (click)="chosenPlace.set(p)"
-                        class="flex w-full items-center justify-between rounded-lg border p-2 text-left text-sm"
-                        [class]="p === chosenPlace() ? 'border-rose-500 bg-rose-50 dark:bg-rose-950' : 'border-gray-200 dark:border-gray-700'">
-                  <span class="min-w-0 flex-1 truncate">{{ p.name }}</span>
-                  <span class="shrink-0 text-gray-500">{{ p.distM }} m</span>
-                </button>
-              </li>
-            }
-          </ul>
-          <button (click)="confirmMatch()" [disabled]="!chosenPlace()"
-                  class="w-full rounded-xl bg-rose-600 p-2.5 font-semibold text-white hover:bg-rose-700 disabled:opacity-40">
-            {{ t('picker.askClosest') }} {{ chosenPlace()?.name }}
-          </button>
-        } @else {
-          <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">{{ t('picker.couldntLookup') }}</p>
-          <button (click)="confirmMatch()" class="w-full rounded-xl bg-rose-600 p-2.5 font-semibold text-white hover:bg-rose-700">{{ t('picker.askAnyway') }}</button>
-        }
       } @else {
         <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">{{ t('categoryHint.' + selected()!) }}</p>
 
@@ -86,6 +59,8 @@
               </div>
             }
           }
+        } @else if (finding()) {
+          <p class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">{{ t('picker.findingRef') }}</p>
         } @else {
           <!-- Subject questions as icon tiles. -->
           <div class="grid grid-cols-3 gap-2 sm:grid-cols-4">

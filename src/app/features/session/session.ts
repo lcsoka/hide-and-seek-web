@@ -67,6 +67,13 @@ export class SessionView {
 
     return p ? { lat: p.lat, lng: p.lng, radiusM: p.radiusM } : null;
   });
+  // A reference place the seeker is previewing for a measuring/matching question before asking.
+  readonly refPreview = signal<{ questionId: string; category: string; name: string; lat: number; lng: number; fromLat: number | null; fromLng: number | null } | null>(null);
+  readonly refPreviewMarker = computed(() => {
+    const p = this.refPreview();
+
+    return p ? { lat: p.lat, lng: p.lng, fromLat: p.fromLat, fromLng: p.fromLng, label: p.name } : null;
+  });
   // Which mobile drawer is open (icon-button HUD). Desktop shows the full side panel instead.
   readonly mobileDrawer = signal<'hide' | 'questions' | 'hand' | 'seeker' | null>(null);
   // Host's End-game confirmation (a single HUD control, not a per-panel button).
@@ -307,6 +314,7 @@ export class SessionView {
    *  their position isn't known yet, fall back to asking straight away. */
   onRadarPreview(s: GameState, ev: { questionId: string; radiusM: number; label: string }): void {
     this.pickerOpen.set(false);
+    this.refPreview.set(null);
     const me = this.me(s);
     if (me?.lat == null || me?.lng == null) {
       void this.onAsk(s, { questionId: ev.questionId, category: 'radar', payload: { radius_m: ev.radiusM } });
@@ -329,6 +337,30 @@ export class SessionView {
 
   cancelRadar(): void {
     this.radarPreview.set(null);
+  }
+
+  /** Seeker picked a measuring/matching question: preview its reference place on the map (with a
+   *  line from their position) for confirmation. */
+  onRefPreview(s: GameState, ev: { questionId: string; category: string; name: string; lat: number; lng: number }): void {
+    this.pickerOpen.set(false);
+    this.radarPreview.set(null);
+    const me = this.me(s);
+    this.refPreview.set({ ...ev, fromLat: me?.lat ?? null, fromLng: me?.lng ?? null });
+  }
+
+  /** Confirm the previewed reference — ask the question against it (server uses this exact place). */
+  async confirmRef(s: GameState): Promise<void> {
+    const p = this.refPreview();
+    if (!p) {
+      return;
+    }
+    this.refPreview.set(null);
+    await this.api.submitAction(s.session_id, 'ask_question', { question_id: p.questionId, ref_lat: p.lat, ref_lng: p.lng, ref_name: p.name });
+    this.store.refresh();
+  }
+
+  cancelRef(): void {
+    this.refPreview.set(null);
   }
 
   /** Live-play states where the map is the focus and the panel becomes openable drawers on mobile. */

@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { Point } from 'geojson';
+import { FeatureCollection, Point } from 'geojson';
 import { distance, point } from '@turf/turf';
 import { TranslocoModule } from '@jsverse/transloco';
 import { QuestionCatalogItem } from '../../core/models/models';
@@ -35,6 +35,8 @@ export class QuestionPicker {
   // Radar is two-step: choosing a radius previews it on the map (picker closes), then the
   // seeker confirms in the shell to actually ask.
   readonly preview = output<{ questionId: string; radiusM: number; label: string }>();
+  // Measuring/matching: preview the seeker's reference place on the map, then confirm in the shell.
+  readonly refPreview = output<{ questionId: string; category: string; name: string; lat: number; lng: number }>();
   readonly closeChange = output<boolean>();
 
   readonly selected = signal<string | null>(null);
@@ -45,10 +47,8 @@ export class QuestionPicker {
   /** Distance-based categories get inline chips; the rest get a grid of subject tiles. */
   readonly isParametric = computed(() => this.selected() === 'radar' || this.selected() === 'thermometer');
 
-  // Matching: confirm which place is actually the seeker's closest before asking.
-  readonly matchQ = signal<QuestionCatalogItem | null>(null);
-  readonly places = signal<NearbyPlace[] | null>(null);
-  readonly chosenPlace = signal<NearbyPlace | null>(null);
+  // Looking up the reference place for a measuring/matching question before previewing it.
+  readonly finding = signal(false);
 
   readonly categories = computed(() => [...new Set(this.catalog().map((q) => q.category))]);
   readonly categoryQuestions = computed(() => this.catalog().filter((q) => q.category === this.selected()));
@@ -74,15 +74,12 @@ export class QuestionPicker {
 
   back(): void {
     this.selected.set(null);
-    this.matchQ.set(null);
   }
 
   close(): void {
     this.selected.set(null);
     this.custom.set('');
-    this.matchQ.set(null);
-    this.places.set(null);
-    this.chosenPlace.set(null);
+    this.finding.set(false);
     this.closeChange.emit(false);
   }
 
@@ -121,58 +118,59 @@ export class QuestionPicker {
     }
   }
 
-  /** Tapping a subject tile. Matching first confirms the seeker's closest place. */
+  /** Tapping a subject tile. Measuring/matching first preview the seeker's reference place. */
   pickQuestion(q: QuestionCatalogItem): void {
-    if (q.category === 'matching') {
-      void this.openMatchConfirm(q);
+    if (q.category === 'matching' || q.category === 'measuring') {
+      void this.openRefPreview(q);
     } else {
       this.askGeneric(q);
     }
   }
 
-  private async openMatchConfirm(q: QuestionCatalogItem): Promise<void> {
-    this.matchQ.set(q);
-    this.places.set(null);
-    this.chosenPlace.set(null);
-
+  /** Look up the seeker's nearest reference place and preview it on the map (picker closes). No
+   *  nearby feature (or Overpass unavailable) → ask directly and let the server compute the ref. */
+  private async openRefPreview(q: QuestionCatalogItem): Promise<void> {
     const feature = q.parameters?.['feature'] as string | undefined;
     const lat = this.seekerLat();
     const lng = this.seekerLng();
     const tag = feature ? FEATURE_TAGS[feature] : undefined;
     if (!tag || lat == null || lng == null) {
-      this.places.set([]); // can't look up — the seeker can still ask without confirming
+      this.askGeneric(q);
       return;
     }
 
+    this.finding.set(true);
+    let nearest: NearbyPlace | null = null;
     try {
       // Bound the lookup — a throttled Overpass shouldn't trap the seeker on "Finding…".
-      const fc = await Promise.race([this.overpass.pois(lat, lng, 8, tag), new Promise<null>((res) => setTimeout(() => res(null), 10000))]);
-      if (!fc) {
-        this.places.set([]); // timed out → let them ask without confirming
-        return;
-      }
-      const here = point([lng, lat]);
-      const list = fc.features
-        .map((f) => {
-          const [flng, flat] = (f.geometry as Point).coordinates;
-          return { name: String(f.properties?.['name'] ?? 'Unnamed'), lat: flat, lng: flng, distM: Math.round(distance(here, f as any, { units: 'kilometers' }) * 1000) };
-        })
-        .sort((a, b) => a.distM - b.distM)
-        .slice(0, 8);
-      this.places.set(list);
-      this.chosenPlace.set(list[0] ?? null);
+      const fc = await Promise.race([this.overpass.pois(lat, lng, 15, tag), new Promise<FeatureCollection<Point> | null>((res) => setTimeout(() => res(null), 10000))]);
+      nearest = this.nearestPlace(fc, lat, lng);
     } catch {
-      this.places.set([]);
+      nearest = null;
+    }
+    this.finding.set(false);
+
+    if (nearest) {
+      this.refPreview.emit({ questionId: q.id, category: q.category, name: nearest.name, lat: nearest.lat, lng: nearest.lng });
+      this.close();
+    } else {
+      this.askGeneric(q); // no nearby reference — ask directly (server computes / falls back)
     }
   }
 
-  confirmMatch(): void {
-    const q = this.matchQ();
-    const place = this.chosenPlace();
-    if (!q) {
-      return;
+  private nearestPlace(fc: FeatureCollection<Point> | null, lat: number, lng: number): NearbyPlace | null {
+    if (!fc) {
+      return null;
     }
-    this.emit(q, place ? { ref_lat: place.lat, ref_lng: place.lng, ref_name: place.name } : {});
+    const here = point([lng, lat]);
+    const list = fc.features
+      .map((f) => {
+        const [flng, flat] = f.geometry.coordinates;
+        return { name: String(f.properties?.['name'] ?? 'Unnamed'), lat: flat, lng: flng, distM: Math.round(distance(here, f as any, { units: 'kilometers' }) * 1000) };
+      })
+      .sort((a, b) => a.distM - b.distM);
+
+    return list[0] ?? null;
   }
 
   askGeneric(q: QuestionCatalogItem): void {
