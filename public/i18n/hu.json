@@ -112,6 +112,7 @@
   "landing": {
     "yourName": "A neved",
     "nameRequired": "Add meg a neved a kezdéshez",
+    "playingAs": "{{ name }} néven játszol",
     "tagline": "Bújj el a városban. Vadássz kérdésekkel. Éld túl a többieket.",
     "badge": "10 magyar város · valós tömegközlekedés",
     "how": { "hide": "Bújj el egy megállónál", "ask": "Szűkítsd a térképet", "catch": "Kapd el a bújót" },

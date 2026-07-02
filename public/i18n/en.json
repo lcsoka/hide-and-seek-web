@@ -112,6 +112,7 @@
   "landing": {
     "yourName": "Your name",
     "nameRequired": "Enter your name to start",
+    "playingAs": "Playing as {{ name }}",
     "tagline": "Hide across the city. Hunt with questions. Outlast everyone.",
     "badge": "10 Hungarian cities · real transit",
     "how": { "hide": "Hide near a station", "ask": "Narrow the map", "catch": "Catch the hider" },

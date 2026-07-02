@@ -1,4 +1,4 @@
-import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -48,6 +48,15 @@ export class Landing {
 
   constructor() {
     afterNextRender(() => this.initBackdrop());
+
+    // Prefill the name from the signed-in profile: a registered user always plays under their
+    // account name (the input is hidden for them); a returning guest gets their name pre-filled.
+    effect(() => {
+      const user = this.auth.user();
+      if (user && (!user.is_guest || !this.name)) {
+        this.name = user.name;
+      }
+    });
   }
 
   /** A non-interactive Budapest map that slowly drifts between landmarks — the hero backdrop,
