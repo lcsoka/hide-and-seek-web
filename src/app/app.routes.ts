@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   { path: '', loadComponent: () => import('./features/landing/landing').then((m) => m.Landing) },
+  { path: 'profile', loadComponent: () => import('./features/profile/profile').then((m) => m.ProfilePage) },
   { path: 's/:id', loadComponent: () => import('./features/session/session').then((m) => m.SessionView) },
   { path: 'map', loadComponent: () => import('./features/map/map-page').then((m) => m.MapPage) },
   { path: 'dev', loadComponent: () => import('./features/dev/index').then((m) => m.DevIndex) },

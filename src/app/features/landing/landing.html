@@ -12,7 +12,19 @@
     <div class="font-display flex items-center gap-2 text-lg font-bold tracking-tight">
       <span class="grid h-8 w-8 place-items-center rounded-lg bg-rose-600 text-sm">🚇</span> Hide <span class="text-rose-500 dark:text-rose-400">&amp;</span> Seek
     </div>
-    <app-lang-toggle />
+    <div class="flex items-center gap-2">
+      @if (auth.isRegistered()) {
+        <a routerLink="/profile" class="flex max-w-[9rem] items-center gap-1.5 rounded-full bg-gray-900/5 py-1 pl-1 pr-3 text-sm font-medium text-gray-700 ring-1 ring-gray-900/10 backdrop-blur dark:bg-white/10 dark:text-white dark:ring-white/15">
+          <span class="grid h-6 w-6 shrink-0 place-items-center overflow-hidden rounded-full bg-rose-600 text-xs font-bold text-white">
+            @if (auth.user()!.avatar) { <img [src]="auth.user()!.avatar" alt="" class="h-full w-full object-cover" /> } @else { {{ (auth.user()!.name || '?').charAt(0).toUpperCase() }} }
+          </span>
+          <span class="truncate">{{ auth.user()!.name }}</span>
+        </a>
+      } @else {
+        <button (click)="authOpen.set(true)" class="rounded-full bg-gray-900/5 px-3 py-1.5 text-sm font-medium text-gray-700 ring-1 ring-gray-900/10 backdrop-blur transition hover:bg-gray-900/10 dark:bg-white/10 dark:text-white dark:ring-white/15 dark:hover:bg-white/20">{{ t('auth.logIn') }}</button>
+      }
+      <app-lang-toggle />
+    </div>
   </header>
 
   <!-- Hero -->
@@ -141,5 +153,7 @@
       </div>
     </div>
   }
+
+  <app-auth-modal [open]="authOpen()" (closeChange)="authOpen.set($event)" />
   </ng-container>
 </div>

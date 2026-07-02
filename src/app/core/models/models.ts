@@ -9,6 +9,15 @@ export interface GuestAuth {
   user_id: string;
 }
 
+/** The signed-in user's profile (a guest until they register). */
+export interface Profile {
+  id: number;
+  name: string;
+  email: string | null;
+  avatar: string | null;
+  is_guest: boolean;
+}
+
 export interface PlayerView {
   id: string;
   display_name: string;

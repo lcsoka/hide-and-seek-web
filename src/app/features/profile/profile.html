@@ -1,0 +1,65 @@
+<div class="mx-auto flex min-h-[100dvh] w-full max-w-md flex-col gap-6 p-5" *transloco="let t">
+  <header class="flex items-center justify-between">
+    <a routerLink="/" class="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-white">← {{ t('common.leave') }}</a>
+    <h1 class="font-display text-lg font-bold">{{ t('auth.profile') }}</h1>
+    <span class="w-10"></span>
+  </header>
+
+  @if (user(); as u) {
+    <!-- Avatar -->
+    <div class="flex flex-col items-center gap-3">
+      <div class="grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-rose-600 text-3xl font-bold text-white ring-4 ring-white shadow-lg dark:ring-gray-900">
+        @if (u.avatar) {
+          <img [src]="u.avatar" alt="Avatar" class="h-full w-full object-cover" />
+        } @else {
+          {{ (u.name || '?').charAt(0).toUpperCase() }}
+        }
+      </div>
+      @if (!u.is_guest) {
+        <label class="cursor-pointer text-sm font-medium text-rose-600 hover:underline dark:text-rose-400">
+          {{ t('auth.changeAvatar') }}
+          <input type="file" accept="image/*" class="hidden" (change)="onAvatarPicked($event)" [disabled]="busy()" />
+        </label>
+      }
+    </div>
+
+    <!-- Identity -->
+    <div class="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-white/10">
+      <label class="block space-y-1 text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('auth.displayName') }}
+        <div class="flex gap-2">
+          <input [(ngModel)]="name" maxlength="50"
+                 class="w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 focus:border-rose-400 focus:outline-none dark:border-white/15 dark:bg-white/10 dark:text-white" />
+          <button (click)="saveName()" [disabled]="busy() || !name.trim() || name.trim() === u.name"
+                  class="rounded-xl bg-rose-600 px-4 font-semibold text-white transition hover:bg-rose-500 disabled:opacity-40">{{ t('auth.save') }}</button>
+        </div>
+      </label>
+
+      <div class="text-sm">
+        <span class="text-gray-500 dark:text-gray-400">{{ t('auth.email') }}:</span>
+        @if (u.is_guest) {
+          <span class="ml-1 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">{{ t('auth.guestBadge') }}</span>
+        } @else {
+          <span class="ml-1 font-medium">{{ u.email }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Actions -->
+    @if (u.is_guest) {
+      <div class="space-y-2 rounded-2xl bg-rose-50 p-4 dark:bg-rose-950/40">
+        <p class="text-sm text-rose-800 dark:text-rose-200">{{ t('auth.guestUpsell') }}</p>
+        <button (click)="authOpen.set(true)" class="w-full rounded-xl bg-rose-600 p-3 font-semibold text-white shadow-lg shadow-rose-600/30 transition hover:bg-rose-500">
+          {{ t('auth.createAccount') }}
+        </button>
+      </div>
+    } @else {
+      <button (click)="logout()" class="w-full rounded-xl border border-gray-300 p-3 font-medium text-gray-700 transition hover:bg-gray-100 dark:border-white/15 dark:text-gray-200 dark:hover:bg-white/5">
+        {{ t('auth.logOut') }}
+      </button>
+    }
+  } @else {
+    <div class="grid flex-1 place-items-center text-gray-400">{{ t('common.loading') }}</div>
+  }
+
+  <app-auth-modal [open]="authOpen()" startMode="register" (closeChange)="authOpen.set($event)" />
+</div>

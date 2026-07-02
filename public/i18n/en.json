@@ -8,6 +8,26 @@
     "error": "Something went wrong."
   },
   "connection": { "reconnecting": "Reconnecting…" },
+  "auth": {
+    "logIn": "Log in",
+    "signUp": "Sign up",
+    "loginTitle": "Welcome back",
+    "registerTitle": "Create your account",
+    "registerBlurb": "Keep your games, stats and name across devices. You can keep playing as a guest without one.",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least 8 characters.",
+    "displayName": "Display name",
+    "haveAccount": "Already have an account? Log in",
+    "noAccount": "No account? Create one",
+    "profile": "Profile",
+    "changeAvatar": "Change avatar",
+    "save": "Save",
+    "guestBadge": "Guest",
+    "guestUpsell": "You're playing as a guest. Create an account to keep your history and play across devices.",
+    "createAccount": "Create account",
+    "logOut": "Log out"
+  },
   "role": { "hider": "Hider", "seeker": "Seeker" },
   "state": {
     "lobby": "Lobby",

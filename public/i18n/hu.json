@@ -8,6 +8,26 @@
     "error": "Valami hiba történt."
   },
   "connection": { "reconnecting": "Újracsatlakozás…" },
+  "auth": {
+    "logIn": "Belépés",
+    "signUp": "Regisztráció",
+    "loginTitle": "Üdv újra!",
+    "registerTitle": "Fiók létrehozása",
+    "registerBlurb": "Őrizd meg a játékaidat, statisztikáidat és a neved az eszközök között. Fiók nélkül is játszhatsz vendégként.",
+    "email": "E-mail",
+    "password": "Jelszó",
+    "passwordHint": "Legalább 8 karakter.",
+    "displayName": "Megjelenített név",
+    "haveAccount": "Van már fiókod? Lépj be",
+    "noAccount": "Nincs fiókod? Hozz létre egyet",
+    "profile": "Profil",
+    "changeAvatar": "Avatar módosítása",
+    "save": "Mentés",
+    "guestBadge": "Vendég",
+    "guestUpsell": "Vendégként játszol. Hozz létre fiókot, hogy megőrizd az előzményeidet és több eszközön játszhass.",
+    "createAccount": "Fiók létrehozása",
+    "logOut": "Kilépés"
+  },
   "role": { "hider": "Bújó", "seeker": "Kereső" },
   "state": {
     "lobby": "Váróterem",

@@ -5,13 +5,15 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import * as L from 'leaflet';
 import { TRANSIT_MODES } from '../../core/maps/overpass';
 import { ApiClient } from '../../core/services/api-client';
+import { AuthStore } from '../../core/services/auth-store';
 import { PlayerStore } from '../../core/services/player-store';
 import { TokenStore } from '../../core/services/token-store';
+import { AuthModal } from '../auth/auth-modal';
 import { LangToggle } from '../../shared/lang-toggle';
 
 @Component({
   selector: 'app-landing',
-  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle],
+  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, AuthModal],
   templateUrl: './landing.html',
 })
 export class Landing {
@@ -21,6 +23,8 @@ export class Landing {
   private readonly router = inject(Router);
   private readonly transloco = inject(TranslocoService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly auth = inject(AuthStore);
+  readonly authOpen = signal(false);
 
   readonly mapEl = viewChild.required<ElementRef<HTMLElement>>('mapEl');
   readonly busy = signal(false);

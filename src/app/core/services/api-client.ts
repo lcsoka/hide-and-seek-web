@@ -2,7 +2,7 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CurseCatalogItem, GameState, GuestAuth, PlayerView, QuestionCatalogItem, SessionSummary } from '../models/models';
+import { CurseCatalogItem, GameState, GuestAuth, PlayerView, Profile, QuestionCatalogItem, SessionSummary } from '../models/models';
 
 /**
  * Typed wrapper over the REST contract. Reads use `httpResource` (signals);
@@ -15,6 +15,34 @@ export class ApiClient {
 
   guest(displayName?: string): Promise<GuestAuth> {
     return firstValueFrom(this.http.post<GuestAuth>(`${this.base}/auth/guest`, { display_name: displayName }));
+  }
+
+  /** Promote the current guest to a registered account (email + password). */
+  register(body: { email: string; password: string; name?: string }): Promise<Profile> {
+    return firstValueFrom(this.http.post<Profile>(`${this.base}/auth/register`, body));
+  }
+
+  login(email: string, password: string): Promise<Profile & { token: string }> {
+    return firstValueFrom(this.http.post<Profile & { token: string }>(`${this.base}/auth/login`, { email, password }));
+  }
+
+  logout(): Promise<unknown> {
+    return firstValueFrom(this.http.post(`${this.base}/auth/logout`, {}));
+  }
+
+  me(): Promise<Profile> {
+    return firstValueFrom(this.http.get<Profile>(`${this.base}/auth/me`));
+  }
+
+  updateProfile(body: { name?: string }): Promise<Profile> {
+    return firstValueFrom(this.http.patch<Profile>(`${this.base}/profile`, body));
+  }
+
+  uploadAvatar(file: File): Promise<Profile> {
+    const form = new FormData();
+    form.append('image', file);
+
+    return firstValueFrom(this.http.post<Profile>(`${this.base}/profile/avatar`, form));
   }
 
   createSession(body: {
