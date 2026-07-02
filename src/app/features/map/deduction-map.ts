@@ -26,8 +26,11 @@ const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
   template: `
     <div #el class="h-full min-h-72 w-full overflow-hidden"></div>
     @if (loading()) {
-      <div class="pointer-events-none absolute inset-0 z-[500] flex items-center justify-center">
-        <span class="rounded-full bg-gray-900/85 px-3 py-1.5 text-sm font-medium text-white shadow-lg">{{ 'map.calculating' | transloco }}</span>
+      <div class="pointer-events-none absolute inset-x-0 top-3 z-[500] flex justify-center">
+        <span class="flex items-center gap-2 rounded-full bg-gray-900/85 px-3 py-1.5 text-xs font-medium text-white shadow-lg backdrop-blur">
+          <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
+          {{ 'map.calculating' | transloco }}
+        </span>
       </div>
     }
     @if (candidate()) {
@@ -111,9 +114,11 @@ export class DeductionMap {
   }
 
   private render(): void {
-    // Hold the last-rendered view until the deduction settles, so it's drawn once
-    // (not visibly re-cut per clue) when the page reloads with many questions.
-    if (!this.map || this.loading()) {
+    // Always draw what we know now — the candidate from the synchronous cuts (radar/
+    // thermometer) is ready immediately, and OSM-backed regions narrow it as they land.
+    // (Previously the whole map was held while OSM fetched, so a slow/throttled Overpass
+    // left the deduction blank for up to 10s. A small "calculating" badge shows instead.)
+    if (!this.map) {
       return;
     }
 
