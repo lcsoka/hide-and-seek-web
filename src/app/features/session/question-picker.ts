@@ -32,6 +32,9 @@ export class QuestionPicker {
   readonly disabledCategories = input<string[]>([]);
   readonly onTransit = input(false); // seeker is riding → thermometer is unavailable (walk-only)
   readonly ask = output<{ questionId: string; category: string; payload: Record<string, unknown> }>();
+  // Radar is two-step: choosing a radius previews it on the map (picker closes), then the
+  // seeker confirms in the shell to actually ask.
+  readonly preview = output<{ questionId: string; radiusM: number; label: string }>();
   readonly closeChange = output<boolean>();
 
   readonly selected = signal<string | null>(null);
@@ -83,8 +86,11 @@ export class QuestionPicker {
     this.closeChange.emit(false);
   }
 
-  askRadar(q: QuestionCatalogItem, radiusM: number): void {
-    this.emit(q, { radius_m: radiusM });
+  /** Preview a radar radius (don't ask yet): close the picker so the map + circle are visible,
+   *  then the seeker confirms in the shell. */
+  previewRadar(q: QuestionCatalogItem, radiusM: number, label: string): void {
+    this.preview.emit({ questionId: q.id, radiusM, label });
+    this.close();
   }
 
   askThermo(q: QuestionCatalogItem, preset: DistancePreset): void {
@@ -101,10 +107,10 @@ export class QuestionPicker {
     return Math.round(value * (this.units() === 'imperial' ? 1609.34 : 1000));
   }
 
-  askCustomRadar(q: QuestionCatalogItem): void {
+  previewCustomRadar(q: QuestionCatalogItem): void {
     const meters = this.customMeters();
     if (meters) {
-      this.emit(q, { radius_m: meters });
+      this.previewRadar(q, meters, `${parseFloat(this.custom())} ${this.unitLabel()}`);
     }
   }
 

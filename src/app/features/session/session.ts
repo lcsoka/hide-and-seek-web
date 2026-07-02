@@ -60,6 +60,13 @@ export class SessionView {
   readonly devPlacing = signal(false);
   readonly pickerOpen = signal(false);
   readonly boardOpen = signal(false);
+  // A radar radius the seeker has previewed (circle drawn on the map) but not yet asked.
+  readonly radarPreview = signal<{ questionId: string; radiusM: number; label: string; lat: number; lng: number } | null>(null);
+  readonly radarPreviewMarker = computed(() => {
+    const p = this.radarPreview();
+
+    return p ? { lat: p.lat, lng: p.lng, radiusM: p.radiusM } : null;
+  });
   // Seekers may board ANY mode (not just the game's hiding modes), so the picker offers all.
   readonly allTransitModes = ALL_TRANSIT_MODES;
   readonly catalog = signal<QuestionCatalogItem[]>([]);
@@ -268,6 +275,34 @@ export class SessionView {
     const action = event.category === 'thermometer' ? 'start_thermometer' : 'ask_question';
     await this.api.submitAction(s.session_id, action, { question_id: event.questionId, ...event.payload });
     this.store.refresh();
+  }
+
+  /** Seeker picked a radar radius: show it on the map (centred on them) for confirmation. If
+   *  their position isn't known yet, fall back to asking straight away. */
+  onRadarPreview(s: GameState, ev: { questionId: string; radiusM: number; label: string }): void {
+    this.pickerOpen.set(false);
+    const me = this.me(s);
+    if (me?.lat == null || me?.lng == null) {
+      void this.onAsk(s, { questionId: ev.questionId, category: 'radar', payload: { radius_m: ev.radiusM } });
+
+      return;
+    }
+    this.radarPreview.set({ ...ev, lat: me.lat, lng: me.lng });
+  }
+
+  /** Confirm the previewed radar radius — now actually ask the question. */
+  async confirmRadar(s: GameState): Promise<void> {
+    const p = this.radarPreview();
+    if (!p) {
+      return;
+    }
+    this.radarPreview.set(null);
+    await this.api.submitAction(s.session_id, 'ask_question', { question_id: p.questionId, radius_m: p.radiusM });
+    this.store.refresh();
+  }
+
+  cancelRadar(): void {
+    this.radarPreview.set(null);
   }
 
   /** The seeker chose a stop + line in the board picker — record the boarding. */

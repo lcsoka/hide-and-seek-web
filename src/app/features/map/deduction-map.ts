@@ -52,6 +52,8 @@ export class DeductionMap {
   readonly autoZoom = input(true);
   readonly loading = input(false); // hold rendering until the deduction is fully computed
   readonly thermoMarker = input<{ lat: number; lng: number; radiusM?: number | null; label?: string } | null>(null);
+  // A radar radius the seeker is previewing before committing to ask (two-step: preview → confirm).
+  readonly radarPreview = input<{ lat: number; lng: number; radiusM: number } | null>(null);
   readonly players = input<PlayerView[]>([]); // visible players (seekers see themselves + teammates)
   readonly meId = input<string | null>(null);
   readonly mapClick = output<Position>();
@@ -64,6 +66,7 @@ export class DeductionMap {
   // user has panned/zoomed — so background /state refreshes don't reset their view.
   private lastFitSig = '';
   private lastRouteSig = '';
+  private lastPreviewSig = '';
   private userMoved = false;
   private programmaticMove = false;
 
@@ -78,6 +81,7 @@ export class DeductionMap {
       this.overlays();
       this.loading();
       this.thermoMarker();
+      this.radarPreview();
       this.players();
       this.transitRoutes.displayed();
       this.render();
@@ -223,6 +227,28 @@ export class DeductionMap {
       L.marker([thermo.lat, thermo.lng], { icon: markerIcon('🌡️', { color: '#f59e0b', size: 28 }) })
         .bindTooltip(thermo.label ?? 'Thermometer start', { permanent: true, direction: 'top', offset: [0, -18] })
         .addTo(this.overlay);
+    }
+
+    // A radar radius the seeker is previewing before asking — a marching-dashed rose circle
+    // centred on them, framed once so they can judge the coverage, then Confirm & Ask.
+    const preview = this.radarPreview();
+    const previewSig = preview ? `${preview.lat}:${preview.lng}:${preview.radiusM}` : '';
+    if (preview) {
+      const circle = L.circle([preview.lat, preview.lng], { radius: preview.radiusM, color: '#e11d48', weight: 2, dashArray: '8 6', fillColor: '#e11d48', fillOpacity: 0.06 });
+      circle.addTo(this.overlay);
+      L.circleMarker([preview.lat, preview.lng], { radius: 5, color: '#e11d48', fillColor: '#e11d48', fillOpacity: 1 }).addTo(this.overlay);
+      if (previewSig !== this.lastPreviewSig) {
+        this.lastPreviewSig = previewSig;
+        try {
+          this.programmaticMove = true;
+          this.map.fitBounds(circle.getBounds(), { padding: [48, 48], maxZoom: 16, animate: true, duration: 0.5 });
+          setTimeout(() => (this.programmaticMove = false), 600);
+        } catch {
+          this.programmaticMove = false;
+        }
+      }
+    } else {
+      this.lastPreviewSig = '';
     }
 
     // Visible players (the seeker themselves + teammates; the hider is concealed by
