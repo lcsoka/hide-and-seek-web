@@ -61,6 +61,16 @@ export class ApiClient {
     return firstValueFrom(this.http.get<CurseCatalogItem[]>(`${this.base}/curses`));
   }
 
+  /** Missed broadcast events after a cursor, for reconnect catch-up. */
+  eventsSince(id: string, since: number): Promise<{ events: { seq: number; type: string; payload: Record<string, unknown> }[]; cursor: number }> {
+    return firstValueFrom(
+      this.http.get<{ events: { seq: number; type: string; payload: Record<string, unknown> }[]; cursor: number }>(
+        `${this.base}/sessions/${id}/events`,
+        { params: { since } },
+      ),
+    );
+  }
+
   /** Reactive, visibility-filtered game state, keyed on the session id signal. */
   stateResource(sessionId: Signal<string | undefined>) {
     return httpResource<GameState>(() => {

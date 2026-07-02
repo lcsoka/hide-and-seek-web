@@ -70,6 +70,9 @@ export class SessionView {
   private readonly tick = signal(0);
   private offset = 0;
 
+  /** Shown as a banner: true only after the socket has dropped following a live connection. */
+  readonly reconnecting = computed(() => this.realtime.everConnected() && !this.realtime.connected());
+
   readonly timer = computed<GameTimer | null>(() => {
     this.tick();
     const s = this.store.state();
@@ -78,22 +81,35 @@ export class SessionView {
   });
 
   constructor() {
+    const destroyRef = inject(DestroyRef);
     const sessionId = this.id();
     if (sessionId) {
       this.myId.set(this.players.get(sessionId));
       this.store.setSession(sessionId);
-      this.realtime.connect(sessionId, this.myId(), (name, data) => this.store.onEvent(name, data));
+      // On reconnect, replay the events missed while the socket was down, then re-hydrate.
+      this.realtime.connect(sessionId, this.myId(), (name, data) => this.store.onEvent(name, data), () => this.store.catchUp());
       // In a dev build the position is driven by the debug tools (map tap / presets),
       // so don't let the browser GPS overwrite the simulated location.
       if (!this.devMode) {
         this.location.start(sessionId);
       }
+
+      // Browsers suspend backgrounded tabs (locked phones) and can silently drop the socket.
+      // On return to the foreground / regaining connectivity, catch up on missed events.
+      const onVisible = () => document.visibilityState === 'visible' && this.store.catchUp();
+      const onOnline = () => this.store.catchUp();
+      document.addEventListener('visibilitychange', onVisible);
+      window.addEventListener('online', onOnline);
+      destroyRef.onDestroy(() => {
+        document.removeEventListener('visibilitychange', onVisible);
+        window.removeEventListener('online', onOnline);
+      });
     }
 
     // 1s local tick for countdowns (no server hit). State updates come from realtime
     // (Reverb) events + the refresh after each of this player's own actions — no poll.
     const interval = setInterval(() => this.tick.update((n) => n + 1), 1000);
-    inject(DestroyRef).onDestroy(() => clearInterval(interval));
+    destroyRef.onDestroy(() => clearInterval(interval));
 
     effect(() => {
       const now = this.store.state()?.timers?.now;

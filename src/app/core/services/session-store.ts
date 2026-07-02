@@ -38,6 +38,10 @@ export class SessionStore {
   // they know to ask again rather than waiting on a vanished question. Auto-clears.
   readonly questionNotice = signal<string | null>(null);
 
+  // The highest event seq the client has seen (from `_seq` on live events / the catch-up cursor).
+  // Used to ask the server for only what was missed while the socket was down.
+  private lastSeq = 0;
+
   private notify(message: string): void {
     this.questionNotice.set(message);
     setTimeout(() => this.questionNotice.set(null), 6000);
@@ -54,6 +58,7 @@ export class SessionStore {
   /** A realtime event arrived: log it. PlayerMoved just patches a position (cheap);
    *  everything else re-hydrates authoritative state. */
   onEvent(type: string, data?: unknown): void {
+    this.trackSeq(data);
     this.feed.update((log) => [{ type, at: Date.now() }, ...log].slice(0, 30));
 
     if (type === 'PlayerMoved') {
@@ -64,12 +69,51 @@ export class SessionStore {
       return;
     }
 
+    this.applyNotice(type);
+    this.refresh();
+  }
+
+  /**
+   * Reconnect catch-up: replay the events broadcast while the socket was down (their
+   * transient notices would otherwise be lost — Reverb doesn't buffer for absent clients),
+   * then re-hydrate authoritative state. Safe to call on every reconnect / tab-resume:
+   * with nothing missed it just advances the cursor and does one /state refresh.
+   */
+  async catchUp(): Promise<void> {
+    const id = this.sessionId();
+    if (!id) {
+      return;
+    }
+    try {
+      const { events, cursor } = await this.api.eventsSince(id, this.lastSeq);
+      for (const e of events) {
+        this.feed.update((log) => [{ type: e.type, at: Date.now() }, ...log].slice(0, 30));
+        if (e.type !== 'PlayerMoved') {
+          this.applyNotice(e.type); // replay the notice the user missed
+        }
+      }
+      if (typeof cursor === 'number') {
+        this.lastSeq = Math.max(this.lastSeq, cursor);
+      }
+    } catch {
+      // Network still flaky — the refresh below still re-syncs correctness.
+    }
+    this.refresh();
+  }
+
+  /** A brief seeker notice for events whose only payload is transient (not reflected in /state). */
+  private applyNotice(type: string): void {
     if (type === 'QuestionVoided') {
       this.notify(this.transloco.translate('seeker.voidedNotice'));
     } else if (type === 'QuestionVetoed') {
       this.notify(this.transloco.translate('seeker.vetoedNotice'));
     }
+  }
 
-    this.refresh();
+  private trackSeq(data?: unknown): void {
+    const seq = (data as { _seq?: number } | undefined)?._seq;
+    if (typeof seq === 'number' && seq > this.lastSeq) {
+      this.lastSeq = seq;
+    }
   }
 }

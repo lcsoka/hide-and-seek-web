@@ -7,6 +7,7 @@
     "copied": "Másolva!",
     "error": "Valami hiba történt."
   },
+  "connection": { "reconnecting": "Újracsatlakozás…" },
   "role": { "hider": "Bújó", "seeker": "Kereső" },
   "state": {
     "lobby": "Váróterem",
