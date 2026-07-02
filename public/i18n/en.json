@@ -52,6 +52,7 @@
   },
   "landing": {
     "yourName": "Your name",
+    "nameRequired": "Enter your name to start",
     "tagline": "Hide across the city. Hunt with questions. Outlast everyone.",
     "badge": "Budapest · real transit",
     "how": { "hide": "Hide near a station", "ask": "Narrow the map", "catch": "Catch the hider" },

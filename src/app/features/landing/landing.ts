@@ -80,24 +80,35 @@ export class Landing {
     this.modes.update((m) => (m.includes(id) ? (m.length > 1 ? m.filter((x) => x !== id) : m) : [...m, id]));
   }
 
+  /** Join codes are 6 uppercase alphanumerics (SessionFactory Str::random(6)); be lenient on length. */
+  joinCodeValid(): boolean {
+    return /^[A-Za-z0-9]{4,8}$/.test(this.joinCode.trim());
+  }
+
   async create(): Promise<void> {
+    if (!this.name.trim()) {
+      return;
+    }
     await this.run(async () => {
       await this.ensureToken();
-      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name || undefined, config: { units: this.units, transit_modes: this.modes(), hiding_zone_rule: this.zoneRule, reveal_seekers_to_hider: this.revealSeekers } });
+      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name.trim(), config: { units: this.units, transit_modes: this.modes(), hiding_zone_rule: this.zoneRule, reveal_seekers_to_hider: this.revealSeekers } });
       if (session.host_player_id) {
         this.players.set(session.id, session.host_player_id);
       }
       await this.router.navigate(['/s', session.id]);
-    });
+    }, this.transloco.translate('landing.createFailed'));
   }
 
   async join(): Promise<void> {
+    if (!this.name.trim() || !this.joinCodeValid()) {
+      return;
+    }
     await this.run(async () => {
       await this.ensureToken();
-      const { player, session } = await this.api.join(this.joinCode.trim().toUpperCase(), this.name || 'Player');
+      const { player, session } = await this.api.join(this.joinCode.trim().toUpperCase(), this.name.trim());
       this.players.set(session.id, player.id);
       await this.router.navigate(['/s', session.id]);
-    });
+    }, this.transloco.translate('landing.joinFailed'));
   }
 
   private async ensureToken(): Promise<void> {
@@ -107,7 +118,7 @@ export class Landing {
     }
   }
 
-  private async run(fn: () => Promise<void>): Promise<void> {
+  private async run(fn: () => Promise<void>, fallback?: string): Promise<void> {
     this.busy.set(true);
     this.error.set(null);
     try {
@@ -125,7 +136,9 @@ export class Landing {
           e = retryError;
         }
       }
-      this.error.set(e?.error?.message ?? this.transloco.translate('common.error'));
+      // Prefer the caller's friendly, localized fallback (e.g. "check the code") over the raw
+      // backend message; fall back to a validation message or the generic error.
+      this.error.set(fallback ?? e?.error?.message ?? this.transloco.translate('common.error'));
     } finally {
       this.busy.set(false);
     }

@@ -52,6 +52,7 @@
   },
   "landing": {
     "yourName": "A neved",
+    "nameRequired": "Add meg a neved a kezdéshez",
     "tagline": "Bújj el a városban. Vadássz kérdésekkel. Éld túl a többieket.",
     "badge": "Budapest · valós tömegközlekedés",
     "how": { "hide": "Bújj el egy megállónál", "ask": "Szűkítsd a térképet", "catch": "Kapd el a bújót" },
