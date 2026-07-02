@@ -1,8 +1,8 @@
 import { afterNextRender, Component, computed, effect, ElementRef, inject, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
-import { hidingZoneViz } from '../../core/maps/deduction';
-import { disperse } from '../../core/maps/spread';
+import { hidingZoneViz } from '../../core/deduction/deduction';
+import { disperse } from '../../core/geo/spread';
 import { HidingState } from '../../core/services/hiding-state';
 import { TransitRoutes } from '../../core/services/transit-routes';
 import { HidingZone, PlayerView, Position } from '../../core/models';

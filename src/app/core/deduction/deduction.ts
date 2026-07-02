@@ -1,7 +1,7 @@
 import { bbox, buffer, circle, difference, featureCollection, intersect, point, pointToPolygonDistance, simplify, voronoi } from '@turf/turf';
 import { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from 'geojson';
 import { modifyMapData } from './operators';
-import { Poly } from './map.model';
+import { Poly } from '../maps/map.model';
 import { DeductionQuestion, HidingZoneViz, RadarQuestion, RegionQuestion, ThermometerQuestion, ZoneCut } from './deduction.model';
 
 /**

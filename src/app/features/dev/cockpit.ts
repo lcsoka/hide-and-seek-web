@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { GodView, Position } from '../../core/models';
 import { DebugApi } from '../../core/services/debug-api';
-import { stepTowards } from '../../core/util/geo';
+import { stepTowards } from '../../core/geo/geo';
 import { DevMap } from './dev-map';
 
 const STATES = ['lobby', 'role_assignment', 'hiding', 'seeking', 'round_review', 'finished'];

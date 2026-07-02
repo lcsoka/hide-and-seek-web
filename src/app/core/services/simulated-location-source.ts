@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Position } from '../models';
-import { stepTowards } from '../util/geo';
+import { stepTowards } from '../geo/geo';
 import { LocationSource } from './location-source';
 
 const BUDAPEST: Position = { lat: 47.4979, lng: 19.0402 };

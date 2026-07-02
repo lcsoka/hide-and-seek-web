@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { FEATURE_TAGS } from '../../core/maps/osm-deduction';
+import { FEATURE_TAGS } from '../../core/deduction/osm-deduction';
 import { OverpassService } from '../../core/maps/overpass';
-import { distanceMeters } from '../../core/util/geo';
+import { distanceMeters } from '../../core/geo/geo';
 import { ActiveCurse, GameState, HandCard, PendingQuestion, PlayerView, ResolvedQuestion } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { Clock, formatCountdown } from '../../core/services/clock';

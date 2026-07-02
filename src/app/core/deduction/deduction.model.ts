@@ -1,4 +1,4 @@
-import { Poly } from './map.model';
+import { Poly } from '../maps/map.model';
 
 export interface RadarQuestion {
   id: string;

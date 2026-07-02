@@ -1,10 +1,10 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FeatureCollection, Point } from 'geojson';
-import { applyQuestions, playArea } from '../../core/maps/deduction';
-import { DeductionQuestion, RegionQuestion } from '../../core/maps/deduction.model';
-import { resolvedQuestionsToDeduction } from '../../core/maps/game-deduction';
-import { isOsmCategory, osmRegion } from '../../core/maps/osm-deduction';
+import { applyQuestions, playArea } from '../../core/deduction/deduction';
+import { DeductionQuestion, RegionQuestion } from '../../core/deduction/deduction.model';
+import { resolvedQuestionsToDeduction } from '../../core/deduction/game-deduction';
+import { isOsmCategory, osmRegion } from '../../core/deduction/osm-deduction';
 import { OverpassService } from '../../core/maps/overpass';
 import { GodView, ResolvedQuestion } from '../../core/models';
 import { DebugApi } from '../../core/services/debug-api';

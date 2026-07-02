@@ -1,10 +1,10 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { buildAnnotations } from '../maps/annotations';
-import { applyQuestions, playArea } from '../maps/deduction';
-import { DeductionQuestion, RegionQuestion } from '../maps/deduction.model';
-import { resolvedQuestionsToDeduction } from '../maps/game-deduction';
-import { isOsmCategory, osmRegion } from '../maps/osm-deduction';
+import { applyQuestions, playArea } from '../deduction/deduction';
+import { DeductionQuestion, RegionQuestion } from '../deduction/deduction.model';
+import { resolvedQuestionsToDeduction } from '../deduction/game-deduction';
+import { isOsmCategory, osmRegion } from '../deduction/osm-deduction';
 import { OverpassService } from '../maps/overpass';
 import { Poly } from '../maps/map.model';
 import { unitsOf } from '../util/units';

@@ -1,6 +1,6 @@
 import { difference, featureCollection, intersect } from '@turf/turf';
 import { Feature, Polygon } from 'geojson';
-import { Poly } from './map.model';
+import { Poly } from '../maps/map.model';
 
 /** Near-global rectangle used to invert a region (kept just inside the poles for safety). */
 export const WORLD: Feature<Polygon> = {
