@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GameState } from '../models';
+import { formatCountdown as fmt } from './clock';
 import { GameTimer } from './game-timer.model';
-
-function fmt(seconds: number): string {
-  const s = Math.max(0, Math.floor(seconds));
-
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-}
 
 @Injectable({ providedIn: 'root' })
 export class GameTimerService {

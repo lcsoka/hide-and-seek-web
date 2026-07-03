@@ -10,9 +10,14 @@ export class Clock {
   }
 }
 
-/** Format whole seconds as `m:ss` (clamped at zero). */
+/** Format whole seconds as `m:ss`, or `h:mm:ss` once the time reaches an hour (clamped at zero). */
 export function formatCountdown(seconds: number): string {
   const s = Math.max(0, Math.floor(seconds));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
 
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  return h > 0
+    ? `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+    : `${m}:${String(sec).padStart(2, '0')}`;
 }
