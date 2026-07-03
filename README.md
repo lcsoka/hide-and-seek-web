@@ -1,59 +1,110 @@
-# Web
+# Hide & Seek — Web
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.4.
+The web client for **Hide & Seek**, a real-time, location-based hide-and-seek game played across
+Hungarian cities (inspired by Jet Lag: The Game). One seeker team chases a hider around a city,
+narrowing down their location with radar/thermometer/matching questions while the hider slows them
+down with curses.
 
-## Development server
+This is a thin, presentational client: the [backend](https://github.com/lcsoka/hide-and-seek-backend)
+is authoritative for all rules and state, and this app renders it, sends player actions, and reacts
+to real-time events. Built with **Angular 22**, **Tailwind CSS v4**, **Leaflet** + **turf.js** and
+**Laravel Echo**.
 
-To start a local development server, run:
+> The backend lives in a separate repository: **[hide-and-seek-backend](https://github.com/lcsoka/hide-and-seek-backend)**.
+
+---
+
+## Highlights
+
+- **Join & lobby** — create or join a game by code, pick a display name and avatar, ready up.
+- **Roles & onboarding** — role intros and objectives for hider vs. seeker; faithful visibility (the
+  hider can't see seekers).
+- **Deduction map** — Leaflet map with live radar/thermometer previews and a running deduction area
+  that carves down the play region as questions are answered (turf.js geometry).
+- **Questions & curses** — ask geo questions, play curses, roll dice, complete challenges.
+- **Transit** — board/alight journeys with a seeker journey log.
+- **Real-time** — live positions, questions, curses and state changes over WebSockets (Laravel
+  Echo + Pusher protocol), with reconnection and backgrounding handling.
+- **Mobile-first HUD** — bottom sheets and FAB controls that keep the map visible.
+- **Hungarian-first localization** — Transloco with `hu` as the default and `en` as the fallback.
+- **Developer cockpit** — a debug mode for GPS spoofing, state inspection and action injection while
+  building against the backend contract.
+
+## Tech stack
+
+| | |
+|---|---|
+| Framework | Angular 22 (standalone, signals) |
+| Styling | Tailwind CSS v4 |
+| Maps / geometry | Leaflet, `@turf/turf`, `osmtogeojson` |
+| Realtime | `laravel-echo` + `pusher-js` (Reverb) |
+| i18n | `@jsverse/transloco` (Hungarian-first) |
+| Unit tests | Vitest |
+| E2E tests | Playwright |
+
+## Requirements
+
+- Node.js **20+** and npm
+- A running **[hide-and-seek-backend](https://github.com/lcsoka/hide-and-seek-backend)** instance (REST + Reverb WebSockets)
+
+## Getting started
 
 ```bash
-ng serve
+git clone git@github.com:lcsoka/hide-and-seek-web.git
+cd hide-and-seek-web
+npm install
+
+# Start the dev server
+npm start          # ng serve → http://localhost:4200
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Pointing at the backend
 
-## Code scaffolding
+The dev build reads its configuration from `src/environments/environment.development.ts`. Defaults
+assume the backend runs at `http://hide-and-seek.test` (Laravel Herd) with Reverb on `localhost:8080`:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```ts
+export const environment = {
+  apiBase: 'http://hide-and-seek.test/api',
+  reverb: { key: '…', host: 'localhost', port: 8080, scheme: 'ws' },
+  // developerToken: '…'  // for the developer cockpit
+};
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
+Adjust these to match your backend's `.env` (`APP_URL`, `REVERB_*`).
 
 ## Building
 
-To build the project run:
-
 ```bash
-ng build
+npm run build      # production build → dist/
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Testing
 
 ```bash
-ng test
+npm test           # Vitest unit tests
+npm run e2e        # Playwright end-to-end tests
 ```
 
-## Running end-to-end tests
+## Project layout
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
+```
+src/app/
+  core/          Services (API client, realtime, location), map/Overpass helpers
+  features/
+    landing/     Create / join a game
+    auth/        Guest + account auth UI
+    session/     In-game shell, HUD, drawers, pickers
+    map/         Deduction map + player markers
+    replay/      In-app replay view
+    profile/     Player profile
+    content/     User-generated curses / questions
+    dev/         Developer cockpit (GPS spoofing, inspector, action injector)
+  shared/        Reusable UI components
+  transloco-loader.ts
+src/environments/  Per-environment config (API base, Reverb keys)
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## License
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Private project. All rights reserved unless noted otherwise.
