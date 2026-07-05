@@ -5,6 +5,11 @@
    the landing and the in-app game ship light + dark styling, so the whole app is consistent. */
 html { color-scheme: light dark; }
 
+/* Installed PWA (esp. iOS standalone): don't rubber-band-scroll the whole app; individual
+   scrollable regions still scroll. viewport-fit=cover (index.html) exposes the safe-area env()
+   insets that the game HUD + bottom bars pad against so nothing hides under the notch/home bar. */
+html, body { overscroll-behavior: none; }
+
 /* Landing hero: display wordmark + the "living map" marker pulses + entrance. */
 .font-display { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }
 

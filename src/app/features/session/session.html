@@ -55,7 +55,7 @@
 
     <!-- Action rejected by the server (e.g. not valid right now) — show why, don't crash. -->
     @if (actionError(); as err) {
-      <div class="pointer-events-none absolute inset-x-0 bottom-4 z-[850] flex justify-center px-4" *transloco="let t">
+      <div class="pointer-events-none absolute inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[850] flex justify-center px-4" *transloco="let t">
         <div class="jl-pop pointer-events-auto flex items-center gap-2 rounded-full bg-red-600/95 px-4 py-2 text-sm font-medium text-white shadow-xl backdrop-blur">
           <span>{{ err }}</span>
           <button (click)="actionError.set(null)" [attr.aria-label]="t('common.cancel')" class="ml-1 text-base leading-none opacity-80 hover:opacity-100">✕</button>
@@ -96,7 +96,7 @@
          (during hiding/seeking/endgame the mobile UI is the icon-button HUD below, so the map stays
          visible). -->
     <aside [class]="'pointer-events-none absolute inset-x-0 bottom-0 z-[600] flex max-h-[62%] flex-col lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[400px] lg:pt-16' + (activePlay(s) ? ' max-lg:hidden' : '')">
-      <div class="pointer-events-auto m-2 flex-1 overflow-y-auto rounded-2xl bg-white/95 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3" *transloco="let t">
+      <div class="pointer-events-auto m-2 flex-1 overflow-y-auto rounded-2xl bg-white/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3" *transloco="let t">
         @if (objective(s); as obj) {
           <p class="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-200">{{ t(obj) }}</p>
         }
@@ -160,7 +160,7 @@
 
     <!-- Mobile icon-button HUD (active play): each opens a drawer so the map stays visible. -->
     @if (activePlay(s)) {
-      <div class="jl-rise pointer-events-none absolute inset-x-0 bottom-0 z-[700] flex items-end justify-center gap-3 p-4 lg:hidden" *transloco="let t">
+      <div class="jl-rise pointer-events-none absolute inset-x-0 bottom-0 z-[700] flex items-end justify-center gap-3 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden" *transloco="let t">
         @if (role(s) === 'hider') {
           @if (s.state === 'hiding') {
             <button (click)="mobileDrawer.set('hide')" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
@@ -193,7 +193,7 @@
 
       @if (mobileDrawer(); as d) {
         <div class="jl-fade fixed inset-0 z-[800] flex items-end bg-black/50 backdrop-blur-sm lg:hidden" (click)="mobileDrawer.set(null)">
-          <div class="jl-sheet max-h-[80vh] w-full overflow-y-auto rounded-t-3xl bg-white p-4 shadow-2xl dark:bg-gray-900" (click)="$event.stopPropagation()" *transloco="let t">
+          <div class="jl-sheet max-h-[80vh] w-full overflow-y-auto rounded-t-3xl bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl dark:bg-gray-900" (click)="$event.stopPropagation()" *transloco="let t">
             <div class="mb-3 flex items-center justify-between">
               <h2 class="font-display text-lg font-bold">{{ t('hud.' + (d === 'seeker' ? 'info' : d)) }}</h2>
               <button (click)="mobileDrawer.set(null)" class="text-xl text-gray-400 hover:text-gray-600">✕</button>
