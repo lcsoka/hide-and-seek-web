@@ -473,5 +473,10 @@
     "replay": {
       "title": "Replay — Hide & Seek"
     }
+  },
+  "push": {
+    "title": "Notifications",
+    "blurb": "Push notifications for key game events on this device.",
+    "blocked": "Notifications are blocked in your browser settings."
   }
 }

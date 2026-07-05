@@ -62,6 +62,19 @@ export class ApiClient {
     return firstValueFrom(this.http.delete(`${this.base}/profile`, { body: password ? { password } : {} }));
   }
 
+  // ── Web Push ──────────────────────────────────────────────────────────────
+  pushPublicKey(): Promise<{ key: string | null }> {
+    return firstValueFrom(this.http.get<{ key: string | null }>(`${this.base}/push/public-key`));
+  }
+
+  pushSubscribe(body: { endpoint: string; keys: { p256dh: string; auth: string }; locale: string }): Promise<unknown> {
+    return firstValueFrom(this.http.post(`${this.base}/push/subscribe`, body));
+  }
+
+  pushUnsubscribe(endpoint: string): Promise<unknown> {
+    return firstValueFrom(this.http.post(`${this.base}/push/unsubscribe`, { endpoint }));
+  }
+
   createSession(body: {
     city: string;
     game_size: string;

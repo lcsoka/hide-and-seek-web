@@ -91,6 +91,23 @@
       </div>
     }
 
+    <!-- Notifications (Web Push) -->
+    @if (push.supported) {
+      <div class="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 p-4 dark:border-white/10">
+        <div class="min-w-0">
+          <div class="text-sm font-semibold">{{ t('push.title') }}</div>
+          <div class="text-xs text-gray-500 dark:text-gray-400">
+            @if (push.permission() === 'denied') { {{ t('push.blocked') }} } @else { {{ t('push.blurb') }} }
+          </div>
+        </div>
+        <button (click)="push.toggle()" [disabled]="push.busy() || push.permission() === 'denied'" role="switch" [attr.aria-checked]="push.enabled()"
+                [class]="push.enabled() ? 'bg-rose-600' : 'bg-gray-300 dark:bg-gray-700'"
+                class="relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-40">
+          <span [class]="push.enabled() ? 'translate-x-5' : 'translate-x-1'" class="absolute top-1 left-0 block h-4 w-4 rounded-full bg-white transition"></span>
+        </button>
+      </div>
+    }
+
     <!-- Actions -->
     @if (u.is_guest) {
       <div class="space-y-2 rounded-2xl bg-rose-50 p-4 dark:bg-rose-950/40">

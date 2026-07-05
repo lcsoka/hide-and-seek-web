@@ -5,6 +5,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { ProfileStats } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { AuthStore } from '../../core/services/auth-store';
+import { Push } from '../../core/services/push';
 import { AppFooter } from '../../shared/app-footer';
 
 /** Account screen: display name, email, avatar; register (if guest), or log out. */
@@ -18,6 +19,7 @@ export class ProfilePage {
   private readonly auth = inject(AuthStore);
   private readonly api = inject(ApiClient);
   private readonly router = inject(Router);
+  readonly push = inject(Push);
 
   readonly user = this.auth.user;
   readonly stats = signal<ProfileStats | null>(null);
@@ -84,6 +86,7 @@ export class ProfilePage {
   }
 
   async logout(): Promise<void> {
+    await this.push.disable().catch(() => undefined); // stop pushes to this device
     await this.auth.logout();
     void this.router.navigate(['/']);
   }

@@ -473,5 +473,10 @@
     "replay": {
       "title": "Visszajátszás — Hide & Seek"
     }
+  },
+  "push": {
+    "title": "Értesítések",
+    "blurb": "Push-értesítések a fontos játékeseményekről ezen az eszközön.",
+    "blocked": "Az értesítések le vannak tiltva a böngésző beállításaiban."
   }
 }
