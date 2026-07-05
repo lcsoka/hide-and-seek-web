@@ -1,4 +1,9 @@
 {
+  "maintenance": {
+    "title": "Karbantartás alatt",
+    "body": "A Hide & Seek rövid ideig karbantartás miatt nem elérhető. Hamarosan visszatérünk — ez a képernyő automatikusan eltűnik, amint újra elérhetők vagyunk.",
+    "retry": "Újrapróbálom"
+  },
   "common": {
     "loading": "Betöltés…",
     "cancel": "Mégse",

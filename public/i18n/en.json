@@ -1,4 +1,9 @@
 {
+  "maintenance": {
+    "title": "Under maintenance",
+    "body": "Hide & Seek is briefly offline for maintenance. We'll be back shortly — this screen clears automatically once we're up again.",
+    "retry": "Try again"
+  },
   "common": {
     "loading": "Loading…",
     "cancel": "Cancel",

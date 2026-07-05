@@ -1,0 +1,13 @@
+@if (maintenance.down()) {
+  <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-gray-950/80 p-6 backdrop-blur-sm" *transloco="let t">
+    <div class="w-full max-w-sm space-y-4 rounded-3xl bg-white p-6 text-center shadow-2xl dark:bg-gray-900">
+      <div class="text-5xl">🛠️</div>
+      <h1 class="text-xl font-bold">{{ t('maintenance.title') }}</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('maintenance.body') }}</p>
+      <button (click)="maintenance.check()"
+              class="w-full rounded-xl bg-rose-600 p-3 font-semibold text-white transition hover:bg-rose-500">
+        {{ t('maintenance.retry') }}
+      </button>
+    </div>
+  </div>
+}
