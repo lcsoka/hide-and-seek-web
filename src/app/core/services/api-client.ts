@@ -75,6 +75,11 @@ export class ApiClient {
     return firstValueFrom(this.http.post(`${this.base}/push/unsubscribe`, { endpoint }));
   }
 
+  /** Player feedback — a bug report or suggestion. Public endpoint (no auth required). */
+  sendFeedback(body: { type: 'bug' | 'suggestion'; message: string; contact?: string; context?: Record<string, unknown> }): Promise<unknown> {
+    return firstValueFrom(this.http.post(`${this.base}/feedback`, body));
+  }
+
   createSession(body: {
     city: string;
     game_size: string;

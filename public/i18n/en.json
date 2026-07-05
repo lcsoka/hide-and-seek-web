@@ -489,5 +489,16 @@
     "blurb": "Add it to your home screen for quick access.",
     "action": "Install",
     "iosHint": "Tap the Share icon, then \"Add to Home Screen\"."
+  },
+  "feedback": {
+    "link": "Feedback",
+    "title": "Send feedback",
+    "typeSuggestion": "Idea",
+    "typeBug": "Bug",
+    "message": "Tell us what happened or what you'd suggest…",
+    "contact": "Email (optional, if you'd like a reply)",
+    "send": "Send",
+    "sent": "Thanks for the feedback! 🙌",
+    "error": "Couldn't send. Please try again."
   }
 }

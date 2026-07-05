@@ -489,5 +489,16 @@
     "blurb": "Add a kezdőképernyődhöz a gyorsabb eléréshez.",
     "action": "Telepítés",
     "iosHint": "Koppints a Megosztás ikonra, majd a „Kezdőképernyőhöz adás” lehetőségre."
+  },
+  "feedback": {
+    "link": "Visszajelzés",
+    "title": "Visszajelzés küldése",
+    "typeSuggestion": "Ötlet",
+    "typeBug": "Hiba",
+    "message": "Írd le, mit tapasztaltál vagy mit javasolnál…",
+    "contact": "E-mail (opcionális, ha választ szeretnél)",
+    "send": "Küldés",
+    "sent": "Köszönjük a visszajelzést! 🙌",
+    "error": "Nem sikerült elküldeni. Kérlek, próbáld újra."
   }
 }

@@ -1,0 +1,42 @@
+<ng-container *transloco="let t">
+  <button (click)="show()" class="transition hover:text-gray-800 dark:hover:text-gray-200">{{ t('feedback.link') }}</button>
+
+  @if (open()) {
+    <div class="jl-fade fixed inset-0 z-[900] flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-6" (click)="close()">
+      <div class="jl-sheet w-full max-w-md space-y-4 rounded-t-3xl bg-white p-5 text-left text-gray-900 shadow-2xl sm:rounded-3xl dark:bg-gray-900 dark:text-white" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between">
+          <h2 class="font-display text-lg font-bold">{{ t('feedback.title') }}</h2>
+          <button (click)="close()" class="text-xl text-gray-400 hover:text-gray-700 dark:hover:text-white">✕</button>
+        </div>
+
+        @if (sent()) {
+          <p class="rounded-xl bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950/40 dark:text-green-200">{{ t('feedback.sent') }}</p>
+          <button (click)="close()" class="w-full rounded-xl bg-rose-600 p-3 font-semibold text-white transition hover:bg-rose-500">{{ t('common.leave') }}</button>
+        } @else {
+          <!-- Type -->
+          <div class="flex gap-2">
+            <button type="button" (click)="type = 'suggestion'"
+                    [class]="type === 'suggestion' ? 'bg-rose-600 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                    class="flex-1 rounded-xl p-2.5 text-sm font-semibold transition">💡 {{ t('feedback.typeSuggestion') }}</button>
+            <button type="button" (click)="type = 'bug'"
+                    [class]="type === 'bug' ? 'bg-rose-600 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                    class="flex-1 rounded-xl p-2.5 text-sm font-semibold transition">🐞 {{ t('feedback.typeBug') }}</button>
+          </div>
+
+          <textarea [(ngModel)]="message" [placeholder]="t('feedback.message')" rows="4" maxlength="5000"
+                    class="w-full resize-none rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-rose-400 focus:outline-none dark:border-white/15 dark:bg-white/10 dark:text-white dark:placeholder-white/40"></textarea>
+
+          <input [(ngModel)]="contact" [placeholder]="t('feedback.contact')" maxlength="255" autocomplete="email"
+                 class="w-full rounded-xl border border-gray-300 bg-white p-3 text-sm text-gray-900 placeholder-gray-400 focus:border-rose-400 focus:outline-none dark:border-white/15 dark:bg-white/10 dark:text-white dark:placeholder-white/40" />
+
+          @if (error()) { <p class="text-xs text-red-600 dark:text-red-400">{{ t('feedback.error') }}</p> }
+
+          <button (click)="send()" [disabled]="busy() || !message.trim()"
+                  class="w-full rounded-xl bg-rose-600 p-3 font-semibold text-white shadow-lg shadow-rose-600/30 transition hover:bg-rose-500 disabled:opacity-40">
+            {{ t('feedback.send') }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+</ng-container>
