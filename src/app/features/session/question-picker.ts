@@ -33,6 +33,7 @@ export class QuestionPicker {
   readonly seekerLat = input<number | null>(null);
   readonly seekerLng = input<number | null>(null);
   readonly disabledCategories = input<string[]>([]);
+  readonly cooldowns = input<Record<string, number>>({}); // category → seconds until re-askable
   readonly onTransit = input(false); // seeker is riding → thermometer is unavailable (walk-only)
   readonly ask = output<{ questionId: string; category: string; payload: Record<string, unknown> }>();
   // Radar is two-step: choosing a radius previews it on the map (picker closes), then the
@@ -45,6 +46,8 @@ export class QuestionPicker {
   readonly selected = signal<string | null>(null);
   readonly custom = signal('');
   readonly meta = (c: string) => this.category.categoryMeta(c);
+  readonly iconSrc = (c: string) => this.category.categoryIconSrc(c);
+  readonly color = (c: string) => this.category.categoryMeta(c).color;
   readonly qIcon = (q: QuestionCatalogItem) => this.category.questionIcon(`${q.title} ${q.key}`, q.category);
   readonly qLabel = (title: string) => this.category.questionShortLabel(title);
   /** Distance-based categories get inline chips; the rest get a grid of subject tiles. */
@@ -60,11 +63,25 @@ export class QuestionPicker {
   readonly unitLabel = computed(() => (this.units() === 'imperial' ? 'mi' : 'km'));
 
   isDisabled(category: string): boolean {
-    return this.disabledCategories().includes(category) || (category === 'thermometer' && this.onTransit());
+    return this.disabledCategories().includes(category) || this.cooldownLeft(category) > 0 || (category === 'thermometer' && this.onTransit());
   }
 
-  /** Why a category tile is greyed: walk-only (on transit) vs blocked by a curse. */
+  /** Seconds until a category can be re-asked (0 = ready). */
+  cooldownLeft(category: string): number {
+    return this.cooldowns()[category] ?? 0;
+  }
+
+  /** A category on cooldown shown as m:ss for the tile. */
+  cooldownLabel(category: string): string {
+    const s = this.cooldownLeft(category);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  }
+
+  /** Why a category tile is greyed: cooling down vs walk-only (on transit) vs blocked by a curse. */
   disabledReason(category: string): string {
+    if (this.cooldownLeft(category) > 0) {
+      return 'picker.cooldown';
+    }
     return category === 'thermometer' && this.onTransit() ? 'picker.thermoTransit' : 'picker.disabledLock';
   }
 

@@ -21,7 +21,9 @@ export interface GameState {
   hiding_zone: HidingZone | null;
   zone_locked: boolean;
   relocating: boolean; // hider played 'move' and must re-confirm a new spot
+  hider_locked: boolean; // hider-only: the endgame has locked them to their spot (else they roam the zone)
   disabled_categories: string[]; // question categories a curse currently blocks
+  question_cooldowns: Record<string, number>; // category → seconds until it can be re-asked
   questions_blocked: boolean; // a blocking curse is stopping the seekers from asking
   curse_choice: CurseChoice | null; // hider-only: a 'choose' curse awaiting category picks
   standings: Standing[];

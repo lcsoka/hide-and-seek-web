@@ -104,6 +104,17 @@
               </div>
             }
           } @else {
+            @if (s.hider_locked) {
+              <div class="mb-3 rounded-lg bg-rose-100 p-3 dark:bg-rose-950">
+                <p class="text-sm font-semibold text-rose-800 dark:text-rose-300">{{ t('hider.locked') }}</p>
+                <p class="text-sm text-rose-700 dark:text-rose-400">{{ t('hider.lockedHint') }}</p>
+              </div>
+            } @else {
+              <div class="mb-3 rounded-lg bg-emerald-50 p-3 dark:bg-emerald-950/40">
+                <p class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">{{ t('hider.roam') }}</p>
+                <p class="text-sm text-emerald-700 dark:text-emerald-400">{{ t('hider.roamHint') }}</p>
+              </div>
+            }
             <app-card-deck [state]="s" [sessionId]="s.session_id" />
           }
         } @else if (s.state === 'round_end' || s.state === 'finished') {
@@ -187,7 +198,7 @@
 
     <app-question-picker [catalog]="catalog()" [units]="askUnits(s)" [open]="pickerOpen()"
                          [seekerLat]="me(s)?.lat ?? null" [seekerLng]="me(s)?.lng ?? null"
-                         [disabledCategories]="s.disabled_categories" [onTransit]="s.transit?.on_transit ?? false"
+                         [disabledCategories]="s.disabled_categories" [cooldowns]="s.question_cooldowns" [onTransit]="s.transit?.on_transit ?? false"
                          (ask)="onAsk(s, $event)" (preview)="onRadarPreview(s, $event)" (refPreview)="onRefPreview(s, $event)" (closeChange)="pickerOpen.set($event)" />
     <app-transit-picker [open]="boardOpen()" [seekerLat]="me(s)?.lat ?? null" [seekerLng]="me(s)?.lng ?? null"
                         [transitModes]="allTransitModes" (board)="onBoard(s, $event)" (closeChange)="boardOpen.set($event)" />

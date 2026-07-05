@@ -106,7 +106,11 @@
     "none": "No stations found nearby. Move closer to a station.",
     "relocated": "🚚 You played Move",
     "relocateTravel": "Travel to a new area, then pick a station below to hide at.",
-    "relocateConfirm": "Confirm new spot"
+    "relocateConfirm": "Confirm new spot",
+    "roam": "🚶 You can roam your zone",
+    "roamHint": "Move freely anywhere inside your hiding zone — your spot only locks when a seeker reaches you.",
+    "locked": "🔒 Seekers are in your zone!",
+    "lockedHint": "The endgame has started — stay exactly where you are until you're found."
   },
   "draw": {
     "title": "You drew {{ drew }} — keep {{ keep }}",
@@ -316,7 +320,8 @@
     "custom": "custom",
     "findingPlaces": "Finding nearby places…",
     "findingRef": "Finding your reference place…",
-    "thermoTransit": "🚶 Walk-only — get off transit"
+    "thermoTransit": "🚶 Walk-only — get off transit",
+    "cooldown": "⏳ Cooling down"
   },
   "timer": {
     "answering": "Hider answering",

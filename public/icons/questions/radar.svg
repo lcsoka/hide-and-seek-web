@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Radar">
+  <rect width="64" height="64" rx="13" fill="#EE8A3B"/>
+  <g fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round">
+    <circle cx="30" cy="34" r="7.5"/>
+    <circle cx="30" cy="34" r="15.5"/>
+    <line x1="30" y1="34" x2="44" y2="20"/>
+  </g>
+  <circle cx="30" cy="34" r="3.3" fill="#fff"/>
+  <circle cx="42.5" cy="21.5" r="2.9" fill="#fff"/>
+</svg>

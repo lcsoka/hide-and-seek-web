@@ -5,13 +5,18 @@ import { CategoryMeta } from './category.model';
 export class CategoryService {
   /** Display metadata per question category (icon, label, one-line hint). */
   private readonly CATEGORY_META: Record<string, CategoryMeta> = {
-    radar: { icon: '📡', label: 'Radar', hint: 'Are you within a distance of me?' },
-    thermometer: { icon: '🌡️', label: 'Thermometer', hint: 'Hotter or colder as I travel?' },
-    matching: { icon: '🧩', label: 'Matching', hint: 'Is your nearest place the same as mine?' },
-    measuring: { icon: '📏', label: 'Measuring', hint: 'Closer or further from a place than me?' },
-    tentacles: { icon: '🐙', label: 'Tentacles', hint: 'Which nearby place are you closest to?' },
-    photo: { icon: '📷', label: 'Photo', hint: 'Ask for a photo clue.' },
+    radar: { icon: '📡', label: 'Radar', hint: 'Are you within a distance of me?', color: '#EE8A3B' },
+    thermometer: { icon: '🌡️', label: 'Thermometer', hint: 'Hotter or colder as I travel?', color: '#D9534F' },
+    matching: { icon: '🧩', label: 'Matching', hint: 'Is your nearest place the same as mine?', color: '#1E2A44' },
+    measuring: { icon: '📏', label: 'Measuring', hint: 'Closer or further from a place than me?', color: '#5E9ED0' },
+    tentacles: { icon: '🐙', label: 'Tentacles', hint: 'Which nearby place are you closest to?', color: '#8E76B4' },
+    photo: { icon: '📷', label: 'Photo', hint: 'Ask for a photo clue.', color: '#4FA65B' },
   };
+
+  /** Path to the category's SVG badge (in web/public/icons/questions). */
+  categoryIconSrc(category: string): string {
+    return `/icons/questions/${category}.svg`;
+  }
 
   /** Subject keyword → emoji, most-specific first. Used to give each question an icon. */
   private readonly QUESTION_ICONS: [string, string][] = [
@@ -25,7 +30,7 @@ export class CategoryService {
   ];
 
   categoryMeta(category: string): CategoryMeta {
-    return this.CATEGORY_META[category] ?? { icon: '❓', label: category, hint: '' };
+    return this.CATEGORY_META[category] ?? { icon: '❓', label: category, hint: '', color: '#6B7280' };
   }
 
   /** An icon for a specific question (by its subject), falling back to the category icon. */

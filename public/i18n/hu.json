@@ -106,7 +106,11 @@
     "none": "Nincs megálló a közelben. Menj közelebb egy megállóhoz.",
     "relocated": "🚚 Kijátszottad a Költözést",
     "relocateTravel": "Menj egy új területre, majd válassz lent egy megállót, ahol elbújsz.",
-    "relocateConfirm": "Új hely megerősítése"
+    "relocateConfirm": "Új hely megerősítése",
+    "roam": "🚶 Szabadon mozoghatsz a zónádban",
+    "roamHint": "Mozogj szabadon a rejtekzónádon belül — a helyed csak akkor rögzül, ha egy kereső elér.",
+    "locked": "🔒 A keresők a zónádban vannak!",
+    "lockedHint": "Elkezdődött a végjáték — maradj pontosan ott, ahol vagy, amíg meg nem találnak."
   },
   "draw": {
     "title": "Húztál {{ drew }} lapot — tarts meg {{ keep }}-t",
@@ -316,7 +320,8 @@
     "custom": "egyéni",
     "findingPlaces": "Közeli helyek keresése…",
     "findingRef": "Referenciahely keresése…",
-    "thermoTransit": "🚶 Csak gyalog — szállj le"
+    "thermoTransit": "🚶 Csak gyalog — szállj le",
+    "cooldown": "⏳ Pihenő"
   },
   "timer": {
     "answering": "Bújó válaszol",
