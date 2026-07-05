@@ -477,7 +477,11 @@
   "push": {
     "title": "Értesítések",
     "blurb": "Push-értesítések a fontos játékeseményekről ezen az eszközön.",
-    "blocked": "Az értesítések le vannak tiltva a böngésző beállításaiban."
+    "blocked": "Az értesítések le vannak tiltva a böngésző beállításaiban.",
+    "nudgeTitle": "Kapcsold be az értesítéseket",
+    "nudgeBody": "Így a háttérben is értesülsz a kérdésekről, átkokról és a játék eseményeiről.",
+    "nudgeEnable": "Bekapcsolom",
+    "nudgeLater": "Most nem"
   },
   "install": {
     "title": "Telepítsd az alkalmazást",

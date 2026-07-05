@@ -477,7 +477,11 @@
   "push": {
     "title": "Notifications",
     "blurb": "Push notifications for key game events on this device.",
-    "blocked": "Notifications are blocked in your browser settings."
+    "blocked": "Notifications are blocked in your browser settings.",
+    "nudgeTitle": "Turn on notifications",
+    "nudgeBody": "Get alerted about questions, curses and game events even when the app is in the background.",
+    "nudgeEnable": "Turn on",
+    "nudgeLater": "Not now"
   },
   "install": {
     "title": "Install the app",
