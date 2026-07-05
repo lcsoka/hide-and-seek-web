@@ -1,22 +1,55 @@
 import { inject, Injectable } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { distanceMeters } from '../geo/geo';
+import { Position } from '../models';
 import { ApiClient } from './api-client';
 import { LOCATION_SOURCE } from './location-source';
 import { SessionStore } from './session-store';
 
-/** Subscribes to the active LocationSource and posts throttled pings to /location. */
+/** Never post more than once a second, even when moving fast. */
+const MIN_INTERVAL_MS = 1000;
+/** Deadband: ignore GPS jitter — don't post unless the player moved at least this far. */
+const MIN_DISTANCE_M = 10;
+/** …but still post at least this often when stationary, to stay "active" and self-correct. */
+const HEARTBEAT_MS = 45_000;
+
+/**
+ * Pure decision for whether a new fix is worth sending to the server. Mobile GPS emits a steady
+ * stream of jittery fixes while the user stands still; we send the first fix, then only when the
+ * player has actually moved (beyond the deadband) or a heartbeat interval has elapsed — always
+ * rate-limited to ~1/s.
+ */
+export function shouldSendLocation(lastSent: Position | null, lastSentAt: number, pos: Position, now: number): boolean {
+  if (lastSent === null) {
+    return true; // first fix of the session
+  }
+  if (now - lastSentAt < MIN_INTERVAL_MS) {
+    return false; // rate cap
+  }
+  if (distanceMeters(lastSent, pos) >= MIN_DISTANCE_M) {
+    return true; // real movement
+  }
+
+  return now - lastSentAt >= HEARTBEAT_MS; // stationary, but keep a fresh heartbeat
+}
+
+/** Subscribes to the active LocationSource and posts distance-gated, throttled pings to /location. */
 @Injectable({ providedIn: 'root' })
 export class LocationTracker {
   private readonly api = inject(ApiClient);
   private readonly source = inject(LOCATION_SOURCE);
   private readonly store = inject(SessionStore);
   private subscription: Subscription | null = null;
-  private lastSent = 0;
+
+  private lastSent: Position | null = null;
+  private lastSentAt = 0;
 
   start(sessionId: string, playerId: string | null): void {
     if (this.subscription) {
       return;
     }
+    this.lastSent = null;
+    this.lastSentAt = 0;
 
     this.subscription = this.source.positions().subscribe({
       next: (pos) => {
@@ -24,12 +57,11 @@ export class LocationTracker {
         if (playerId) {
           this.store.setLivePosition(playerId, pos.lat, pos.lng);
         }
-        const now = Date.now();
-        if (now - this.lastSent < 1000) {
-          return; // ~1 ping/sec to the server
+        if (shouldSendLocation(this.lastSent, this.lastSentAt, pos, Date.now())) {
+          this.lastSent = pos;
+          this.lastSentAt = Date.now();
+          void this.api.reportLocation(sessionId, pos.lat, pos.lng);
         }
-        this.lastSent = now;
-        void this.api.reportLocation(sessionId, pos.lat, pos.lng);
       },
       // Permission denied / unavailable — stop quietly; the game still works without GPS.
       error: () => this.stop(),
