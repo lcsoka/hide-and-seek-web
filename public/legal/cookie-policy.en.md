@@ -24,7 +24,7 @@ trackers, or cross-site tracking of any kind.
 
 When the map is shown, your browser loads **map tiles** and makes **OpenStreetMap** queries from
 external providers. These providers receive your IP address and the map area you view, and may set
-their own cookies under their policies. See our [Privacy Policy](privacy-policy.md) §3.
+their own cookies under their policies. See our [Privacy Policy](/legal/privacy) §3.
 
 ## Managing storage
 
