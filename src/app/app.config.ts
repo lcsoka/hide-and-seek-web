@@ -1,6 +1,7 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideServiceWorker } from '@angular/service-worker';
 import { provideTransloco } from '@jsverse/transloco';
 import * as Sentry from '@sentry/angular';
 
@@ -31,6 +32,12 @@ export const appConfig: ApplicationConfig = {
         prodMode: environment.production,
       },
       loader: TranslocoHttpLoader,
+    }),
+    // PWA service worker: app-shell caching only (no API/state caching — see ngsw-config.json).
+    // Enabled in production builds; registers after the app stabilises so it never blocks startup.
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: environment.production,
+      registrationStrategy: 'registerWhenStable:30000',
     }),
   ],
 };
