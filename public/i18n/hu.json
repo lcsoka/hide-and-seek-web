@@ -478,5 +478,11 @@
     "title": "Értesítések",
     "blurb": "Push-értesítések a fontos játékeseményekről ezen az eszközön.",
     "blocked": "Az értesítések le vannak tiltva a böngésző beállításaiban."
+  },
+  "install": {
+    "title": "Telepítsd az alkalmazást",
+    "blurb": "Add a kezdőképernyődhöz a gyorsabb eléréshez.",
+    "action": "Telepítés",
+    "iosHint": "Koppints a Megosztás ikonra, majd a „Kezdőképernyőhöz adás” lehetőségre."
   }
 }

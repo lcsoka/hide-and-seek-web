@@ -478,5 +478,11 @@
     "title": "Notifications",
     "blurb": "Push notifications for key game events on this device.",
     "blocked": "Notifications are blocked in your browser settings."
+  },
+  "install": {
+    "title": "Install the app",
+    "blurb": "Add it to your home screen for quick access.",
+    "action": "Install",
+    "iosHint": "Tap the Share icon, then \"Add to Home Screen\"."
   }
 }

@@ -8,12 +8,13 @@ import { AuthStore } from '../../core/services/auth-store';
 import { PlayerStore } from '../../core/services/player-store';
 import { TokenStore } from '../../core/services/token-store';
 import { AppFooter } from '../../shared/app-footer';
+import { InstallBanner } from '../../shared/install-banner';
 import { LangToggle } from '../../shared/lang-toggle';
 import { MapBackdrop } from '../../shared/map-backdrop';
 
 @Component({
   selector: 'app-landing',
-  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop, AppFooter],
+  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop, AppFooter, InstallBanner],
   templateUrl: './landing.html',
 })
 export class Landing {

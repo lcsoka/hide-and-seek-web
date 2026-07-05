@@ -1,0 +1,19 @@
+@if (prompt.visible()) {
+  <div *transloco="let t" class="fixed inset-x-0 bottom-0 z-40 p-3">
+    <div class="mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-xl ring-1 ring-black/5 dark:border-white/10 dark:bg-gray-900 dark:ring-white/10">
+      <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-rose-600 text-lg">🚇</span>
+      <div class="min-w-0 flex-1">
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ t('install.title') }}</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          @if (prompt.isIos()) { {{ t('install.iosHint') }} } @else { {{ t('install.blurb') }} }
+        </div>
+      </div>
+      @if (prompt.canInstall()) {
+        <button (click)="prompt.install()" class="shrink-0 rounded-xl bg-rose-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-rose-500">
+          {{ t('install.action') }}
+        </button>
+      }
+      <button (click)="prompt.dismiss()" [attr.aria-label]="t('common.cancel')" class="shrink-0 rounded-full p-1.5 text-lg leading-none text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/10 dark:hover:text-white">✕</button>
+    </div>
+  </div>
+}
