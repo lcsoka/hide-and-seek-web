@@ -168,7 +168,13 @@
     "units": {
       "metric": "Metric (km)",
       "imperial": "Imperial (mi)"
-    }
+    },
+    "resumeTitle": "Active game",
+    "resume": "Resume",
+    "newGameTitle": "Start a new game?",
+    "newGameBody": "You already have an active game. Start a new one anyway?",
+    "resumeExisting": "Back to my game",
+    "newGameAnyway": "Start new game"
   },
   "lobby": {
     "title": "Waiting room",
@@ -500,5 +506,13 @@
     "send": "Send",
     "sent": "Thanks for the feedback! 🙌",
     "error": "Couldn't send. Please try again."
+  },
+  "found": {
+    "eyebrow": "Found?",
+    "title": "A seeker found you!",
+    "body": "A seeker claims they found you.",
+    "bodyNamed": "{{name}} claims they found you.",
+    "confirm": "I'm caught",
+    "dispute": "Dispute"
   }
 }

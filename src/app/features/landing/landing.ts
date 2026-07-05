@@ -2,6 +2,7 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { ActiveSession } from '../../core/models';
 import { TRANSIT_MODES } from '../../core/maps/overpass';
 import { ApiClient } from '../../core/services/api-client';
 import { AuthStore } from '../../core/services/auth-store';
@@ -29,6 +30,9 @@ export class Landing {
   readonly error = signal<string | null>(null);
   readonly createOpen = signal(false);
   readonly joinOpen = signal(false);
+  // Still-live games the user can rejoin, and the "start a new one anyway?" confirmation.
+  readonly activeSessions = signal<ActiveSession[]>([]);
+  readonly confirmNew = signal(false);
 
   readonly cities = ['budapest', 'debrecen', 'szeged', 'miskolc', 'pecs', 'gyor', 'nyiregyhaza', 'kecskemet', 'szekesfehervar', 'szombathely'];
   readonly sizes = ['small', 'medium', 'large'];
@@ -53,6 +57,39 @@ export class Landing {
         this.name = user.name;
       }
     });
+    void this.loadActiveSessions();
+  }
+
+  /** Load the user's still-live games so they can rejoin one they left. */
+  private async loadActiveSessions(): Promise<void> {
+    if (!this.tokens.token()) {
+      return;
+    }
+    try {
+      this.activeSessions.set(await this.api.mySessions());
+    } catch {
+      // not signed in / offline — no resume list, that's fine
+    }
+  }
+
+  /** Rejoin a game the user is already part of. */
+  resume(s: ActiveSession): void {
+    this.players.set(s.id, s.player_id);
+    void this.router.navigate(['/s', s.id]);
+  }
+
+  /** Open the create sheet — but confirm first if the user already has a live game. */
+  startGame(): void {
+    if (this.activeSessions().length) {
+      this.confirmNew.set(true);
+    } else {
+      this.createOpen.set(true);
+    }
+  }
+
+  proceedNewGame(): void {
+    this.confirmNew.set(false);
+    this.createOpen.set(true);
   }
 
   /** Toggle a transit mode, but never let the last one be removed (need ≥1 to hide at). */

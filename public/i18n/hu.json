@@ -168,7 +168,13 @@
     "units": {
       "metric": "Metrikus (km)",
       "imperial": "Angolszász (mérföld)"
-    }
+    },
+    "resumeTitle": "Aktív játék",
+    "resume": "Folytatás",
+    "newGameTitle": "Új játék indítása?",
+    "newGameBody": "Már van egy aktív játékod. Biztosan új játékot indítasz?",
+    "resumeExisting": "Vissza a játékomhoz",
+    "newGameAnyway": "Új játék indítása"
   },
   "lobby": {
     "title": "Váróterem",
@@ -500,5 +506,13 @@
     "send": "Küldés",
     "sent": "Köszönjük a visszajelzést! 🙌",
     "error": "Nem sikerült elküldeni. Kérlek, próbáld újra."
+  },
+  "found": {
+    "eyebrow": "Megtaláltak?",
+    "title": "Egy kereső megtalált!",
+    "body": "Egy kereső bejelentette, hogy megtalált.",
+    "bodyNamed": "{{name}} bejelentette, hogy megtalált.",
+    "confirm": "Elkaptak",
+    "dispute": "Vitatom"
   }
 }

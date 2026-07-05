@@ -2,7 +2,7 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CurseCatalogItem, CustomCurse, CustomQuestion, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models';
+import { ActiveSession, CurseCatalogItem, CustomCurse, CustomQuestion, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models';
 
 /**
  * Typed wrapper over the REST contract. Reads use `httpResource` (signals);
@@ -78,6 +78,11 @@ export class ApiClient {
   /** Player feedback — a bug report or suggestion. Public endpoint (no auth required). */
   sendFeedback(body: { type: 'bug' | 'suggestion'; message: string; contact?: string; context?: Record<string, unknown> }): Promise<unknown> {
     return firstValueFrom(this.http.post(`${this.base}/feedback`, body));
+  }
+
+  /** The user's still-live games, for the landing "resume" list. */
+  mySessions(): Promise<ActiveSession[]> {
+    return firstValueFrom(this.http.get<ActiveSession[]>(`${this.base}/my/sessions`));
   }
 
   createSession(body: {

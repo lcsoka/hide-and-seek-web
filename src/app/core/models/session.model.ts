@@ -11,3 +11,15 @@ export interface SessionSummary {
   players: PlayerView[];
   teams: TeamView[];
 }
+
+/** A still-live game the user is part of — for the "resume" list on the landing. */
+export interface ActiveSession {
+  id: string;
+  join_code: string;
+  city: string | null;
+  state: string;
+  status: string;
+  is_host: boolean;
+  player_id: string;
+  players_count: number;
+}
