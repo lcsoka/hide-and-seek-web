@@ -92,6 +92,13 @@ export class AuthStore {
     this.user.set(await this.api.updateProfile({ name }));
   }
 
+  /** Permanently delete the account (GDPR). Only clears local auth once the server confirms. */
+  async deleteAccount(password?: string): Promise<void> {
+    await this.api.deleteAccount(password);
+    this.tokens.clear();
+    this.user.set(null);
+  }
+
   async uploadAvatar(file: File): Promise<void> {
     this.user.set(await this.api.uploadAvatar(file));
   }

@@ -57,6 +57,11 @@ export class ApiClient {
     return firstValueFrom(this.http.post<Profile>(`${this.base}/profile/avatar`, form));
   }
 
+  /** GDPR: permanently delete the account. Registered users must pass their password. */
+  deleteAccount(password?: string): Promise<unknown> {
+    return firstValueFrom(this.http.delete(`${this.base}/profile`, { body: password ? { password } : {} }));
+  }
+
   createSession(body: {
     city: string;
     game_size: string;

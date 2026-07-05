@@ -21,7 +21,10 @@ export class ProfilePage {
   readonly user = this.auth.user;
   readonly stats = signal<ProfileStats | null>(null);
   readonly busy = signal(false);
+  readonly confirmingDelete = signal(false);
+  readonly deleteError = signal<string | null>(null);
   name = '';
+  deletePassword = '';
   private synced = false;
 
   constructor() {
@@ -82,5 +85,30 @@ export class ProfilePage {
   async logout(): Promise<void> {
     await this.auth.logout();
     void this.router.navigate(['/']);
+  }
+
+  startDelete(): void {
+    this.confirmingDelete.set(true);
+    this.deleteError.set(null);
+    this.deletePassword = '';
+  }
+
+  cancelDelete(): void {
+    this.confirmingDelete.set(false);
+  }
+
+  async confirmDelete(): Promise<void> {
+    if (this.busy()) {
+      return;
+    }
+    this.busy.set(true);
+    this.deleteError.set(null);
+    try {
+      await this.auth.deleteAccount(this.deletePassword || undefined);
+      void this.router.navigate(['/']);
+    } catch {
+      this.deleteError.set('auth.deleteFailed');
+      this.busy.set(false);
+    }
   }
 }
