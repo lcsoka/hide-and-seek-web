@@ -481,7 +481,8 @@
     "nudgeTitle": "Kapcsold be az értesítéseket",
     "nudgeBody": "Így a háttérben is értesülsz a kérdésekről, átkokról és a játék eseményeiről.",
     "nudgeEnable": "Bekapcsolom",
-    "nudgeLater": "Most nem"
+    "nudgeLater": "Most nem",
+    "nudgeShort": "Értesítések"
   },
   "install": {
     "title": "Telepítsd az alkalmazást",

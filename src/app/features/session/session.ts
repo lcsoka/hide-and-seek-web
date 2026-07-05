@@ -29,6 +29,7 @@ import { TransitPicker } from './transit-picker';
 import { BoardChoice } from './transit-picker.model';
 import { RoundResults } from './round-results';
 import { SeekerPanel } from './seeker-panel';
+import { PushNudge } from '../../shared/push-nudge';
 
 // Actions with a dedicated panel — kept out of the generic button row.
 const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'start_thermometer', 'stop_thermometer', 'board_transit', 'alight_transit', 'claim_found', 'confirm_caught', 'dispute_found', 'amend_answer', 'choose_disabled_categories', 'discard_card'];
@@ -42,7 +43,7 @@ const OBJECTIVE_STATES = new Set(['hider_hiding', 'hider_seeking', 'hider_endgam
 @Component({
   selector: 'app-session',
   host: { class: 'block h-[100dvh] w-full' },
-  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults],
+  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, PushNudge],
   templateUrl: './session.html',
 })
 export class SessionView {

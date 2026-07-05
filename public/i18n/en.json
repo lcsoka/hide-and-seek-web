@@ -481,7 +481,8 @@
     "nudgeTitle": "Turn on notifications",
     "nudgeBody": "Get alerted about questions, curses and game events even when the app is in the background.",
     "nudgeEnable": "Turn on",
-    "nudgeLater": "Not now"
+    "nudgeLater": "Not now",
+    "nudgeShort": "Notifications"
   },
   "install": {
     "title": "Install the app",

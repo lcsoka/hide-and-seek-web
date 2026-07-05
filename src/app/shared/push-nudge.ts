@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
 import { Push } from '../core/services/push';
 
@@ -16,6 +16,8 @@ const DISMISS_KEY = 'jl_push_nudge_dismissed';
 })
 export class PushNudge {
   readonly push = inject(Push);
+  /** Slim pill layout for the in-game HUD (vs the full card used in the lobby). */
+  readonly compact = input(false);
   private readonly dismissed = signal(this.readDismissed());
 
   readonly visible = computed(() => this.push.supported && !this.dismissed() && !this.push.enabled() && this.push.permission() !== 'denied');

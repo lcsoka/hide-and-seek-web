@@ -53,6 +53,13 @@
       </div>
     }
 
+    <!-- Subtle in-game reminder to enable notifications (for players who skipped the lobby). -->
+    @if (activePlay(s) && !reconnecting() && !hidingCalculating()) {
+      <div class="pointer-events-none absolute inset-x-0 top-16 z-[650] flex justify-center px-4">
+        <app-push-nudge [compact]="true" />
+      </div>
+    }
+
     <!-- Radar preview: the chosen radius is drawn on the map; confirm to actually ask, or cancel. -->
     @if (radarPreview(); as rp) {
       <div class="pointer-events-none absolute inset-x-0 top-28 z-[750] flex justify-center px-4">
