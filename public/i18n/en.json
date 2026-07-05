@@ -445,5 +445,33 @@
     "cookiesTitle": "Cookie Policy",
     "notFound": "Document not found.",
     "backHome": "Back to home"
+  },
+  "seo": {
+    "home": {
+      "title": "Hide & Seek — hide and seek across the city",
+      "desc": "Real-time, location-based hide-and-seek across Hungarian cities. One hider hides; seekers narrow down the location with questions while the hider slows them with curses."
+    },
+    "map": {
+      "title": "Map — Hide & Seek",
+      "desc": "Interactive map for the Hide & Seek game."
+    },
+    "legal": {
+      "title": "Legal — Hide & Seek"
+    },
+    "auth": {
+      "title": "Sign in — Hide & Seek"
+    },
+    "profile": {
+      "title": "Profile — Hide & Seek"
+    },
+    "content": {
+      "title": "My content — Hide & Seek"
+    },
+    "game": {
+      "title": "Game — Hide & Seek"
+    },
+    "replay": {
+      "title": "Replay — Hide & Seek"
+    }
   }
 }

@@ -1,17 +1,58 @@
 <!doctype html>
-<html lang="en">
+<html lang="hu">
 <head>
   <meta charset="utf-8">
   <title>Hide &amp; Seek — rejtőzz és keress</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!-- SEO -->
+  <meta name="description" content="Valós idejű, helyalapú bújócska magyar városokban. Egy bújó rejtőzik, a keresők kérdésekkel szűkítik a helyét, a bújó pedig átkokkal lassítja őket. A Jet Lag: The Game ihlette.">
+  <meta name="application-name" content="Hide &amp; Seek">
+  <meta name="theme-color" content="#e11d48">
+  <link rel="canonical" href="https://hideandseek.hu/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Hide &amp; Seek">
+  <meta property="og:title" content="Hide &amp; Seek — rejtőzz és keress">
+  <meta property="og:description" content="Valós idejű, helyalapú bújócska magyar városokban. Egy bújó, csapatnyi kereső, kérdések, átkok és tömegközlekedés.">
+  <meta property="og:url" content="https://hideandseek.hu/">
+  <meta property="og:image" content="https://hideandseek.hu/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="hu_HU">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hide &amp; Seek — rejtőzz és keress">
+  <meta name="twitter:description" content="Valós idejű, helyalapú bújócska magyar városokban. Egy bújó, csapatnyi kereső, kérdések, átkok és tömegközlekedés.">
+  <meta name="twitter:image" content="https://hideandseek.hu/og-image.png">
+
+  <!-- Icons + PWA manifest -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <meta name="theme-color" content="#e11d48">
+  <link rel="manifest" href="manifest.webmanifest">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Hide & Seek",
+    "url": "https://hideandseek.hu/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Web",
+    "inLanguage": ["hu", "en"],
+    "description": "Valós idejű, helyalapú bújócska magyar városokban, a Jet Lag: The Game ihlette.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "HUF" }
+  }
+  </script>
 </head>
 <body>
   <app-root></app-root>

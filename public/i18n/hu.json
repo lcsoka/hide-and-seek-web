@@ -445,5 +445,33 @@
     "cookiesTitle": "Süti tájékoztató",
     "notFound": "A dokumentum nem található.",
     "backHome": "Vissza a főoldalra"
+  },
+  "seo": {
+    "home": {
+      "title": "Hide & Seek — rejtőzz és keress",
+      "desc": "Valós idejű, helyalapú bújócska magyar városokban. Egy bújó rejtőzik, a keresők kérdésekkel szűkítik a helyét, a bújó pedig átkokkal lassítja őket."
+    },
+    "map": {
+      "title": "Térkép — Hide & Seek",
+      "desc": "Interaktív térkép a Hide & Seek játékhoz."
+    },
+    "legal": {
+      "title": "Jogi tudnivalók — Hide & Seek"
+    },
+    "auth": {
+      "title": "Belépés — Hide & Seek"
+    },
+    "profile": {
+      "title": "Profil — Hide & Seek"
+    },
+    "content": {
+      "title": "Saját tartalom — Hide & Seek"
+    },
+    "game": {
+      "title": "Játék — Hide & Seek"
+    },
+    "replay": {
+      "title": "Visszajátszás — Hide & Seek"
+    }
   }
 }

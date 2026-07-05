@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+# Private / ephemeral routes — no value to index.
+Disallow: /s/
+Disallow: /dev
+Disallow: /replay/
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /profile
+Disallow: /content
+
+Sitemap: https://hideandseek.hu/sitemap.xml

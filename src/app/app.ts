@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Language } from './core/services/language';
+import { Seo } from './core/services/seo';
 import { MaintenanceOverlay } from './shared/maintenance-overlay';
 
 @Component({
@@ -16,5 +17,6 @@ import { MaintenanceOverlay } from './shared/maintenance-overlay';
 export class App {
   constructor() {
     inject(Language).init(); // restore the saved language (Hungarian by default)
+    inject(Seo).init(); // keep <title> + meta tags in sync with the route and language
   }
 }
