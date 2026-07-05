@@ -11,7 +11,7 @@ import { LocationTracker } from '../../core/services/location';
 import { PlayerStore } from '../../core/services/player-store';
 import { Realtime } from '../../core/services/realtime';
 import { SessionStore } from '../../core/services/session-store';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { GameTimerService } from '../../core/services/game-timer.service';
 import { GameTimer } from '../../core/services/game-timer.model';
 import { DeductionMap } from '../map/deduction-map';
@@ -57,10 +57,13 @@ export class SessionView {
   readonly hiding = inject(HidingState);
   private readonly unitsService = inject(UnitsService);
   private readonly gameTimer = inject(GameTimerService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly id = signal<string | undefined>(this.route.snapshot.paramMap.get('id') ?? undefined);
   readonly myId = signal<string | null>(null);
   readonly acting = signal(false);
+  // A dismissible message when the backend rejects an action (e.g. 422 — not valid now / on cooldown).
+  readonly actionError = signal<string | null>(null);
   readonly devMode = !!environment.developerToken;
   readonly devPlacing = signal(false);
   readonly pickerOpen = signal(false);
@@ -313,8 +316,7 @@ export class SessionView {
     this.pickerOpen.set(false);
     // A thermometer is started (then stopped) rather than asked outright.
     const action = event.category === 'thermometer' ? 'start_thermometer' : 'ask_question';
-    await this.api.submitAction(s.session_id, action, { question_id: event.questionId, ...event.payload });
-    this.store.refresh();
+    await this.submit(s.session_id, action, { question_id: event.questionId, ...event.payload });
   }
 
   /** Seeker picked a radar radius: show it on the map (centred on them) for confirmation. If
@@ -338,8 +340,7 @@ export class SessionView {
       return;
     }
     this.radarPreview.set(null);
-    await this.api.submitAction(s.session_id, 'ask_question', { question_id: p.questionId, radius_m: p.radiusM });
-    this.store.refresh();
+    await this.submit(s.session_id, 'ask_question', { question_id: p.questionId, radius_m: p.radiusM });
   }
 
   cancelRadar(): void {
@@ -362,8 +363,7 @@ export class SessionView {
       return;
     }
     this.refPreview.set(null);
-    await this.api.submitAction(s.session_id, 'ask_question', { question_id: p.questionId, ref_lat: p.lat, ref_lng: p.lng, ref_name: p.name });
-    this.store.refresh();
+    await this.submit(s.session_id, 'ask_question', { question_id: p.questionId, ref_lat: p.lat, ref_lng: p.lng, ref_name: p.name });
   }
 
   cancelRef(): void {
@@ -384,8 +384,7 @@ export class SessionView {
   /** The seeker chose a stop + line in the board picker — record the boarding. */
   async onBoard(s: GameState, choice: BoardChoice): Promise<void> {
     this.boardOpen.set(false);
-    await this.api.submitAction(s.session_id, 'board_transit', choice as unknown as Record<string, unknown>);
-    this.store.refresh();
+    await this.submit(s.session_id, 'board_transit', choice as unknown as Record<string, unknown>);
   }
 
   /** Once a round is over, reveal where the hider was actually hiding. */
@@ -419,13 +418,24 @@ export class SessionView {
 
   async act(type: string): Promise<void> {
     const sessionId = this.id();
-    if (!sessionId) {
-      return;
+    if (sessionId) {
+      await this.submit(sessionId, type);
     }
+  }
 
+  /**
+   * Submit a game action, surfacing a rejection (e.g. 422 — not valid in this state / on cooldown)
+   * as a dismissible message rather than an unhandled rejection, and always re-syncing state.
+   */
+  private async submit(sessionId: string, type: string, payload: Record<string, unknown> = {}): Promise<void> {
     this.acting.set(true);
+    this.actionError.set(null);
     try {
-      await this.api.submitAction(sessionId, type);
+      await this.api.submitAction(sessionId, type, payload);
+    } catch (e: unknown) {
+      const message = (e as { error?: { message?: string } })?.error?.message || (this.transloco.translate('common.error') as string);
+      this.actionError.set(message);
+      setTimeout(() => this.actionError.update((m) => (m === message ? null : m)), 5000);
     } finally {
       this.acting.set(false);
       this.store.refresh();

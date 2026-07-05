@@ -53,6 +53,16 @@
       </div>
     }
 
+    <!-- Action rejected by the server (e.g. not valid right now) — show why, don't crash. -->
+    @if (actionError(); as err) {
+      <div class="pointer-events-none absolute inset-x-0 bottom-4 z-[850] flex justify-center px-4" *transloco="let t">
+        <div class="jl-pop pointer-events-auto flex items-center gap-2 rounded-full bg-red-600/95 px-4 py-2 text-sm font-medium text-white shadow-xl backdrop-blur">
+          <span>{{ err }}</span>
+          <button (click)="actionError.set(null)" [attr.aria-label]="t('common.cancel')" class="ml-1 text-base leading-none opacity-80 hover:opacity-100">✕</button>
+        </div>
+      </div>
+    }
+
     <!-- Subtle in-game reminder to enable notifications (for players who skipped the lobby). -->
     @if (activePlay(s) && !reconnecting() && !hidingCalculating()) {
       <div class="pointer-events-none absolute inset-x-0 top-16 z-[650] flex justify-center px-4">
