@@ -244,5 +244,10 @@
     @if (curseAlert(); as c) {
       <app-curse-alert [curse]="c" />
     }
+
+    <!-- Hider: a seeker claims the catch — surface it front-and-centre with the confirm/dispute actions. -->
+    @if (role(s) === 'hider' && s.found_claim; as fc) {
+      <app-found-alert [claim]="fc" [busy]="acting()" (confirm)="act('confirm_caught')" (dispute)="act('dispute_found')" />
+    }
   </div>
 }
