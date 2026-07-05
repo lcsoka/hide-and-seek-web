@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
+import { DevMode } from '../../core/services/dev-mode';
 
 interface DuoView {
   name: string;
@@ -77,6 +78,7 @@ interface DuoView {
 })
 export class DevDuo {
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly dev = inject(DevMode);
   private readonly base = environment.apiBase;
 
   readonly busy = signal(false);
@@ -156,7 +158,7 @@ export class DevDuo {
   private async debug(path: string, body?: unknown): Promise<any> {
     const res = await fetch(this.base + path, {
       method: body ? 'POST' : 'GET',
-      headers: { 'Content-Type': 'application/json', 'X-Developer-Token': environment.developerToken },
+      headers: { 'Content-Type': 'application/json', 'X-Developer-Token': this.dev.token },
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
     if (!res.ok) {

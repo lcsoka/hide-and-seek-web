@@ -1,11 +1,11 @@
 import { Component, computed, DestroyRef, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { environment } from '../../../environments/environment';
 import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models';
 import { ALL_TRANSIT_MODES } from '../../core/maps/overpass';
 import { UnitsService } from '../../core/services/units.service';
 import { ApiClient } from '../../core/services/api-client';
 import { DeductionState } from '../../core/services/deduction-state';
+import { DevMode } from '../../core/services/dev-mode';
 import { HidingState } from '../../core/services/hiding-state';
 import { LocationTracker } from '../../core/services/location';
 import { PlayerStore } from '../../core/services/player-store';
@@ -65,7 +65,7 @@ export class SessionView {
   readonly acting = signal(false);
   // A dismissible message when the backend rejects an action (e.g. 422 — not valid now / on cooldown).
   readonly actionError = signal<string | null>(null);
-  readonly devMode = !!environment.developerToken;
+  readonly devMode = inject(DevMode).enabled;
   readonly devPlacing = signal(false);
   readonly pickerOpen = signal(false);
   readonly boardOpen = signal(false);

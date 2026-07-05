@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { GodView } from '../models';
+import { DevMode } from './dev-mode';
 
 /**
  * Client for the developer/debug API (gated by EnsureDebugAccess on the backend).
@@ -13,9 +14,10 @@ import { GodView } from '../models';
 export class DebugApi {
   private readonly http = inject(HttpClient);
   private readonly base = environment.apiBase;
+  private readonly dev = inject(DevMode);
 
   private get options() {
-    return { headers: new HttpHeaders({ 'X-Developer-Token': environment.developerToken }) };
+    return { headers: new HttpHeaders({ 'X-Developer-Token': this.dev.token }) };
   }
 
   state(id: string): Promise<GodView> {

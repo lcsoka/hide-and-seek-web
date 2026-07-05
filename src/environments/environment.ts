@@ -7,7 +7,9 @@ export const environment = {
     port: 443,
     scheme: 'wss',
   },
-  // Developer cockpit token — empty in production so the cockpit stays inert there.
+  // Developer cockpit token — MUST stay empty in production (a non-empty token turns dev mode on
+  // for everyone, which also disables the real GPS loop). Enable it per-browser at runtime via
+  // `?dev=<token>` instead (see DevMode / the deploy notes).
   developerToken: '',
   // Sentry error monitoring — paste your project's (public) DSN to enable. Empty = disabled.
   sentryDsn:
