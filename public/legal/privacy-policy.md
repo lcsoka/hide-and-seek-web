@@ -1,10 +1,6 @@
 # Privacy Policy — Hide & Seek
 
-_Last updated: [DATE]._
-
-> **Template notice.** This is a good-faith draft tailored to how the Hide & Seek app works. It is
-> **not legal advice**. Have a qualified data-protection lawyer review it, translate it to Hungarian
-> (the primary language of the service), and fill in every `[PLACEHOLDER]` before publishing.
+_Last updated: 5 July 2026._
 
 This policy explains how **[OPERATOR NAME]** ("we", "us"), operator of **Hide & Seek**
 (`hideandseek.hu`), collects and uses your personal data, and your rights under the EU General Data
@@ -32,7 +28,7 @@ Protection Regulation (GDPR) and Hungarian data-protection law.
   trace, and technical context — no location or account passwords) is sent to our error-monitoring
   provider so we can fix bugs.
 
-We do **not** knowingly collect data from children under the age required by [JURISDICTION]. We do
+We do **not** knowingly collect data from children under 16 (the age of digital consent in Hungary). We do
 **not** use advertising or cross-site tracking, and our analytics are **cookieless** — so no consent
 banner is required.
 

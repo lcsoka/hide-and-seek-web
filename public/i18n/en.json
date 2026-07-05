@@ -438,5 +438,12 @@
     "seekerTitle": "If you're a Seeker 🔎",
     "seeker": "Ask questions to rule out parts of the map, then ride transit toward what's left. When close, declare endgame and reach the hider to catch them.",
     "questionsTitle": "Question types"
+  },
+  "legal": {
+    "title": "Legal",
+    "privacyTitle": "Privacy Policy",
+    "cookiesTitle": "Cookie Policy",
+    "notFound": "Document not found.",
+    "backHome": "Back to home"
   }
 }

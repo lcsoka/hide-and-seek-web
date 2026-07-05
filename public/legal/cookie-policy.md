@@ -1,10 +1,6 @@
 # Cookie & Local Storage Policy — Hide & Seek
 
-_Last updated: [DATE]._
-
-> **Template notice.** This is a good-faith draft based on how the Hide & Seek app actually stores
-> data in the browser. It is **not legal advice** — have it reviewed and translated to Hungarian, and
-> verify the list below against the deployed app before publishing.
+_Last updated: 5 July 2026._
 
 This policy explains the cookies and browser storage that **Hide & Seek** (`hideandseek.hu`) uses.
 

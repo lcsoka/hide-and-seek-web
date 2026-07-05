@@ -1,0 +1,124 @@
+/* Typography for the markdown injected into .legal-doc. Encapsulation is None on this component,
+   so every rule is scoped under .legal-doc to avoid leaking into the rest of the app. */
+.legal-doc {
+  line-height: 1.7;
+  font-size: 0.95rem;
+  color: #374151;
+}
+.legal-doc h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.75rem;
+  color: #111827;
+}
+.legal-doc h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 2rem 0 0.6rem;
+  color: #111827;
+}
+.legal-doc h3 {
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin: 1.4rem 0 0.4rem;
+  color: #111827;
+}
+.legal-doc p,
+.legal-doc ul,
+.legal-doc ol {
+  margin: 0 0 0.9rem;
+}
+.legal-doc ul,
+.legal-doc ol {
+  padding-left: 1.35rem;
+}
+.legal-doc li {
+  margin: 0.2rem 0;
+}
+.legal-doc a {
+  color: #e11d48;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.legal-doc strong {
+  color: #111827;
+  font-weight: 600;
+}
+.legal-doc em {
+  color: #6b7280;
+}
+.legal-doc hr {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 1.5rem 0;
+}
+.legal-doc blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid #fca5a5;
+  background: rgba(244, 63, 94, 0.06);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+.legal-doc blockquote p {
+  margin: 0;
+}
+.legal-doc code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  background: rgba(120, 120, 120, 0.14);
+  padding: 0.1em 0.35em;
+  border-radius: 0.3rem;
+}
+.legal-doc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.1rem;
+  font-size: 0.88rem;
+  display: block;
+  overflow-x: auto;
+}
+.legal-doc th,
+.legal-doc td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+.legal-doc th {
+  background: rgba(120, 120, 120, 0.08);
+  font-weight: 600;
+  color: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  .legal-doc {
+    color: #cbd5e1;
+  }
+  .legal-doc h1,
+  .legal-doc h2,
+  .legal-doc h3,
+  .legal-doc strong,
+  .legal-doc th {
+    color: #f1f5f9;
+  }
+  .legal-doc em {
+    color: #94a3b8;
+  }
+  .legal-doc a {
+    color: #fb7185;
+  }
+  .legal-doc hr {
+    border-top-color: rgba(255, 255, 255, 0.12);
+  }
+  .legal-doc blockquote {
+    color: #94a3b8;
+    border-left-color: #9f1239;
+  }
+  .legal-doc th,
+  .legal-doc td {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+}

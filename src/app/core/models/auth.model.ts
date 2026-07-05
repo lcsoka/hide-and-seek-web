@@ -10,6 +10,7 @@ export interface Profile {
   name: string;
   email: string | null;
   avatar: string | null;
+  avatar_thumb: string | null;
   is_guest: boolean;
 }
 

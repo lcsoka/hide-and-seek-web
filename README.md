@@ -10,6 +10,8 @@ is authoritative for all rules and state, and this app renders it, sends player 
 to real-time events. Built with **Angular 22**, **Tailwind CSS v4**, **Leaflet** + **turf.js** and
 **Laravel Echo**.
 
+**Live:** play at **[hideandseek.hu](https://hideandseek.hu)** (talks to the API at `api.hideandseek.hu`).
+
 > The backend lives in a separate repository: **[hide-and-seek-backend](https://github.com/lcsoka/hide-and-seek-backend)**.
 
 ---

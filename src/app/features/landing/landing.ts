@@ -7,12 +7,13 @@ import { ApiClient } from '../../core/services/api-client';
 import { AuthStore } from '../../core/services/auth-store';
 import { PlayerStore } from '../../core/services/player-store';
 import { TokenStore } from '../../core/services/token-store';
+import { AppFooter } from '../../shared/app-footer';
 import { LangToggle } from '../../shared/lang-toggle';
 import { MapBackdrop } from '../../shared/map-backdrop';
 
 @Component({
   selector: 'app-landing',
-  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop],
+  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop, AppFooter],
   templateUrl: './landing.html',
 })
 export class Landing {

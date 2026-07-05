@@ -6,6 +6,7 @@ export const routes: Routes = [
   { path: 'content', loadComponent: () => import('./features/content/my-content').then((m) => m.MyContentPage) },
   { path: 'auth', loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage) },
   { path: 'reset-password', loadComponent: () => import('./features/auth/reset-password').then((m) => m.ResetPasswordPage) },
+  { path: 'legal/:doc', loadComponent: () => import('./features/legal/legal-page').then((m) => m.LegalPage) },
   { path: 's/:id', loadComponent: () => import('./features/session/session').then((m) => m.SessionView) },
   { path: 'map', loadComponent: () => import('./features/map/map-page').then((m) => m.MapPage) },
   { path: 'dev', loadComponent: () => import('./features/dev/index').then((m) => m.DevIndex) },

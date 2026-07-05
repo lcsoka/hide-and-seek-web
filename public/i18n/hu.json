@@ -438,5 +438,12 @@
     "seekerTitle": "Ha te vagy a Kereső 🔎",
     "seeker": "Tegyél fel kérdéseket a térkép egyes részeinek kizárásához, majd menj tömegközlekedéssel a maradék felé. Ha közel vagy, indítsd a hajrát, és érj a bújóhoz, hogy elkapd.",
     "questionsTitle": "Kérdéstípusok"
+  },
+  "legal": {
+    "title": "Jogi tudnivalók",
+    "privacyTitle": "Adatvédelmi tájékoztató",
+    "cookiesTitle": "Süti tájékoztató",
+    "notFound": "A dokumentum nem található.",
+    "backHome": "Vissza a főoldalra"
   }
 }
