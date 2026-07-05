@@ -19,9 +19,10 @@ We use only what is necessary for the app to work:
 | Language preference | `localStorage` | Remembers your chosen language (Hungarian/English). | Until cleared |
 | Gameplay state | `localStorage` | Remembers your current player/game so a page refresh doesn't drop you mid-game. | Until the game ends or you clear it |
 
-Sign-in uses a bearer token (not login cookies), so the app sets no tracking cookies of its own. We
-do **not** use advertising cookies, third-party analytics, social-media trackers, or cross-site
-tracking of any kind.
+Sign-in uses a bearer token (not login cookies), so the app sets no tracking cookies of its own. Our
+web analytics (**Cloudflare Web Analytics**) and error monitoring (**Sentry**) are **cookieless** —
+they don't store cookies or build a profile of you. We do **not** use advertising cookies, social-media
+trackers, or cross-site tracking of any kind.
 
 ## Third-party requests
 

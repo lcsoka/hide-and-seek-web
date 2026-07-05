@@ -9,4 +9,6 @@ export const environment = {
   },
   // Developer cockpit token — empty in production so the cockpit stays inert there.
   developerToken: '',
+  // Sentry error monitoring — paste your project's (public) DSN to enable. Empty = disabled.
+  sentryDsn: '',
 };

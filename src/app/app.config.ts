@@ -1,7 +1,8 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideTransloco } from '@jsverse/transloco';
+import * as Sentry from '@sentry/angular';
 
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
@@ -14,6 +15,8 @@ import { TranslocoHttpLoader } from './transloco-loader';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    // Report uncaught errors to Sentry (no-op until a DSN is configured — see main.ts).
+    ...(environment.sentryDsn ? [{ provide: ErrorHandler, useValue: Sentry.createErrorHandler() }] : []),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor, maintenanceInterceptor])),
     { provide: LOCATION_SOURCE, useClass: BrowserLocationSource },

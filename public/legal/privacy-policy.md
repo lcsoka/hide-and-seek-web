@@ -28,8 +28,13 @@ Protection Regulation (GDPR) and Hungarian data-protection law.
 - **Technical data**: IP address and basic request logs, device/browser information, and
   authentication tokens needed to keep you signed in.
 
+- **Error diagnostics**: when the app hits an error, a diagnostic report (error message, stack
+  trace, and technical context — no location or account passwords) is sent to our error-monitoring
+  provider so we can fix bugs.
+
 We do **not** knowingly collect data from children under the age required by [JURISDICTION]. We do
-**not** use advertising or third-party analytics/tracking.
+**not** use advertising or cross-site tracking, and our analytics are **cookieless** — so no consent
+banner is required.
 
 ## 2. Why we use it, and our legal basis
 
@@ -47,6 +52,10 @@ gameplay that depends on location will then stop working.
 ## 3. Who we share it with (processors & recipients)
 
 - **Hosting**: our servers run on **DigitalOcean** (data processor).
+- **CDN + web analytics**: the web app is served through **Cloudflare**, which also provides our
+  **cookieless** web analytics (aggregate page views, referrers — no personal profiles, no cookies).
+- **Error monitoring**: **Sentry** receives error/diagnostic reports so we can fix problems (with
+  personal data minimised — no IP attachment).
 - **OpenStreetMap infrastructure**: to answer geographic questions and draw the map, coordinates and
   map queries are sent to **Overpass / Nominatim / OSM tile providers**. This means location-derived
   queries reach these third parties. See their respective privacy terms.
