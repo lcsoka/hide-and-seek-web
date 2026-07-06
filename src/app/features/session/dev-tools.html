@@ -1,4 +1,4 @@
-<button (click)="open.set(!open())"
+<button (click)="toggle()"
         class="fixed bottom-3 left-3 z-[700] grid h-11 w-11 place-items-center rounded-full bg-gray-900/90 text-lg text-white shadow-xl ring-1 ring-white/20 backdrop-blur">🛠</button>
 
 @if (open()) {
@@ -40,6 +40,19 @@
       <div class="flex flex-wrap gap-1">
         <button (click)="expire('question_answer')" [class]="ghost">Expire question</button>
         <button (click)="expire('hiding_deadline')" [class]="ghost">Expire hiding</button>
+      </div>
+    </section>
+
+    <section class="space-y-2 rounded-lg bg-white/5 p-2">
+      <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Give card → hider's hand</p>
+      <div class="flex items-center gap-2">
+        <select [(ngModel)]="giveCardId" class="flex-1 rounded bg-white/10 px-2 py-1">
+          <option class="text-black" [ngValue]="''">— card ({{ cards().length }}) —</option>
+          @for (c of cards(); track c.id) {
+            <option class="text-black" [ngValue]="c.id">{{ c.name }} · {{ c.type }}{{ c.power ? ':' + c.power : '' }}</option>
+          }
+        </select>
+        <button (click)="giveCard()" [disabled]="!giveCardId" [class]="btn">Give</button>
       </div>
     </section>
 

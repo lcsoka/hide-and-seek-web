@@ -5,6 +5,14 @@ import { environment } from '../../../environments/environment';
 import { GodView } from '../models';
 import { DevMode } from './dev-mode';
 
+/** A grantable card in the dev card-tester. */
+export interface DebugCard {
+  id: string;
+  type: string;
+  name: string;
+  power: string | null;
+}
+
 /**
  * Client for the developer/debug API (gated by EnsureDebugAccess on the backend).
  * Every endpoint returns the unfiltered god view, so callers refresh state from the
@@ -48,5 +56,15 @@ export class DebugApi {
 
   expireTimer(id: string, key: string): Promise<GodView> {
     return firstValueFrom(this.http.post<GodView>(`${this.base}/sessions/${id}/debug/timer/${key}/expire`, {}, this.options));
+  }
+
+  /** Every grantable card, for the dev card-tester. */
+  cards(id: string): Promise<DebugCard[]> {
+    return firstValueFrom(this.http.get<DebugCard[]>(`${this.base}/sessions/${id}/debug/cards`, this.options));
+  }
+
+  /** Drop a card into the hider's hand (test-any-card). */
+  giveCard(id: string, cardId: string): Promise<GodView> {
+    return firstValueFrom(this.http.post<GodView>(`${this.base}/sessions/${id}/debug/give-card`, { card_id: cardId }, this.options));
   }
 }

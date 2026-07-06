@@ -2,7 +2,7 @@ import { Component, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GameState } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
-import { DebugApi } from '../../core/services/debug-api';
+import { DebugApi, DebugCard } from '../../core/services/debug-api';
 import { SessionStore } from '../../core/services/session-store';
 
 const STATES = ['lobby', 'role_assignment', 'hiding', 'seeking', 'endgame', 'round_end', 'finished'];
@@ -35,10 +35,36 @@ export class DevTools {
   readonly activeBtn = 'w-full rounded-lg bg-amber-500 px-3 py-1.5 text-sm font-medium text-black';
   readonly ghost = 'rounded-lg border border-white/20 px-2 py-1 text-xs hover:bg-white/10';
 
+  readonly cards = signal<DebugCard[]>([]);
+
   seedCount = 2;
   forceStateValue = 'seeking';
   actPlayer = '';
   actType = 'confirm_hidden';
+  giveCardId = '';
+
+  /** Toggle the drawer, loading the card catalogue the first time it opens. */
+  toggle(): void {
+    const next = !this.open();
+    this.open.set(next);
+    if (next && !this.cards().length) {
+      void this.loadCards();
+    }
+  }
+
+  private async loadCards(): Promise<void> {
+    try {
+      this.cards.set(await this.debug.cards(this.sessionId()));
+    } catch {
+      // debug API off — leave the list empty
+    }
+  }
+
+  async giveCard(): Promise<void> {
+    if (this.giveCardId) {
+      await this.run(() => this.debug.giveCard(this.sessionId(), this.giveCardId));
+    }
+  }
 
   togglePlacing(): void {
     this.placingChange.emit(!this.placing());
