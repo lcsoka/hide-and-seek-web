@@ -11,6 +11,11 @@ html { color-scheme: light dark; }
    letting fixed headers drift. viewport-fit=cover (index.html) exposes the safe-area env() insets
    that the game HUD + bottom bars pad against so nothing hides under the notch/home bar. */
 html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+/* iOS standalone paints the transparent page canvas (white) in any area the fixed app shell doesn't
+   cover — notably the bottom home-indicator safe area. Give the document the app's base colour so
+   that strip never flashes white; the full-viewport map backdrop then reads through on top of it. */
+html, body { background-color: var(--color-gray-50); }
+@media (prefers-color-scheme: dark) { html, body { background-color: var(--color-gray-950); } }
 /* Make the height chain definite from the viewport down to the app shell: html/body → <app-root> →
    the shell's scroll owner. Percentage heights (h-full) below here then resolve to the *real* screen
    height, sidestepping the iOS standalone bug where 100dvh comes up short of the screen once the web
