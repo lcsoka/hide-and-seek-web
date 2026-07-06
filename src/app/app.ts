@@ -12,7 +12,11 @@ import { UpdateToast } from './shared/update-toast';
   selector: 'app-root',
   imports: [RouterOutlet, MaintenanceOverlay, UpdateToast],
   template: `
-    <div class="fixed inset-0 overflow-y-auto overscroll-contain bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <!-- Base fill layer: a plain fixed element paints the WHOLE viewport incl. the safe areas
+         (iOS can skip painting a scroll container's background into the home-indicator band, which
+         left a strip there). The scroll container above it is transparent; pages supply their bg. -->
+    <div class="fixed inset-0 bg-gray-50 dark:bg-gray-950"></div>
+    <div class="fixed inset-0 overflow-y-auto overscroll-contain text-gray-900 dark:text-gray-100">
       <router-outlet />
     </div>
     <app-maintenance-overlay />
