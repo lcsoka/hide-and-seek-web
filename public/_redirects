@@ -1,1 +1,13 @@
-/*    /index.html   200
+# Missing hashed assets must NOT fall back to the SPA shell. Serving index.html (200, text/html)
+# at a .js/.css URL trips "text/html is not a valid JavaScript MIME type" and, once Cloudflare
+# caches that response, poisons the URL so the Angular service-worker's atomic update fails and
+# users stay stuck on the old build. A 404 makes the browser reject the chunk cleanly (so the app
+# can recover) and can't be mistaken for a valid asset. Existing files are unaffected — Cloudflare
+# Pages serves a matching static asset in preference to these rules; they only fire when the file
+# genuinely doesn't exist (e.g. an old content hash after a new deploy).
+/*.js     /index.html   404
+/*.mjs    /index.html   404
+/*.css    /index.html   404
+
+# SPA fallback for real navigations (client-side routes like /s/:id, /legal/:doc).
+/*        /index.html   200
