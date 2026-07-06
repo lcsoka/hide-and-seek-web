@@ -96,7 +96,7 @@
          (during hiding/seeking/endgame the mobile UI is the icon-button HUD below, so the map stays
          visible). -->
     <aside [class]="'pointer-events-none absolute inset-x-0 bottom-0 z-[600] flex flex-col lg:inset-y-0 lg:left-auto lg:right-0 lg:w-[400px] lg:pt-16' + (activePlay(s) ? ' max-lg:hidden' : '')">
-      <div class="pointer-events-auto m-2 mb-[max(0.5rem,env(safe-area-inset-bottom))] max-h-[62dvh] overflow-y-auto rounded-2xl bg-white/95 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3 lg:max-h-none lg:flex-1" *transloco="let t">
+      <div class="pointer-events-auto max-h-[78dvh] overflow-y-auto rounded-t-3xl bg-white/95 p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3 lg:max-h-none lg:flex-1 lg:rounded-2xl lg:pb-4" *transloco="let t">
         @if (objective(s); as obj) {
           <p class="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-200">{{ t(obj) }}</p>
         }
