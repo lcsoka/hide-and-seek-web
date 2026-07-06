@@ -1,34 +1,34 @@
-<div class="pointer-events-none absolute inset-x-0 top-0 z-[600] flex items-start justify-between gap-2 px-3 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4 sm:pb-4" *transloco="let tr">
-  <div class="pointer-events-auto flex items-center gap-2">
+<div class="pointer-events-none absolute inset-x-0 top-0 z-[600] flex items-start justify-between gap-1.5 px-2.5 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:gap-2 sm:px-4 sm:pb-4" *transloco="let tr">
+  <div class="pointer-events-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
     <a routerLink="/" [attr.aria-label]="tr('common.leave')"
-       class="grid h-9 w-9 place-items-center rounded-full bg-white/85 text-lg text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">←</a>
-    <button (click)="copy()" class="flex items-center gap-2 rounded-full bg-white/85 px-3 py-1.5 shadow-lg backdrop-blur dark:bg-gray-900/80">
-      <span class="text-[10px] font-semibold uppercase tracking-widest text-gray-400">{{ copied() ? tr('common.copied') : tr('common.code') }}</span>
-      <span class="font-mono text-sm font-bold tracking-[0.2em] text-gray-900 dark:text-white">{{ joinCode() }}</span>
+       class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/85 text-lg text-gray-700 shadow-lg backdrop-blur sm:h-9 sm:w-9 dark:bg-gray-900/80 dark:text-gray-200">←</a>
+    <button (click)="copy()" class="flex min-w-0 items-center gap-1.5 rounded-full bg-white/85 px-2.5 py-1.5 shadow-lg backdrop-blur dark:bg-gray-900/80">
+      <span class="hidden text-[10px] font-semibold uppercase tracking-widest text-gray-400 sm:inline">{{ copied() ? tr('common.copied') : tr('common.code') }}</span>
+      <span class="truncate font-mono text-sm font-bold tracking-[0.2em] text-gray-900 dark:text-white">{{ joinCode() }}</span>
     </button>
   </div>
 
   @if (timer(); as t) {
-    <div class="pointer-events-auto rounded-2xl px-5 py-1.5 text-center shadow-xl backdrop-blur transition-colors"
+    <div class="pointer-events-auto shrink-0 rounded-2xl px-3 py-1 text-center shadow-xl backdrop-blur transition-colors sm:px-5 sm:py-1.5"
          [class]="t.urgent ? 'bg-red-600 text-white' : 'bg-gray-900/85 text-white'">
-      <div class="text-[10px] font-semibold uppercase tracking-widest opacity-70">{{ tr(t.label) }}</div>
-      <div class="font-mono text-2xl font-bold leading-none tabular-nums">{{ t.text }}</div>
+      <div class="text-[9px] font-semibold uppercase tracking-widest opacity-70 sm:text-[10px]">{{ tr(t.label) }}</div>
+      <div class="font-mono text-xl font-bold leading-none tabular-nums sm:text-2xl">{{ t.text }}</div>
     </div>
   }
 
-  <div class="pointer-events-auto flex items-center gap-2">
+  <div class="pointer-events-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
     <button (click)="helpOpen.set(true)" [attr.aria-label]="tr('intro.howToPlay')"
-            class="grid h-9 w-9 place-items-center rounded-full bg-white/85 text-base font-bold text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">?</button>
+            class="grid h-8 w-8 place-items-center rounded-full bg-white/85 text-base font-bold text-gray-700 shadow-lg backdrop-blur sm:h-9 sm:w-9 dark:bg-gray-900/80 dark:text-gray-200">?</button>
     <app-lang-toggle />
     @if (role(); as r) {
-      <span class="rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-lg backdrop-blur"
+      <span class="rounded-full px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-lg backdrop-blur sm:px-3 sm:text-xs"
             [class]="r === 'hider' ? 'bg-rose-600' : 'bg-blue-600'">{{ tr('role.' + r) }}</span>
     } @else {
-      <span class="rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium text-gray-700 shadow-lg backdrop-blur dark:bg-gray-900/80 dark:text-gray-200">{{ tr('state.' + stateLabel()) }}</span>
+      <span class="rounded-full bg-white/85 px-2.5 py-1.5 text-[10px] font-medium text-gray-700 shadow-lg backdrop-blur sm:px-3 sm:text-xs dark:bg-gray-900/80 dark:text-gray-200">{{ tr('state.' + stateLabel()) }}</span>
     }
     @if (canEndGame()) {
       <button (click)="endGame.emit()" [attr.aria-label]="tr('action.end_game')" [title]="tr('action.end_game')"
-              class="grid h-9 w-9 place-items-center rounded-full bg-white/85 text-base text-red-600 shadow-lg backdrop-blur transition hover:bg-red-600 hover:text-white dark:bg-gray-900/80 dark:text-red-400">⏹</button>
+              class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/85 text-base text-red-600 shadow-lg backdrop-blur transition hover:bg-red-600 hover:text-white sm:h-9 sm:w-9 dark:bg-gray-900/80 dark:text-red-400">⏹</button>
     }
   </div>
 </div>

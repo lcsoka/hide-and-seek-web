@@ -3,7 +3,7 @@
 
   @if (open()) {
     <div class="jl-fade fixed inset-0 z-[900] flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-6" (click)="close()">
-      <div class="jl-sheet w-full max-w-md space-y-4 rounded-t-3xl bg-white p-5 text-left text-gray-900 shadow-2xl sm:rounded-3xl dark:bg-gray-900 dark:text-white" (click)="$event.stopPropagation()">
+      <div class="jl-sheet max-h-[90dvh] w-full max-w-md space-y-4 overflow-y-auto rounded-t-3xl bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-left text-gray-900 shadow-2xl sm:max-h-[85vh] sm:rounded-3xl sm:pb-5 dark:bg-gray-900 dark:text-white" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between">
           <h2 class="font-display text-lg font-bold">{{ t('feedback.title') }}</h2>
           <button (click)="close()" class="text-xl text-gray-400 hover:text-gray-700 dark:hover:text-white">✕</button>

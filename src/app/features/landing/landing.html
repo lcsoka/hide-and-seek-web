@@ -1,4 +1,4 @@
-<div class="relative flex min-h-[100dvh] flex-col overflow-hidden bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
+<div class="relative flex h-[100dvh] flex-col overflow-hidden bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
   <!-- Living Budapest map backdrop (outside *transloco so its viewChild resolves on first render). -->
   <app-map-backdrop />
   <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-gray-50/60 via-gray-50/75 to-gray-50/95 dark:from-gray-950/55 dark:via-gray-950/75 dark:to-gray-950/95"></div>
@@ -6,8 +6,8 @@
   <div class="pointer-events-none absolute inset-0 z-[1] hidden dark:block" style="background: radial-gradient(115% 75% at 50% -5%, transparent 35%, rgba(2,6,23,0.9) 100%)"></div>
 
   <ng-container *transloco="let t">
-  <!-- Top bar -->
-  <header class="relative z-10 flex items-center justify-between p-4 sm:p-6">
+  <!-- Top bar (stays fixed while the hero below scrolls) -->
+  <header class="relative z-10 flex shrink-0 items-center justify-between p-4 pt-[max(1rem,env(safe-area-inset-top))] sm:p-6 sm:pt-[max(1.5rem,env(safe-area-inset-top))]">
     <div class="font-display flex items-center gap-2 text-lg font-bold tracking-tight">
       <span class="grid h-8 w-8 place-items-center rounded-lg bg-rose-600 text-sm">🚇</span> Hide <span class="text-rose-500 dark:text-rose-400">&amp;</span> Seek
       <span class="rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:bg-rose-500/20 dark:text-rose-300">beta</span>
@@ -28,7 +28,7 @@
   </header>
 
   <!-- Hero -->
-  <main class="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-6 px-5 pb-8 sm:max-w-lg">
+  <main class="relative z-10 mx-auto flex w-full max-w-md min-h-0 flex-1 flex-col justify-center-safe gap-6 overflow-y-auto px-5 pb-8 sm:max-w-lg">
     @if (error(); as e) {
       <p class="rounded-xl bg-red-500/90 p-3 text-sm text-white shadow-lg">{{ e }}</p>
     }

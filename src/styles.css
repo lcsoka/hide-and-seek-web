@@ -5,10 +5,17 @@
    the landing and the in-app game ship light + dark styling, so the whole app is consistent. */
 html { color-scheme: light dark; }
 
-/* Installed PWA (esp. iOS standalone): don't rubber-band-scroll the whole app; individual
-   scrollable regions still scroll. viewport-fit=cover (index.html) exposes the safe-area env()
-   insets that the game HUD + bottom bars pad against so nothing hides under the notch/home bar. */
-html, body { overscroll-behavior: none; }
+/* Installed PWA (esp. iOS standalone): lock the document so the whole app can't rubber-band /
+   scroll — the single scroll owner is <app-root>'s wrapper, and individual regions scroll inside
+   themselves. Without this the body itself scrolls on iOS, exposing white above the notch and
+   letting fixed headers drift. viewport-fit=cover (index.html) exposes the safe-area env() insets
+   that the game HUD + bottom bars pad against so nothing hides under the notch/home bar. */
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+
+/* Game maps: the HUD owns the top-left + top-right corners (back / code / controls). Leaflet drops
+   its zoom control at top-left by default, right under the back button — push it clear so the two
+   never overlap on mobile. Scoped to .game-map so the standalone /map page keeps the default spot. */
+.game-map .leaflet-top.leaflet-left { top: calc(env(safe-area-inset-top) + 3.75rem); }
 
 /* Landing hero: display wordmark + the "living map" marker pulses + entrance. */
 .font-display { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }

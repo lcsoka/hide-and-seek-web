@@ -12,12 +12,12 @@
     <!-- Full-bleed map -->
     <div class="absolute inset-0">
       @if (showDeductionMap(s)) {
-        <app-deduction-map class="block h-full" [candidate]="deduction.candidate()" [annotations]="deduction.annotations()"
+        <app-deduction-map class="game-map block h-full" [candidate]="deduction.candidate()" [annotations]="deduction.annotations()"
                            [loading]="deduction.computing()" [thermoMarker]="thermoMarker(s)" [radarPreview]="radarPreviewMarker()"
                            [refPreview]="refPreviewMarker()" [players]="s.players" [meId]="myId()"
                            [autoZoom]="!devPlacing()" (mapClick)="onMapClick($event)" />
       } @else {
-        <app-map class="block h-full" [players]="s.players" [meId]="myId()" [zone]="s.hiding_zone"
+        <app-map class="game-map block h-full" [players]="s.players" [meId]="myId()" [zone]="s.hiding_zone"
                  [stations]="hidingStations(s)" [highlight]="hidingHighlight(s)" [previewZone]="hidingPreviewZone(s)"
                  [questionMarker]="hiderQuestionMarker(s)" [reveal]="revealMarker(s)" [transitModes]="transitModes(s)" [zoneRule]="zoneRule(s)" (mapClick)="onMapClick($event)" />
       }
