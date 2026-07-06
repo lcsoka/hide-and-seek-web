@@ -1,13 +1,25 @@
-# Missing hashed assets must NOT fall back to the SPA shell. Serving index.html (200, text/html)
-# at a .js/.css URL trips "text/html is not a valid JavaScript MIME type" and, once Cloudflare
-# caches that response, poisons the URL so the Angular service-worker's atomic update fails and
-# users stay stuck on the old build. A 404 makes the browser reject the chunk cleanly (so the app
-# can recover) and can't be mistaken for a valid asset. Existing files are unaffected — Cloudflare
-# Pages serves a matching static asset in preference to these rules; they only fire when the file
-# genuinely doesn't exist (e.g. an old content hash after a new deploy).
-/*.js     /index.html   404
-/*.mjs    /index.html   404
-/*.css    /index.html   404
-
-# SPA fallback for real navigations (client-side routes like /s/:id, /legal/:doc).
-/*        /index.html   200
+# SPA fallback — but scoped to the real client-side routes instead of a blanket `/*`.
+#
+# A blanket `/* /index.html 200` also catches requests for hashed assets that no longer exist (an
+# old content hash after a new deploy): it returns index.html (200, text/html) at a .js/.css URL,
+# which trips "text/html is not a valid JavaScript MIME type" and — once Cloudflare caches that
+# 200 — poisons the URL so the service worker's atomic update fails and users stay stuck on the old
+# build. Cloudflare Pages `_redirects` only supports a trailing splat (no `/*.js`), so we can't
+# exclude assets by extension; instead we enumerate the app's routes. Anything else (a missing
+# asset) falls through to a native 404, which the browser rejects cleanly and can't cache as JS.
+#
+# Existing static files (assets, ngsw.json, manifest, /legal/*.md, /i18n/**, icons, og-image, …)
+# are served directly — Cloudflare serves a matching file in preference to a 200 rewrite.
+#
+# Keep this in sync with src/app/app.routes.ts when routes are added or removed.
+/                /index.html   200
+/profile         /index.html   200
+/content         /index.html   200
+/auth            /index.html   200
+/reset-password  /index.html   200
+/map             /index.html   200
+/dev             /index.html   200
+/dev/*           /index.html   200
+/legal/*         /index.html   200
+/s/*             /index.html   200
+/replay/*        /index.html   200
