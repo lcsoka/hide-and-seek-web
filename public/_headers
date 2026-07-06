@@ -1,0 +1,13 @@
+# Cloudflare Pages headers.
+# Always revalidate the service-worker control files + shell so an installed PWA detects a new
+# build promptly (otherwise the SW can keep serving a stale manifest behind the CDN cache).
+# The build's *.js/*.css are content-hashed — a new build means new filenames, so they're already
+# safe to cache; the SW also serves them from its own cache once installed.
+/ngsw.json
+  Cache-Control: no-cache
+/ngsw-worker.js
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Cache-Control: no-cache

@@ -514,5 +514,9 @@
     "bodyNamed": "{{name}} claims they found you.",
     "confirm": "I'm caught",
     "dispute": "Dispute"
+  },
+  "update": {
+    "available": "A new version is available",
+    "refresh": "Refresh"
   }
 }

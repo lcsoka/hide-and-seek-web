@@ -514,5 +514,9 @@
     "bodyNamed": "{{name}} bejelentette, hogy megtalált.",
     "confirm": "Elkaptak",
     "dispute": "Vitatom"
+  },
+  "update": {
+    "available": "Új verzió érhető el",
+    "refresh": "Frissítés"
   }
 }
