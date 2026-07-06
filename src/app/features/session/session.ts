@@ -69,6 +69,8 @@ export class SessionView {
   readonly devPlacing = signal(false);
   readonly pickerOpen = signal(false);
   readonly boardOpen = signal(false);
+  // Mobile only: collapse the bottom sheet (lobby/roster/results) to a peek so the map is visible.
+  readonly sheetMinimized = signal(false);
   // A radar radius the seeker has previewed (circle drawn on the map) but not yet asked.
   readonly radarPreview = signal<{ questionId: string; radiusM: number; label: string; lat: number; lng: number } | null>(null);
   readonly radarPreviewMarker = computed(() => {
