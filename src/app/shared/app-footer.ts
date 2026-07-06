@@ -8,7 +8,7 @@ import { Feedback } from './feedback';
   selector: 'app-footer',
   imports: [RouterLink, TranslocoModule, Feedback],
   template: `
-    <footer *transloco="let t" class="relative z-10 mx-auto flex w-full max-w-lg flex-col items-center gap-2 px-5 pb-6 pt-2 text-center text-xs text-gray-500 dark:text-gray-400">
+    <footer *transloco="let t" class="relative z-10 mx-auto flex w-full max-w-lg flex-col items-center gap-2 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 text-center text-xs text-gray-500 dark:text-gray-400">
       <nav class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
         <a routerLink="/legal/privacy" class="transition hover:text-gray-800 dark:hover:text-gray-200">{{ t('legal.privacyTitle') }}</a>
         <a routerLink="/legal/cookies" class="transition hover:text-gray-800 dark:hover:text-gray-200">{{ t('legal.cookiesTitle') }}</a>

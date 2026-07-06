@@ -16,6 +16,7 @@ import { MapBackdrop } from '../../shared/map-backdrop';
 @Component({
   selector: 'app-landing',
   imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop, AppFooter, InstallBanner],
+  host: { class: 'block h-full' },
   templateUrl: './landing.html',
 })
 export class Landing {

@@ -43,7 +43,7 @@ const OBJECTIVE_STATES = new Set(['hider_hiding', 'hider_seeking', 'hider_endgam
 /** Premium full-screen game shell: a full-bleed map, a floating HUD, and a context side panel. */
 @Component({
   selector: 'app-session',
-  host: { class: 'block h-[100dvh] w-full overflow-hidden' },
+  host: { class: 'block h-full w-full overflow-hidden' },
   imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, PushNudge, FoundAlert],
   templateUrl: './session.html',
 })

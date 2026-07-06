@@ -1,4 +1,4 @@
-<div class="relative flex min-h-[100dvh] flex-col overflow-hidden bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
+<div class="relative flex min-h-full flex-col overflow-hidden bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
   <!-- Living Budapest map backdrop (outside *transloco so its viewChild resolves on first render). -->
   <app-map-backdrop />
   <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-gray-50/70 via-gray-50/80 to-gray-50/95 dark:from-gray-950/70 dark:via-gray-950/80 dark:to-gray-950/95"></div>
@@ -7,7 +7,7 @@
 
   <ng-container *transloco="let t">
     <!-- Top bar -->
-    <header class="relative z-10 flex items-center justify-between p-4 sm:p-6">
+    <header class="relative z-10 flex items-center justify-between p-4 pt-[max(1rem,env(safe-area-inset-top))] sm:p-6 sm:pt-[max(1.5rem,env(safe-area-inset-top))]">
       <a routerLink="/" class="font-display flex items-center gap-2 text-lg font-bold tracking-tight">
         <span class="grid h-8 w-8 place-items-center rounded-lg bg-rose-600 text-sm">🚇</span> Hide <span class="text-rose-500 dark:text-rose-400">&amp;</span> Seek
       </a>

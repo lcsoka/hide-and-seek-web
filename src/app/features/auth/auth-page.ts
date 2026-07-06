@@ -17,6 +17,7 @@ type Mode = 'login' | 'register' | 'forgot';
 @Component({
   selector: 'app-auth-page',
   imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop],
+  host: { class: 'block h-full' },
   templateUrl: './auth-page.html',
 })
 export class AuthPage {

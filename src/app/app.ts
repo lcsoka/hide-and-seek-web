@@ -12,7 +12,7 @@ import { UpdateToast } from './shared/update-toast';
   selector: 'app-root',
   imports: [RouterOutlet, MaintenanceOverlay, UpdateToast],
   template: `
-    <div class="h-[100dvh] overflow-y-auto overscroll-contain bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <div class="h-full overflow-y-auto overscroll-contain bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
       <router-outlet />
     </div>
     <app-maintenance-overlay />

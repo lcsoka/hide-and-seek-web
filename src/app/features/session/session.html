@@ -1,7 +1,7 @@
 @if (store.loading() && !store.state()) {
-  <div class="grid h-[100dvh] place-items-center text-gray-400">Loading…</div>
+  <div class="grid h-full place-items-center text-gray-400">Loading…</div>
 } @else if (store.error()) {
-  <div class="grid h-[100dvh] place-items-center p-6 text-center">
+  <div class="grid h-full place-items-center p-6 text-center">
     <div class="space-y-3">
       <p class="rounded-lg bg-red-100 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">Couldn't load this session.</p>
       <a routerLink="/" class="inline-block text-sm text-rose-600">← Home</a>

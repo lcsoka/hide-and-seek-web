@@ -32,7 +32,7 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
   selector: 'app-map-page',
   imports: [FormsModule, RouterLink, DeductionMap],
   template: `
-    <main class="mx-auto w-full max-w-6xl space-y-4 p-4">
+    <main class="mx-auto w-full max-w-6xl space-y-4 px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
       <header class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-3">
           <a routerLink="/" class="text-sm text-rose-600">← Home</a>
