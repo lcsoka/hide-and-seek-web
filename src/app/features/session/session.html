@@ -97,14 +97,14 @@
          (during hiding/seeking/endgame the mobile UI is the icon-button HUD below, so the map stays
          visible). -->
     <aside [class]="'pointer-events-none absolute inset-x-0 bottom-0 z-[600] flex flex-col lg:inset-y-0 lg:left-auto lg:right-0 lg:w-[400px] lg:pt-16' + (activePlay(s) ? ' max-lg:hidden' : '')">
-      <div class="pointer-events-auto flex max-h-[78dvh] flex-col overflow-hidden rounded-t-3xl bg-white/95 shadow-2xl ring-1 ring-black/5 backdrop-blur transition-transform duration-300 ease-out dark:bg-gray-900/95 dark:ring-white/10 lg:m-3 lg:max-h-none lg:flex-1 lg:translate-y-0 lg:rounded-2xl"
-           [class]="sheetMinimized() ? 'max-lg:translate-y-[calc(100%_-_2.75rem)]' : ''" *transloco="let t">
-        <!-- Grabber: tap to minimize the sheet to a peek (so the map shows) or expand it again. Mobile only. -->
+      <div class="pointer-events-auto flex flex-col overflow-hidden rounded-t-3xl bg-white/95 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10 lg:m-3 lg:flex-1 lg:rounded-2xl lg:pb-0"
+           [class]="sheetMinimized() ? '' : 'max-lg:max-h-[78dvh]'" *transloco="let t">
+        <!-- Grabber: tap to minimize the sheet to a clean handle (so the map shows) or expand it again. Mobile only. -->
         <button type="button" (click)="sheetMinimized.set(!sheetMinimized())" [attr.aria-label]="sheetMinimized() ? 'Expand' : 'Minimize'"
                 class="flex shrink-0 items-center justify-center py-2.5 active:opacity-60 lg:hidden">
           <span class="h-1.5 w-10 rounded-full bg-gray-300 dark:bg-gray-600"></span>
         </button>
-        <div class="min-h-0 overflow-y-auto px-4 pt-1 pb-[max(1.25rem,env(safe-area-inset-bottom))] lg:p-4">
+        <div class="min-h-0 overflow-y-auto px-4 pt-1 lg:p-4" [class]="sheetMinimized() ? 'max-lg:hidden' : ''">
         @if (objective(s); as obj) {
           <p class="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-200">{{ t(obj) }}</p>
         }
