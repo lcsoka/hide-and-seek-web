@@ -101,8 +101,11 @@
            [class]="sheetMinimized() ? '' : 'max-lg:max-h-[78dvh]'" *transloco="let t">
         <!-- Grabber: tap to minimize the sheet to a clean handle (so the map shows) or expand it again. Mobile only. -->
         <button type="button" (click)="sheetMinimized.set(!sheetMinimized())" [attr.aria-label]="sheetMinimized() ? 'Expand' : 'Minimize'"
-                class="flex shrink-0 items-center justify-center py-2.5 active:opacity-60 lg:hidden">
+                class="flex shrink-0 flex-col items-center justify-center gap-1 py-2.5 active:opacity-60 lg:hidden">
           <span class="h-1.5 w-10 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+          @if (sheetMinimized()) {
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">{{ t('state.' + s.state) }}</span>
+          }
         </button>
         <div class="min-h-0 overflow-y-auto px-4 pt-1 lg:p-4" [class]="sheetMinimized() ? 'max-lg:hidden' : ''">
         @if (objective(s); as obj) {
