@@ -13,6 +13,28 @@ export interface DebugCard {
   power: string | null;
 }
 
+/** A place on the map (matched entity / candidate / hider's own nearest). */
+export interface EvalPlace {
+  name: string | null;
+  lat: number;
+  lng: number;
+}
+
+/** Result of evaluating one geo question at a hider/seeker pair (dev question harness). */
+export interface QuestionEvalResult {
+  category: string;
+  key: string;
+  evaluated: boolean; // false = not auto-answerable (admin/border questions)
+  answer: string | null;
+  feature: string | null;
+  radius_m: number | null;
+  seeker: { lat: number; lng: number };
+  hider: { lat: number; lng: number };
+  matched: EvalPlace | null; // the reference/matched entity (measuring/matching/tentacles)
+  hider_nearest: EvalPlace | null; // matching only: the hider's OWN nearest feature
+  candidates: EvalPlace[]; // tentacles: every feature within the seeker radius
+}
+
 /**
  * Client for the developer/debug API (gated by EnsureDebugAccess on the backend).
  * Every endpoint returns the unfiltered god view, so callers refresh state from the
@@ -66,5 +88,13 @@ export class DebugApi {
   /** Drop a card into the hider's hand (test-any-card). */
   giveCard(id: string, cardId: string): Promise<GodView> {
     return firstValueFrom(this.http.post<GodView>(`${this.base}/sessions/${id}/debug/give-card`, { card_id: cardId }, this.options));
+  }
+
+  /** Evaluate one geo question at an arbitrary hider/seeker pair (dev question harness). */
+  evalQuestion(
+    id: string,
+    body: { question_id: string; seeker_lat: number; seeker_lng: number; hider_lat: number; hider_lng: number; radius_m?: number },
+  ): Promise<QuestionEvalResult> {
+    return firstValueFrom(this.http.post<QuestionEvalResult>(`${this.base}/sessions/${id}/debug/eval-question`, body, this.options));
   }
 }

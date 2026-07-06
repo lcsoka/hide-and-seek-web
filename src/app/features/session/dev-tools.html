@@ -68,6 +68,30 @@
       <button (click)="actAs()" [disabled]="!actPlayer" [class]="btn">Submit as player</button>
     </section>
 
+    <section class="space-y-2 rounded-lg bg-white/5 p-2">
+      <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Test question → map</p>
+      <select [(ngModel)]="evalQuestionId" class="w-full rounded bg-white/10 px-2 py-1">
+        <option class="text-black" [ngValue]="''">— question ({{ catalog().length }}) —</option>
+        @for (q of catalog(); track q.id) {
+          <option class="text-black" [ngValue]="q.id">{{ q.category }} · {{ q.title }}</option>
+        }
+      </select>
+      <div class="grid grid-cols-2 gap-1">
+        <input type="number" step="0.0001" [(ngModel)]="evalSeekerLat" placeholder="seeker lat" class="rounded bg-white/10 px-2 py-1 text-xs" />
+        <input type="number" step="0.0001" [(ngModel)]="evalSeekerLng" placeholder="seeker lng" class="rounded bg-white/10 px-2 py-1 text-xs" />
+        <input type="number" step="0.0001" [(ngModel)]="evalHiderLat" placeholder="hider lat" class="rounded bg-white/10 px-2 py-1 text-xs" />
+        <input type="number" step="0.0001" [(ngModel)]="evalHiderLng" placeholder="hider lng" class="rounded bg-white/10 px-2 py-1 text-xs" />
+      </div>
+      @if (categoryOf(evalQuestionId) === 'radar') {
+        <input type="number" [(ngModel)]="evalRadiusM" placeholder="radar radius (m)" class="w-full rounded bg-white/10 px-2 py-1 text-xs" />
+      }
+      <div class="flex gap-2">
+        <button (click)="evalQuestion()" [disabled]="!evalQuestionId" [class]="btn">Evaluate → map</button>
+        <button (click)="clearEval()" [class]="ghost">Clear</button>
+      </div>
+      @if (evalOut(); as o) { <p class="text-xs text-emerald-300">{{ o }}</p> }
+    </section>
+
     @if (error(); as e) { <p class="text-xs text-red-400">{{ e }}</p> }
   </div>
 }

@@ -11,6 +11,7 @@ import { Poly } from '../../core/maps/map.model';
 import { disperse } from '../../core/geo/spread';
 import { TransitRoutes } from '../../core/services/transit-routes';
 import { TransitService } from '../../core/services/transit.service';
+import { QuestionEvalResult } from '../../core/services/debug-api';
 import { PlayerView, Position } from '../../core/models';
 
 const BUDAPEST: L.LatLngExpression = [47.4979, 19.0402];
@@ -60,6 +61,8 @@ export class DeductionMap {
   readonly refPreview = input<{ lat: number; lng: number; fromLat?: number | null; fromLng?: number | null; label?: string } | null>(null);
   readonly players = input<PlayerView[]>([]); // visible players (seekers see themselves + teammates)
   readonly meId = input<string | null>(null);
+  // Dev question harness: an evaluated question's geometry to overlay. Null in normal play.
+  readonly evalResult = input<QuestionEvalResult | null>(null);
   readonly mapClick = output<Position>();
 
   private readonly transitRoutes = inject(TransitRoutes);
@@ -73,6 +76,7 @@ export class DeductionMap {
   private lastRouteSig = '';
   private lastPreviewSig = '';
   private lastRefSig = '';
+  private lastEvalSig = '';
   private userMoved = false;
   private programmaticMove = false;
 
@@ -89,6 +93,7 @@ export class DeductionMap {
       this.thermoMarker();
       this.radarPreview();
       this.refPreview();
+      this.evalResult();
       this.players();
       this.transitRoutes.displayed();
       this.render();
@@ -283,6 +288,49 @@ export class DeductionMap {
       }
     } else {
       this.lastRefSig = '';
+    }
+
+    // Dev question harness: the evaluated question's geometry — seeker + hider points, the seeker's
+    // query radius (radar/tentacles), every candidate (tentacles), and the matched entity with a
+    // dashed line from the hider. For matching, the hider's own nearest is revealed too.
+    const ev = this.evalResult();
+    const evSig = ev ? `${ev.key}:${ev.seeker.lat}:${ev.seeker.lng}:${ev.hider.lat}:${ev.hider.lng}:${ev.answer}` : '';
+    if (ev) {
+      const pts: L.LatLngExpression[] = [[ev.seeker.lat, ev.seeker.lng], [ev.hider.lat, ev.hider.lng]];
+      if (ev.radius_m) {
+        L.circle([ev.seeker.lat, ev.seeker.lng], { radius: ev.radius_m, color: '#e11d48', weight: 1.5, dashArray: '6', fillColor: '#e11d48', fillOpacity: 0.04 }).addTo(this.overlay);
+      }
+      for (const c of ev.candidates) {
+        L.circleMarker([c.lat, c.lng], { radius: 4, color: '#f97316', fillColor: '#f97316', fillOpacity: 0.7, weight: 1 }).bindTooltip(c.name ?? 'candidate').addTo(this.overlay);
+        pts.push([c.lat, c.lng]);
+      }
+      L.marker([ev.seeker.lat, ev.seeker.lng], { icon: markerIcon('🔍', { color: '#2563eb', size: 26 }) }).bindTooltip('Seeker', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
+      L.marker([ev.hider.lat, ev.hider.lng], { icon: markerIcon('🙈', { color: '#7c3aed', size: 26 }) }).bindTooltip('Hider', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
+      if (ev.matched) {
+        L.polyline([[ev.hider.lat, ev.hider.lng], [ev.matched.lat, ev.matched.lng]], { color: '#16a34a', weight: 2, dashArray: '5 5' }).addTo(this.overlay);
+        L.marker([ev.matched.lat, ev.matched.lng], { icon: markerIcon('✅', { color: '#16a34a', size: 28 }) })
+          .bindTooltip(`${ev.answer ?? ''} · ${ev.matched.name ?? '(unnamed)'}`, { permanent: true, direction: 'right', offset: [8, 0], opacity: 0.95 })
+          .addTo(this.overlay);
+        pts.push([ev.matched.lat, ev.matched.lng]);
+      }
+      if (ev.hider_nearest) {
+        L.marker([ev.hider_nearest.lat, ev.hider_nearest.lng], { icon: markerIcon('📍', { color: '#7c3aed', size: 24 }) })
+          .bindTooltip(`hider's nearest · ${ev.hider_nearest.name ?? '(unnamed)'}`, { direction: 'right', offset: [8, 0] })
+          .addTo(this.overlay);
+        pts.push([ev.hider_nearest.lat, ev.hider_nearest.lng]);
+      }
+      if (evSig !== this.lastEvalSig) {
+        this.lastEvalSig = evSig;
+        try {
+          this.programmaticMove = true;
+          this.map.fitBounds(L.latLngBounds(pts).pad(0.2), { padding: [40, 40], maxZoom: 16, animate: true, duration: 0.5 });
+          setTimeout(() => (this.programmaticMove = false), 600);
+        } catch {
+          this.programmaticMove = false;
+        }
+      }
+    } else {
+      this.lastEvalSig = '';
     }
 
     // Visible players (the seeker themselves + teammates; the hider is concealed by

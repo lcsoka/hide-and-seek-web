@@ -6,6 +6,7 @@ import { UnitsService } from '../../core/services/units.service';
 import { ApiClient } from '../../core/services/api-client';
 import { DeductionState } from '../../core/services/deduction-state';
 import { DevMode } from '../../core/services/dev-mode';
+import { QuestionEvalResult } from '../../core/services/debug-api';
 import { HidingState } from '../../core/services/hiding-state';
 import { LocationTracker } from '../../core/services/location';
 import { PlayerStore } from '../../core/services/player-store';
@@ -94,6 +95,8 @@ export class SessionView {
   // Seekers may board ANY mode (not just the game's hiding modes), so the picker offers all.
   readonly allTransitModes = ALL_TRANSIT_MODES;
   readonly catalog = signal<QuestionCatalogItem[]>([]);
+  // Dev question harness: the last evaluated question's geometry, overlaid on the deduction map.
+  readonly devQuestionEval = signal<QuestionEvalResult | null>(null);
   readonly curseAlert = signal<ActiveCurse | null>(null);
   private readonly seenCurses = new Set<string>();
   private cursesInit = false;
