@@ -10,7 +10,14 @@ if (environment.sentryDsn) {
     dsn: environment.sentryDsn,
     environment: environment.production ? 'production' : 'development',
     sendDefaultPii: false, // GDPR: don't attach IPs / request bodies
+    // Distributed tracing: browserTracingIntegration instruments fetch/XHR + navigations and,
+    // for URLs matching tracePropagationTargets, attaches `sentry-trace` + `baggage` headers so a
+    // frontend request and the backend that handles it stitch into ONE trace across the two Sentry
+    // projects. Scoped to our API origin so we never leak trace headers to third parties (tiles,
+    // fonts). The backend already allows these headers via CORS; it must also run Sentry tracing.
+    integrations: [Sentry.browserTracingIntegration()],
     tracesSampleRate: 0.1,
+    tracePropagationTargets: [/^https:\/\/api\.hideandseek\.hu\//],
     beforeSend(event, hint) {
       // Expected client-side HTTP errors (validation, auth, rate limits) are handled in the UI —
       // don't report them as crashes. Server errors (5xx) and real JS errors still flow through.
