@@ -30,6 +30,7 @@ export class MapView {
   readonly questionRef = input<{
     seekerClosest: { name: string | null; lat: number; lng: number } | null;
     yourClosest: { name: string | null; lat: number; lng: number } | null;
+    yourDistanceLabel?: string | null; // measuring: how far the hider is from what's measured
   } | null>(null);
   // Round-over reveal of where the hider was hiding.
   readonly reveal = input<{ lat: number; lng: number; label?: string } | null>(null);
@@ -94,6 +95,14 @@ export class MapView {
     const me = this.players().find((p) => (p.id === this.meId() || p.role === 'hider') && p.lat != null && p.lng != null);
     if (this.map && me) {
       this.map.setView([me.lat!, me.lng!], 15, { animate: true, duration: 0.5 });
+    }
+  }
+
+  /** A dashed line from the hider to a reference point, with the distance labelled at its centre. */
+  private drawRefLine(from: { lat: number; lng: number }, to: { lat: number; lng: number }, distLabel: string | null): void {
+    const line = L.polyline([[from.lat, from.lng], [to.lat, to.lng]], { color: '#f43f5e', weight: 2, dashArray: '6 6', opacity: 0.9 }).addTo(this.overlay!);
+    if (distLabel) {
+      line.bindTooltip(`📏 ${distLabel}`, { permanent: true, direction: 'center', className: 'jl-dist-label' }).openTooltip();
     }
   }
 
@@ -248,6 +257,7 @@ export class MapView {
           .addTo(this.overlay);
         fitPts.push([lat, lng]);
       }
+      const dist = qref.yourDistanceLabel ?? null;
       if (qref.yourClosest) {
         const { lat, lng, name } = qref.yourClosest;
         L.marker([lat, lng], { icon: markerIcon('🎯', { color: '#f43f5e', size: 24 }) })
@@ -255,10 +265,10 @@ export class MapView {
           .addTo(this.overlay);
         fitPts.push([lat, lng]);
         if (hider) {
-          L.polyline([[hider.lat, hider.lng], [lat, lng]], { color: '#f43f5e', weight: 2, dashArray: '6 6', opacity: 0.9 }).addTo(this.overlay);
+          this.drawRefLine(hider, { lat, lng }, dist);
         }
       } else if (qref.seekerClosest && hider) {
-        L.polyline([[hider.lat, hider.lng], [qref.seekerClosest.lat, qref.seekerClosest.lng]], { color: '#f43f5e', weight: 2, dashArray: '6 6', opacity: 0.9 }).addTo(this.overlay);
+        this.drawRefLine(hider, qref.seekerClosest, dist);
       }
       if (hider) {
         fitPts.push([hider.lat, hider.lng]);

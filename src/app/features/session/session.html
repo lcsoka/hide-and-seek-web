@@ -87,6 +87,7 @@
       <div class="pointer-events-none absolute inset-x-0 top-28 z-[750] flex justify-center px-4">
         <div class="jl-pop pointer-events-auto flex items-center gap-2 rounded-full bg-white/95 py-1.5 pl-4 pr-1.5 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10">
           <span class="max-w-[9rem] truncate text-sm font-semibold">📍 {{ rp.name }}</span>
+          @if (refPreviewDist(s); as d) { <span class="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">📏 {{ d }}</span> }
           <button (click)="cancelRef()" class="rounded-full px-3 py-1.5 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-white">{{ 'common.cancel' | transloco }}</button>
           <button (click)="confirmRef(s)" class="rounded-full bg-rose-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-rose-700">{{ 'picker.confirmAsk' | transloco }}</button>
         </div>

@@ -92,6 +92,12 @@ export class CardDeck {
   );
   readonly tentaclePlaces = signal<TentaclePlace[] | null>(null);
   readonly timeBonusMin = computed(() => Math.round((this.state().time_bonus_s ?? 0) / 60));
+  readonly isMeasuring = computed(() => this.pending()?.category === 'measuring');
+  // The hider's own position, for the measuring distance readouts on the answer card.
+  private readonly hiderPos = computed(() => {
+    const h = this.state().players.find((p) => p.role === 'hider');
+    return h?.lat != null && h?.lng != null ? { lat: h.lat, lng: h.lng } : null;
+  });
   readonly playedCurses = computed(() => this.state().curses.filter((c) => c.status === 'active'));
   readonly vetoCard = computed(() => this.hand().find((c) => c.type === 'powerup' && c.power === 'veto') ?? null);
   // The hider's score is the time they survive — show it live (rough; the authoritative
@@ -207,6 +213,17 @@ export class CardDeck {
 
   placeDistance(m: number | undefined): string {
     return m == null ? '' : this.unitsService.formatDistance(m, this.units());
+  }
+
+  /** Distance from the hider to a reference point, formatted — only for measuring questions,
+   *  so the hider sees how far THEY are from what's being measured (like the seeker). */
+  distFromHider(pt: { lat: number; lng: number } | null | undefined): string | null {
+    const me = this.hiderPos();
+    if (!me || !this.isMeasuring() || pt?.lat == null || pt?.lng == null) {
+      return null;
+    }
+
+    return this.placeDistance(Math.round(distanceMeters(me, { lat: pt.lat, lng: pt.lng })));
   }
 
   cardClass(card: HandCard): string {

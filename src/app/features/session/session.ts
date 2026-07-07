@@ -2,6 +2,7 @@ import { Component, computed, DestroyRef, effect, inject, signal, viewChild } fr
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Feature, MultiPolygon, Polygon } from 'geojson';
 import { simplify } from '@turf/turf';
+import { distanceMeters } from '../../core/geo/geo';
 import { OverpassService } from '../../core/maps/overpass';
 import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models';
 import { ALL_TRANSIT_MODES } from '../../core/maps/overpass';
@@ -307,6 +308,7 @@ export class SessionView {
   hiderQuestionRef(s: GameState): {
     seekerClosest: { name: string | null; lat: number; lng: number } | null;
     yourClosest: { name: string | null; lat: number; lng: number } | null;
+    yourDistanceLabel: string | null;
   } | null {
     if (this.role(s) !== 'hider') {
       return null;
@@ -317,8 +319,32 @@ export class SessionView {
     }
     const seekerClosest = q.reference ?? null;
     const yourClosest = q.hider_nearest?.lat != null && q.hider_nearest?.lng != null ? q.hider_nearest : null;
+    if (!seekerClosest && !yourClosest) {
+      return null;
+    }
 
-    return seekerClosest || yourClosest ? { seekerClosest, yourClosest } : null;
+    // Measuring: how far the hider is from what's measured (their nearest border, or the
+    // shared reference feature) — shown on their map, like the distance matters for the seeker.
+    let yourDistanceLabel: string | null = null;
+    const target = yourClosest ?? seekerClosest;
+    const hider = s.players.find((p) => p.role === 'hider');
+    if (q.category === 'measuring' && target && hider?.lat != null && hider?.lng != null) {
+      const m = Math.round(distanceMeters({ lat: hider.lat, lng: hider.lng }, { lat: target.lat, lng: target.lng }));
+      yourDistanceLabel = this.unitsService.formatDistance(m, this.unitsService.unitsOf(s.config));
+    }
+
+    return { seekerClosest, yourClosest, yourDistanceLabel };
+  }
+
+  /** The seeker's own distance to the reference they're previewing (measuring), formatted. */
+  refPreviewDist(s: GameState): string | null {
+    const rp = this.refPreview();
+    if (!rp || rp.category !== 'measuring' || rp.fromLat == null || rp.fromLng == null) {
+      return null;
+    }
+    const m = Math.round(distanceMeters({ lat: rp.fromLat, lng: rp.fromLng }, { lat: rp.lat, lng: rp.lng }));
+
+    return this.unitsService.formatDistance(m, this.unitsService.unitsOf(s.config));
   }
 
   /** i18n key for the current state's status hint, or '' if it has none. */

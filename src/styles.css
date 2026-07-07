@@ -88,6 +88,18 @@ app-root { display: block; height: 100%; }
   stroke-linecap: round;
   filter: drop-shadow(0 0 1px rgba(71, 85, 105, 0.4));
 }
+/* The measuring distance label on the hider's reference line — a rose pill. */
+.jl-dist-label.leaflet-tooltip {
+  background: #f43f5e;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  padding: 1px 8px;
+  font-weight: 700;
+  font-size: 11px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.jl-dist-label.leaflet-tooltip::before { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .jl-candidate-run { animation: none; }
 }

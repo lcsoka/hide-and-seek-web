@@ -90,11 +90,15 @@
       @if (q.reference; as ref) {
         <div class="rounded-lg bg-white/70 p-2 text-sm dark:bg-gray-900/60">
           <span class="text-gray-500 dark:text-gray-400">{{ t('deck.seekerClosest') }}</span> <b>{{ ref.name || t('deck.unnamedPlace') }}</b>
+          @if (!q.hider_nearest && distFromHider(ref); as d) { <span class="text-gray-500 dark:text-gray-400"> · 📏 {{ d }}</span> }
         </div>
       }
       @if (q.hider_nearest; as hn) {
         <div class="rounded-lg bg-white/70 p-2 text-sm dark:bg-gray-900/60">
-          <span class="text-gray-500 dark:text-gray-400">{{ t('deck.yourNearest') }}</span> <b>{{ hn.name || t('deck.unnamedPlace') }}</b>
+          <span class="text-gray-500 dark:text-gray-400">{{ t('deck.yourNearest') }}</span>
+          @if (hn.name) { <b>{{ hn.name }}</b> }
+          @if (distFromHider(hn); as d) { <b class="text-gray-700 dark:text-gray-200">📏 {{ d }}</b> }
+          @else if (!hn.name) { <b>{{ t('deck.unnamedPlace') }}</b> }
         </div>
       }
 
