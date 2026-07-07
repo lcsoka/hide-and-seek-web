@@ -10,6 +10,8 @@
     "leave": "Kilépés",
     "code": "Kód",
     "copied": "Másolva!",
+    "copyCode": "Kód másolása",
+    "close": "Bezárás",
     "error": "Valami hiba történt."
   },
   "connection": {

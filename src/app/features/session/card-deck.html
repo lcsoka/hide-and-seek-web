@@ -222,10 +222,7 @@
       @for (c of hand(); track c.uid; let i = $index) {
         <div class="relative flex h-52 flex-col overflow-hidden rounded-xl border-2 bg-white shadow-md dark:bg-gray-900"
              [style.borderColor]="cardColor(c)" [class.card-draw]="i >= animatingFrom()">
-          <button (click)="discard(c)" [disabled]="busy()" [attr.aria-label]="t('deck.discard')" [title]="t('deck.discard')"
-                  class="absolute right-1 top-1 z-10 grid h-6 w-6 place-items-center rounded-full bg-black/30 text-white hover:bg-black/55 disabled:opacity-40"><app-icon name="trash" [size]="13" /></button>
-
-          <div class="px-2 py-1 pr-6 text-[10px] font-bold leading-tight text-white" [style.background]="cardColor(c)">{{ c.name ?? cardTitle(c) }}</div>
+          <div class="px-2 py-1 text-[10px] font-bold leading-tight text-white" [style.background]="cardColor(c)">{{ c.name ?? cardTitle(c) }}</div>
 
           <div class="relative mx-1.5 mt-1.5 flex h-12 items-center justify-center rounded-lg" [class]="cardTintClass(c)">
             <span [style.color]="cardColor(c)"><app-icon [name]="cardEmblem(c)" [size]="30" /></span>

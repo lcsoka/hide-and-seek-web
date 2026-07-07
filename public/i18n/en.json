@@ -10,6 +10,8 @@
     "leave": "Leave",
     "code": "Code",
     "copied": "Copied!",
+    "copyCode": "Copy code",
+    "close": "Close",
     "error": "Something went wrong."
   },
   "connection": {

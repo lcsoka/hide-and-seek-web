@@ -56,6 +56,7 @@ export class HudNext {
   readonly openDrawer = output<Drawer>();
 
   readonly helpOpen = signal(false);
+  readonly codeOpen = signal(false);
   readonly copied = signal(false);
 
   readonly isHider = computed(() => this.role() === 'hider');
