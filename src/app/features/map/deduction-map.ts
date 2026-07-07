@@ -6,6 +6,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { MapAnnotation } from '../../core/maps/map.model';
 import { DeductionQuestion } from '../../core/deduction/deduction.model';
 import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
+import { MAP } from '../../core/maps/map-theme';
 import { holedMask } from '../../core/deduction/operators';
 import { Poly } from '../../core/maps/map.model';
 import { disperse } from '../../core/geo/spread';
@@ -65,12 +66,15 @@ export class DeductionMap {
   readonly meId = input<string | null>(null);
   // Dev question harness: an evaluated question's geometry to overlay. Null in normal play.
   readonly evalResult = input<QuestionEvalResult | null>(null);
+  // The national border, drawn as a static frame in a different colour from the play area.
+  readonly nationalBorder = input<Feature<Polygon | MultiPolygon> | null>(null);
   readonly mapClick = output<Position>();
 
   private readonly transitRoutes = inject(TransitRoutes);
   private readonly transitService = inject(TransitService);
   private map?: L.Map;
   private overlay?: L.LayerGroup;
+  private fog?: L.SVG; // dedicated SVG renderer holding the "excluded fog" hatch pattern
   private resize?: ResizeObserver;
   // View preservation: only auto-fit when the deduction changes, and never once the
   // user has panned/zoomed — so background /state refreshes don't reset their view.
@@ -98,6 +102,7 @@ export class DeductionMap {
       this.refPreview();
       this.regionPreview();
       this.evalResult();
+      this.nationalBorder();
       this.players();
       this.transitRoutes.displayed();
       this.render();
@@ -115,6 +120,22 @@ export class DeductionMap {
       subdomains: 'abcd',
       maxZoom: 20,
     }).addTo(this.map);
+
+    // A dedicated SVG renderer whose <defs> holds the "excluded fog" hatch pattern; the mask below
+    // fills with url(#jl-fog), so ruled-out land reads as textured fog rather than a flat wash.
+    this.fog = L.svg({ padding: 2 }).addTo(this.map);
+    const svg = (this.fog as unknown as { _container?: SVGSVGElement })._container;
+    if (svg && !svg.querySelector('#jl-fog')) {
+      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      // Diagonal hatch lines only — laid over a base tint below, so ruled-out land reads as a
+      // "crossed-out" fog. (Texture only: if the pattern ever fails to resolve, the tint still shows.)
+      defs.innerHTML =
+        `<pattern id="jl-fog" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">` +
+        `<line x1="0" y1="0" x2="0" y2="6" stroke="${MAP.excluded}" stroke-opacity="0.45" stroke-width="1.5"/>` +
+        `</pattern>`;
+      svg.insertBefore(defs, svg.firstChild);
+    }
+
     this.map.on('click', (e: L.LeafletMouseEvent) => this.mapClick.emit({ lat: e.latlng.lat, lng: e.latlng.lng }));
     // A move the app didn't initiate is the user panning/zooming — stop auto-fitting.
     this.map.on('movestart', () => {
@@ -145,6 +166,13 @@ export class DeductionMap {
     this.overlay?.remove();
     this.overlay = L.layerGroup().addTo(this.map);
 
+    // The national border — a dotted violet frame, distinct from the emerald play area. Drawn first
+    // (beneath everything) and never part of the auto-fit.
+    const border = this.nationalBorder();
+    if (border) {
+      L.geoJSON(border as GeoJsonObject, { style: { color: MAP.region, weight: 2.5, dashArray: '2 7', fill: false, opacity: 0.75, className: 'jl-national' }, interactive: false }).addTo(this.overlay);
+    }
+
     // The transit line the seeker is previewing in the board picker / currently riding,
     // in its mode colour with a white halo so it reads over the candidate mask + tiles.
     const route = this.transitRoutes.displayed();
@@ -163,28 +191,37 @@ export class DeductionMap {
     if (cand) {
       const mask = holedMask(cand);
       if (mask) {
+        // Ruled-out land: a navy base tint + a diagonal-hatch fog on top (a "crossed-out" feel).
+        // `renderer` routes the hatch into the SVG that holds the pattern (Leaflet forwards it to
+        // the path at runtime; it's just missing from the GeoJSONOptions type). The base tint is a
+        // safe fallback so the excluded area always reads even if the pattern doesn't resolve.
+        L.geoJSON(mask as GeoJsonObject, { style: { weight: 0, fillColor: MAP.excluded, fillOpacity: 0.32 }, interactive: false }).addTo(this.overlay);
         L.geoJSON(mask as GeoJsonObject, {
-          style: { weight: 0, fillColor: '#334155', fillOpacity: 0.55 },
+          style: { weight: 0, fillColor: 'url(#jl-fog)', fillOpacity: 1 },
           interactive: false,
-        }).addTo(this.overlay);
+          renderer: this.fog,
+        } as L.GeoJSONOptions & { renderer?: L.SVG }).addTo(this.overlay);
       }
-      L.geoJSON(cand as GeoJsonObject, { style: { color: '#16a34a', weight: 2.5, fill: false, className: 'jl-candidate' } }).addTo(this.overlay);
+      // The live candidate outline: a steady emerald base + a bright light "runner" chasing around
+      // the perimeter (both styled in the global sheet — Leaflet SVG is outside Angular's view).
+      L.geoJSON(cand as GeoJsonObject, { style: { color: MAP.possible, weight: 2, opacity: 0.55, fill: false, className: 'jl-candidate' } }).addTo(this.overlay);
+      L.geoJSON(cand as GeoJsonObject, { style: { color: '#ffffff', weight: 2.5, fill: false, className: 'jl-candidate-run' } }).addTo(this.overlay);
     }
 
     for (const overlay of this.overlays()) {
-      L.geoJSON(overlay as GeoJsonObject, { style: { color: '#a855f7', weight: 2, dashArray: '6', fill: false }, interactive: false }).addTo(this.overlay);
+      L.geoJSON(overlay as GeoJsonObject, { style: { color: MAP.region, weight: 2, dashArray: '6', fill: false }, interactive: false }).addTo(this.overlay);
     }
 
     for (const s of this.stations()?.features ?? []) {
       const [lng, lat] = s.geometry.coordinates;
-      L.circleMarker([lat, lng], { radius: 3, color: '#0891b2', fillColor: '#0891b2', fillOpacity: 0.9, weight: 1 })
+      L.circleMarker([lat, lng], { radius: 3, color: MAP.clue, fillColor: MAP.clue, fillOpacity: 0.9, weight: 1 })
         .bindTooltip(String(s.properties?.['name'] ?? 'stop'))
         .addTo(this.overlay);
     }
 
     for (const p of this.points()?.features ?? []) {
       const [lng, lat] = p.geometry.coordinates;
-      L.circleMarker([lat, lng], { radius: 6, color: '#f97316', fillColor: '#f97316', fillOpacity: 0.9, weight: 2 })
+      L.circleMarker([lat, lng], { radius: 6, color: MAP.region, fillColor: MAP.region, fillOpacity: 0.9, weight: 2 })
         .bindTooltip(String(p.properties?.['name'] ?? 'place'), { permanent: false })
         .addTo(this.overlay);
     }
@@ -193,14 +230,14 @@ export class DeductionMap {
       if (q.type === 'radar') {
         L.circle([q.lat, q.lng], {
           radius: q.radiusKm * 1000,
-          color: q.within === false ? '#ef4444' : '#2563eb',
+          color: q.within === false ? MAP.hider : MAP.seeker,
           weight: 1,
           fillOpacity: 0.04,
         }).addTo(this.overlay);
-        L.circleMarker([q.lat, q.lng], { radius: 5, color: '#2563eb', fillOpacity: 1 }).bindTooltip('Radar').addTo(this.overlay);
+        L.circleMarker([q.lat, q.lng], { radius: 5, color: MAP.seeker, fillOpacity: 1 }).bindTooltip('Radar').addTo(this.overlay);
       } else if (q.type === 'thermometer') {
-        L.circleMarker([q.aLat, q.aLng], { radius: 6, color: '#3b82f6', fillOpacity: 1 }).bindTooltip('A (cold)').addTo(this.overlay);
-        L.circleMarker([q.bLat, q.bLng], { radius: 6, color: '#ef4444', fillOpacity: 1 }).bindTooltip('B (warm)').addTo(this.overlay);
+        L.circleMarker([q.aLat, q.aLng], { radius: 6, color: MAP.seeker, fillOpacity: 1 }).bindTooltip('A (cold)').addTo(this.overlay);
+        L.circleMarker([q.bLat, q.bLng], { radius: 6, color: MAP.warm, fillOpacity: 1 }).bindTooltip('B (warm)').addTo(this.overlay);
         L.polyline([[q.aLat, q.aLng], [q.bLat, q.bLng]], { color: '#94a3b8', weight: 1, dashArray: '4' }).addTo(this.overlay);
       }
     }
@@ -210,20 +247,20 @@ export class DeductionMap {
       if (a.radarKm != null && a.point) {
         L.circle([a.point.lat, a.point.lng], {
           radius: a.radarKm * 1000,
-          color: a.within ? '#2563eb' : '#ef4444',
+          color: a.within ? MAP.seeker : MAP.hider,
           weight: 1.5,
           dashArray: a.within ? undefined : '5',
           fillOpacity: 0.05,
         }).addTo(this.overlay);
       }
       if (a.thermo) {
-        L.polyline([[a.thermo.a.lat, a.thermo.a.lng], [a.thermo.b.lat, a.thermo.b.lng]], { color: '#f59e0b', weight: 2, dashArray: '4' }).addTo(this.overlay);
-        L.circleMarker([a.thermo.a.lat, a.thermo.a.lng], { radius: 4, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 1 }).addTo(this.overlay);
-        L.circleMarker([a.thermo.b.lat, a.thermo.b.lng], { radius: 4, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 1 }).addTo(this.overlay);
+        L.polyline([[a.thermo.a.lat, a.thermo.a.lng], [a.thermo.b.lat, a.thermo.b.lng]], { color: MAP.warm, weight: 2, dashArray: '4' }).addTo(this.overlay);
+        L.circleMarker([a.thermo.a.lat, a.thermo.a.lng], { radius: 4, color: MAP.seeker, fillColor: MAP.seeker, fillOpacity: 1 }).addTo(this.overlay);
+        L.circleMarker([a.thermo.b.lat, a.thermo.b.lng], { radius: 4, color: MAP.warm, fillColor: MAP.warm, fillOpacity: 1 }).addTo(this.overlay);
       }
       if (a.feature) {
         // The reference place (closest airport, matched place, nearest tentacle target).
-        L.marker([a.feature.lat, a.feature.lng], { icon: markerIcon('📍', { color: '#0891b2', size: 26 }) })
+        L.marker([a.feature.lat, a.feature.lng], { icon: markerIcon('📍', { color: MAP.clue, size: 26 }) })
           .bindTooltip(a.feature.name ? `📍 ${a.feature.name}` : '📍 reference place', { permanent: true, direction: 'right', offset: [6, 0], opacity: 0.95 })
           .addTo(this.overlay);
       }
@@ -238,9 +275,9 @@ export class DeductionMap {
     const thermo = this.thermoMarker();
     if (thermo) {
       if (thermo.radiusM) {
-        L.circle([thermo.lat, thermo.lng], { radius: thermo.radiusM, color: '#f59e0b', weight: 1.5, dashArray: '6', fillOpacity: 0.04 }).addTo(this.overlay);
+        L.circle([thermo.lat, thermo.lng], { radius: thermo.radiusM, color: MAP.warm, weight: 1.5, dashArray: '6', fillOpacity: 0.04 }).addTo(this.overlay);
       }
-      L.marker([thermo.lat, thermo.lng], { icon: markerIcon('🌡️', { color: '#f59e0b', size: 28 }) })
+      L.marker([thermo.lat, thermo.lng], { icon: markerIcon('🌡️', { color: MAP.warm, size: 28 }) })
         .bindTooltip(thermo.label ?? 'Thermometer start', { permanent: true, direction: 'top', offset: [0, -18] })
         .addTo(this.overlay);
     }
@@ -250,9 +287,9 @@ export class DeductionMap {
     const preview = this.radarPreview();
     const previewSig = preview ? `${preview.lat}:${preview.lng}:${preview.radiusM}` : '';
     if (preview) {
-      const circle = L.circle([preview.lat, preview.lng], { radius: preview.radiusM, color: '#e11d48', weight: 2, dashArray: '8 6', fillColor: '#e11d48', fillOpacity: 0.06 });
+      const circle = L.circle([preview.lat, preview.lng], { radius: preview.radiusM, color: MAP.seeker, weight: 2, dashArray: '8 6', fillColor: MAP.seeker, fillOpacity: 0.06 });
       circle.addTo(this.overlay);
-      L.circleMarker([preview.lat, preview.lng], { radius: 5, color: '#e11d48', fillColor: '#e11d48', fillOpacity: 1 }).addTo(this.overlay);
+      L.circleMarker([preview.lat, preview.lng], { radius: 5, color: MAP.seeker, fillColor: MAP.seeker, fillOpacity: 1 }).addTo(this.overlay);
       if (previewSig !== this.lastPreviewSig) {
         this.lastPreviewSig = previewSig;
         try {
@@ -272,12 +309,12 @@ export class DeductionMap {
     const ref = this.refPreview();
     const refSig = ref ? `${ref.lat}:${ref.lng}` : '';
     if (ref) {
-      L.marker([ref.lat, ref.lng], { icon: markerIcon('📍', { color: '#0891b2', size: 28 }) })
+      L.marker([ref.lat, ref.lng], { icon: markerIcon('📍', { color: MAP.clue, size: 28 }) })
         .bindTooltip(ref.label ?? 'reference', { permanent: true, direction: 'top', offset: [0, -14], opacity: 0.95 })
         .addTo(this.overlay);
       const pts: L.LatLngExpression[] = [[ref.lat, ref.lng]];
       if (ref.fromLat != null && ref.fromLng != null) {
-        L.polyline([[ref.fromLat, ref.fromLng], [ref.lat, ref.lng]], { color: '#0891b2', weight: 2, dashArray: '6 6', opacity: 0.85 }).addTo(this.overlay);
+        L.polyline([[ref.fromLat, ref.fromLng], [ref.lat, ref.lng]], { color: MAP.clue, weight: 2, dashArray: '6 6', opacity: 0.85 }).addTo(this.overlay);
         pts.push([ref.fromLat, ref.fromLng]);
       }
       if (refSig !== this.lastRefSig) {
@@ -299,7 +336,7 @@ export class DeductionMap {
     const region = this.regionPreview();
     const regionSig = region ? String(region.properties?.['name'] ?? 'region') : '';
     if (region) {
-      const layer = L.geoJSON(region as GeoJsonObject, { style: { color: '#0891b2', weight: 2.5, fillColor: '#0891b2', fillOpacity: 0.12 }, interactive: false });
+      const layer = L.geoJSON(region as GeoJsonObject, { style: { color: MAP.region, weight: 2.5, fillColor: MAP.region, fillOpacity: 0.12 }, interactive: false });
       layer.addTo(this.overlay);
       if (regionSig !== this.lastRegionSig) {
         this.lastRegionSig = regionSig;
@@ -323,23 +360,23 @@ export class DeductionMap {
     if (ev) {
       const pts: L.LatLngExpression[] = [[ev.seeker.lat, ev.seeker.lng], [ev.hider.lat, ev.hider.lng]];
       if (ev.radius_m) {
-        L.circle([ev.seeker.lat, ev.seeker.lng], { radius: ev.radius_m, color: '#e11d48', weight: 1.5, dashArray: '6', fillColor: '#e11d48', fillOpacity: 0.04 }).addTo(this.overlay);
+        L.circle([ev.seeker.lat, ev.seeker.lng], { radius: ev.radius_m, color: MAP.seeker, weight: 1.5, dashArray: '6', fillColor: MAP.seeker, fillOpacity: 0.04 }).addTo(this.overlay);
       }
       for (const c of ev.candidates) {
-        L.circleMarker([c.lat, c.lng], { radius: 4, color: '#f97316', fillColor: '#f97316', fillOpacity: 0.7, weight: 1 }).bindTooltip(c.name ?? 'candidate').addTo(this.overlay);
+        L.circleMarker([c.lat, c.lng], { radius: 4, color: MAP.region, fillColor: MAP.region, fillOpacity: 0.7, weight: 1 }).bindTooltip(c.name ?? 'candidate').addTo(this.overlay);
         pts.push([c.lat, c.lng]);
       }
-      L.marker([ev.seeker.lat, ev.seeker.lng], { icon: markerIcon('🔍', { color: '#2563eb', size: 26 }) }).bindTooltip('Seeker', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
-      L.marker([ev.hider.lat, ev.hider.lng], { icon: markerIcon('🙈', { color: '#7c3aed', size: 26 }) }).bindTooltip('Hider', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
+      L.marker([ev.seeker.lat, ev.seeker.lng], { icon: markerIcon('🔍', { color: MAP.seeker, size: 26 }) }).bindTooltip('Seeker', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
+      L.marker([ev.hider.lat, ev.hider.lng], { icon: markerIcon('🙈', { color: MAP.hider, size: 26 }) }).bindTooltip('Hider', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
       if (ev.matched) {
-        L.polyline([[ev.hider.lat, ev.hider.lng], [ev.matched.lat, ev.matched.lng]], { color: '#16a34a', weight: 2, dashArray: '5 5' }).addTo(this.overlay);
-        L.marker([ev.matched.lat, ev.matched.lng], { icon: markerIcon('✅', { color: '#16a34a', size: 28 }) })
+        L.polyline([[ev.hider.lat, ev.hider.lng], [ev.matched.lat, ev.matched.lng]], { color: MAP.possible, weight: 2, dashArray: '5 5' }).addTo(this.overlay);
+        L.marker([ev.matched.lat, ev.matched.lng], { icon: markerIcon('✅', { color: MAP.possible, size: 28 }) })
           .bindTooltip(`${ev.answer ?? ''} · ${ev.matched.name ?? '(unnamed)'}`, { permanent: true, direction: 'right', offset: [8, 0], opacity: 0.95 })
           .addTo(this.overlay);
         pts.push([ev.matched.lat, ev.matched.lng]);
       }
       if (ev.hider_nearest) {
-        L.marker([ev.hider_nearest.lat, ev.hider_nearest.lng], { icon: markerIcon('📍', { color: '#7c3aed', size: 24 }) })
+        L.marker([ev.hider_nearest.lat, ev.hider_nearest.lng], { icon: markerIcon('📍', { color: MAP.hider, size: 24 }) })
           .bindTooltip(`hider's nearest · ${ev.hider_nearest.name ?? '(unnamed)'}`, { direction: 'right', offset: [8, 0] })
           .addTo(this.overlay);
         pts.push([ev.hider_nearest.lat, ev.hider_nearest.lng]);
@@ -363,7 +400,7 @@ export class DeductionMap {
     const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
     for (const p of disperse(located)) {
       const isMe = p.id === this.meId();
-      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, isMe ? '#2563eb' : colorFor(p.id), isMe, p.avatar) })
+      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, isMe ? MAP.seeker : colorFor(p.id), isMe, p.avatar) })
         .bindTooltip(isMe ? 'You' : p.display_name, isMe ? { permanent: true, direction: 'top', offset: [0, -20] } : {})
         .addTo(this.overlay);
     }

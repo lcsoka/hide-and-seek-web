@@ -1,6 +1,8 @@
 import { Component, computed, DestroyRef, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Feature, MultiPolygon, Polygon } from 'geojson';
+import { simplify } from '@turf/turf';
+import { OverpassService } from '../../core/maps/overpass';
 import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models';
 import { ALL_TRANSIT_MODES } from '../../core/maps/overpass';
 import { UnitsService } from '../../core/services/units.service';
@@ -59,6 +61,7 @@ export class SessionView {
   readonly deduction = inject(DeductionState);
   readonly hiding = inject(HidingState);
   private readonly unitsService = inject(UnitsService);
+  private readonly overpass = inject(OverpassService);
   private readonly gameTimer = inject(GameTimerService);
   private readonly transloco = inject(TranslocoService);
 
@@ -90,6 +93,8 @@ export class SessionView {
   });
   // The admin polygon (megye/település/kerület) to highlight for a "same division?" preview.
   readonly refPreviewRegion = computed(() => this.refPreview()?.region ?? null);
+  // Hungary's outline, fetched once, drawn as a static frame on the deduction map.
+  readonly nationalBorder = signal<Feature<Polygon | MultiPolygon> | null>(null);
   // Which mobile drawer is open (icon-button HUD). Desktop shows the full side panel instead.
   readonly mobileDrawer = signal<'hide' | 'questions' | 'hand' | 'seeker' | null>(null);
   // Host's End-game confirmation (a single HUD control, not a per-panel button).
@@ -120,6 +125,14 @@ export class SessionView {
 
   constructor() {
     const destroyRef = inject(DestroyRef);
+
+    // Hungary's outline (same from any point in the country), fetched once + simplified, for the
+    // static national frame on the deduction map. Cached client + server side; failure is silent.
+    void this.overpass
+      .adminBoundary(47.4979, 19.0402, 2)
+      .then((b) => this.nationalBorder.set(b ? (simplify(b, { tolerance: 0.003, highQuality: false }) as Feature<Polygon | MultiPolygon>) : null))
+      .catch(() => {});
+
     const sessionId = this.id();
     if (sessionId) {
       this.myId.set(this.players.get(sessionId));

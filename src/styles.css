@@ -65,14 +65,26 @@ app-root { display: block; height: 100%; }
   .jl-sheet, .jl-fade, .jl-pop, .jl-rise { animation: none; }
 }
 
-/* Map polish — gently pulse the candidate-area outline so the live deduction reads
-   as "alive". (Leaflet renders its SVG outside Angular's view encapsulation, so this
-   lives in the global sheet.) */
-@keyframes jl-candidate-march {
-  to { stroke-dashoffset: -28; }
-}
+/* Map polish — the live candidate area reads as "alive": a steady emerald base outline with a
+   bright light strip chasing around its perimeter. (Leaflet renders its SVG outside Angular's view
+   encapsulation, so this lives in the global sheet.) */
 .jl-candidate {
-  stroke-dasharray: 10 8;
-  animation: jl-candidate-march 1.2s linear infinite;
-  filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.55));
+  filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.5));
+}
+@keyframes jl-candidate-run {
+  to { stroke-dashoffset: -1600; }
+}
+.jl-candidate-run {
+  stroke-linecap: round;
+  stroke-dasharray: 40 260;
+  animation: jl-candidate-run 5.5s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.95)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
+}
+/* The national frame — a soft violet glow on the dotted border. */
+.jl-national {
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.5));
+}
+@media (prefers-reduced-motion: reduce) {
+  .jl-candidate-run { animation: none; }
 }
