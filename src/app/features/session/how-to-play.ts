@@ -2,11 +2,12 @@ import { Component, inject, input, output } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
 import { CategoryService } from '../../core/services/category.service';
 import { HudPreference } from '../../core/services/hud-preference';
+import { Icon } from '../../shared/icon';
 
 /** A "How to play" reference sheet: the goal, each role, and the question types. */
 @Component({
   selector: 'app-how-to-play',
-  imports: [TranslocoModule],
+  imports: [TranslocoModule, Icon],
   template: `
     @if (open()) {
       <div class="fixed inset-0 z-[850] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" (click)="closeChange.emit(false)" *transloco="let t">
@@ -34,7 +35,7 @@ import { HudPreference } from '../../core/services/hud-preference';
               <ul class="space-y-1.5">
                 @for (c of cats; track c) {
                   <li class="flex items-start gap-2">
-                    <span class="text-lg leading-none">{{ meta(c).icon }}</span>
+                    <app-icon [name]="catIcon(c)" [size]="20" class="mt-0.5 shrink-0 text-rose-600 dark:text-rose-400" />
                     <span><span class="font-medium">{{ t('category.' + c) }}</span> — <span class="text-gray-600 dark:text-gray-300">{{ t('categoryHint.' + c) }}</span></span>
                   </li>
                 }
@@ -65,4 +66,5 @@ export class HowToPlay {
   readonly closeChange = output<boolean>();
   readonly cats = ['radar', 'thermometer', 'matching', 'measuring', 'tentacles', 'photo'];
   readonly meta = (c: string) => this.category.categoryMeta(c);
+  readonly catIcon = (c: string) => this.category.categoryIconName(c);
 }

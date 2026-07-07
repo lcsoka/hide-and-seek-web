@@ -12,11 +12,12 @@ import { TransitService } from '../../core/services/transit.service';
 import { DiceRoller } from './dice-roller';
 import { HangmanGame } from './hangman-game';
 import { ImageUpload } from './image-upload';
+import { Icon } from '../../shared/icon';
 
 /** Seeker side panel: an Ask button, the numbered history (with photo clues), and curses. */
 @Component({
   selector: 'app-seeker-panel',
-  imports: [ImageUpload, DiceRoller, HangmanGame, TranslocoModule],
+  imports: [ImageUpload, DiceRoller, HangmanGame, TranslocoModule, Icon],
   templateUrl: './seeker-panel.html',
 })
 export class SeekerPanel {

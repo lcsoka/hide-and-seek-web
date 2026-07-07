@@ -18,6 +18,47 @@ export class CategoryService {
     return `/icons/questions/${category}.svg`;
   }
 
+  /** app-icon name per category (in-app inline SVG, replaces the emoji fallback). */
+  private readonly CATEGORY_ICON_NAME: Record<string, string> = {
+    radar: 'radar',
+    thermometer: 'thermo',
+    matching: 'pin',
+    measuring: 'ruler',
+    tentacles: 'tentacles',
+    photo: 'camera',
+  };
+
+  /** The app-icon name for a category, falling back to a generic help glyph. */
+  categoryIconName(category: string): string {
+    return this.CATEGORY_ICON_NAME[category] ?? 'help';
+  }
+
+  /**
+   * Subject keyword → app-icon name, mirroring QUESTION_ICONS order so the same
+   * substring precedence holds ('street' before 'tree', etc.).
+   */
+  private readonly QUESTION_ICON_NAMES: [string, string][] = [
+    ['museum', 'landmark'], ['library', 'library'], ['hospital', 'cross'], ['zoo', 'pawprint'], ['aquarium', 'waves'],
+    ['amusement', 'landmark'], ['theme', 'landmark'], ['movie', 'clapperboard'], ['cinema', 'clapperboard'], ['theater', 'clapperboard'],
+    ['metro', 'train'], ['subway', 'train'], ['platform', 'train'], ['rail', 'train'], ['train', 'train'], ['station', 'train'],
+    // 'street' before 'tree' — "s·tree·t" contains "tree" as a substring.
+    ['street', 'signpost'], ['park', 'trees'], ['tree', 'trees'], ['selfie', 'camera'], ['sky', 'cloud'], ['worship', 'church'], ['church', 'church'],
+    ['grocery', 'cart'], ['restaurant', 'utensils'], ['water', 'waves'], ['structure', 'building'], ['tower', 'building'],
+    ['golf', 'pin'], ['airport', 'plane'], ['bridge', 'building'], ['building', 'building'], ['sea', 'waves'],
+  ];
+
+  /** app-icon name for a specific question (by its subject), falling back to the category icon. */
+  questionIconName(text: string, category: string): string {
+    const haystack = text.toLowerCase();
+    for (const [keyword, name] of this.QUESTION_ICON_NAMES) {
+      if (haystack.includes(keyword)) {
+        return name;
+      }
+    }
+
+    return this.categoryIconName(category);
+  }
+
   /** Subject keyword → emoji, most-specific first. Used to give each question an icon. */
   private readonly QUESTION_ICONS: [string, string][] = [
     ['museum', '🏛️'], ['library', '📚'], ['hospital', '🏥'], ['zoo', '🦁'], ['aquarium', '🐠'],

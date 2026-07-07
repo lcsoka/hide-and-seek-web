@@ -83,7 +83,7 @@
     @for (a of history(); track a.n) {
       <div class="flex items-center gap-2 rounded-xl border border-gray-200 p-2 dark:border-gray-700" [class.opacity-40]="deduction.isDismissed(a.seq)">
         <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gray-900 text-xs font-bold text-white dark:bg-gray-700">{{ a.n }}</span>
-        <span class="text-lg">{{ a.icon }}</span>
+        <app-icon [name]="a.iconName" [size]="20" class="shrink-0 text-gray-500 dark:text-gray-400" />
         <div class="min-w-0 flex-1">
           <div class="truncate text-sm font-medium">{{ tr('category.' + a.category) }}</div>
           <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ deduction.isDismissed(a.seq) ? tr('seeker.ignored') : a.effect }}</div>

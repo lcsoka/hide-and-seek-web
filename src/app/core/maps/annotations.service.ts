@@ -36,7 +36,8 @@ export class AnnotationsService {
       const feature = q.answer?.feature_lat != null && q.answer?.feature_lng != null
         ? { lat: q.answer.feature_lat, lng: q.answer.feature_lng, name: place }
         : undefined;
-      const base = { n: i + 1, seq: q.seq, category: q.category, icon: meta.icon, answer };
+      const iconName = this.category.questionIconName(q.ask.feature ?? '', q.category);
+      const base = { n: i + 1, seq: q.seq, category: q.category, icon: meta.icon, iconName, answer };
 
       if (q.category === 'radar' && askPoint) {
         const within = answer === 'yes';

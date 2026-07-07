@@ -2,6 +2,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from 'geojson';
 import { centroid, distance, nearestPointOnLine, point, polygonToLine } from '@turf/turf';
 import { TranslocoModule } from '@jsverse/transloco';
+import { Icon } from '../../shared/icon';
 import { QuestionCatalogItem } from '../../core/models';
 import { FEATURE_TAGS } from '../../core/deduction/osm-deduction.service';
 import { OverpassService } from '../../core/maps/overpass';
@@ -19,7 +20,7 @@ interface NearbyPlace {
 /** Icon-tile question chooser shown as a modal / bottom sheet — pick a category, then a question. */
 @Component({
   selector: 'app-question-picker',
-  imports: [TranslocoModule],
+  imports: [TranslocoModule, Icon],
   templateUrl: './question-picker.html',
 })
 export class QuestionPicker {
@@ -49,7 +50,7 @@ export class QuestionPicker {
   readonly meta = (c: string) => this.category.categoryMeta(c);
   readonly iconSrc = (c: string) => this.category.categoryIconSrc(c);
   readonly color = (c: string) => this.category.categoryMeta(c).color;
-  readonly qIcon = (q: QuestionCatalogItem) => this.category.questionIcon(`${q.title} ${q.key}`, q.category);
+  readonly qIconName = (q: QuestionCatalogItem) => this.category.questionIconName(`${q.title} ${q.key}`, q.category);
   readonly qLabel = (title: string) => this.category.questionShortLabel(title);
   /** Distance-based categories get inline chips; the rest get a grid of subject tiles. */
   readonly isParametric = computed(() => this.selected() === 'radar' || this.selected() === 'thermometer');

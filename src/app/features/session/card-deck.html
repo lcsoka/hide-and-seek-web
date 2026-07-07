@@ -34,7 +34,7 @@
           <button (click)="toggleCategory(c)"
                   class="rounded-full px-3 py-1.5 text-sm font-medium transition"
                   [class]="chosenCategories().includes(c) ? 'bg-purple-600 text-white' : 'border border-purple-300 text-purple-700 dark:border-purple-700 dark:text-purple-300'">
-            {{ meta(c).icon }} {{ t('category.' + c) }}
+            <span class="inline-flex items-center gap-1.5"><app-icon [name]="catIcon(c)" [size]="16" /> {{ t('category.' + c) }}</span>
           </button>
         }
       </div>
@@ -81,7 +81,7 @@
   @if (show('question') && pending(); as q) {
     <div class="space-y-2 rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-950">
       <div class="flex items-center gap-2">
-        <span class="text-xl">{{ meta(q.category ?? '').icon }}</span>
+        <app-icon [name]="qIcon(q.title, q.category)" [size]="22" class="text-blue-600 dark:text-blue-300" />
         <span class="font-semibold">{{ q.title || t('category.' + (q.category ?? '')) }}</span>
       </div>
       @if (q.prompt) { <p class="text-sm text-gray-700 dark:text-gray-200">{{ q.prompt }}</p> }
@@ -260,7 +260,7 @@
       @for (q of history(); track q.seq) {
         <div class="flex items-center gap-2 rounded-lg border border-gray-200 p-2 dark:border-gray-700">
           <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gray-900 text-xs font-bold text-white dark:bg-gray-700">{{ q.seq }}</span>
-          <span class="text-base">{{ meta(q.category).icon }}</span>
+          <app-icon [name]="qIcon(q.ask.feature, q.category)" [size]="18" class="shrink-0 text-gray-500 dark:text-gray-400" />
           <div class="min-w-0 flex-1">
             <div class="truncate text-sm font-medium">{{ t('category.' + q.category) }}</div>
             @if (asker(q); as who) {

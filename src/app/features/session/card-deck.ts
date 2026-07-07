@@ -67,6 +67,9 @@ export class CardDeck {
   private prevLen = 0;
 
   readonly meta = (c: string) => this.category.categoryMeta(c);
+  readonly catIcon = (c: string | null | undefined) => this.category.categoryIconName(c ?? '');
+  readonly qIcon = (subject: string | null | undefined, c: string | null | undefined) =>
+    this.category.questionIconName(subject ?? '', c ?? '');
   readonly confirmCard = signal<HandCard | null>(null);
   // The word the hider types when casting the Hidden Hangman (min 4 letters).
   readonly castWord = signal('');

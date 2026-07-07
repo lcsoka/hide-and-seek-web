@@ -21,6 +21,8 @@ export interface MapAnnotation {
   seq: number;
   category: string;
   icon: string;
+  /** app-icon name for the question's subject (in-app inline SVG). */
+  iconName: string;
   answer: string;
   /** Short explanation of how this question cut the map. */
   effect: string;
