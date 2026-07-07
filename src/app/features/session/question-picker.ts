@@ -1,6 +1,6 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { FeatureCollection, Point } from 'geojson';
-import { distance, point } from '@turf/turf';
+import { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from 'geojson';
+import { centroid, distance, nearestPointOnLine, point, polygonToLine } from '@turf/turf';
 import { TranslocoModule } from '@jsverse/transloco';
 import { QuestionCatalogItem } from '../../core/models';
 import { FEATURE_TAGS } from '../../core/deduction/osm-deduction.service';
@@ -39,8 +39,9 @@ export class QuestionPicker {
   // Radar is two-step: choosing a radius previews it on the map (picker closes), then the
   // seeker confirms in the shell to actually ask.
   readonly preview = output<{ questionId: string; radiusM: number; label: string }>();
-  // Measuring/matching: preview the seeker's reference place on the map, then confirm in the shell.
-  readonly refPreview = output<{ questionId: string; category: string; name: string; lat: number; lng: number }>();
+  // Measuring/matching: preview the seeker's reference (a place, their containing admin area, or the
+  // nearest border) on the map, then confirm in the shell. `region` carries the admin polygon (B).
+  readonly refPreview = output<{ questionId: string; category: string; name: string; lat: number; lng: number; region?: Feature<Polygon | MultiPolygon> | null }>();
   readonly closeChange = output<boolean>();
 
   readonly selected = signal<string | null>(null);
@@ -147,35 +148,93 @@ export class QuestionPicker {
     }
   }
 
-  /** Look up the seeker's nearest reference place and preview it on the map (picker closes). No
-   *  nearby feature (or Overpass unavailable) → ask directly and let the server compute the ref. */
+  /** Look up the seeker's OWN reference — nearest place, containing admin area, or nearest border —
+   *  and preview it on the map before asking, so they see what's closest to them. No reference (or
+   *  Overpass down) → ask directly and let the server compute it. */
   private async openRefPreview(q: QuestionCatalogItem): Promise<void> {
-    const feature = q.parameters?.['feature'] as string | undefined;
     const lat = this.seekerLat();
     const lng = this.seekerLng();
+    const adminLevel = q.parameters?.['admin_level'] as number | undefined;
+    const boundaryLevel = q.parameters?.['boundary_level'] as number | undefined;
+    const feature = q.parameters?.['feature'] as string | undefined;
     const tag = feature ? FEATURE_TAGS[feature] : undefined;
-    if (!tag || lat == null || lng == null) {
+
+    if (lat == null || lng == null || (adminLevel == null && boundaryLevel == null && !tag)) {
       this.askGeneric(q);
       return;
     }
 
     this.finding.set(true);
-    let nearest: NearbyPlace | null = null;
     try {
-      // Bound the lookup — a throttled Overpass shouldn't trap the seeker on "Finding…".
-      const fc = await Promise.race([this.overpass.pois(lat, lng, 15, tag), new Promise<FeatureCollection<Point> | null>((res) => setTimeout(() => res(null), 10000))]);
-      nearest = this.nearestPlace(fc, lat, lng);
-    } catch {
-      nearest = null;
+      if (adminLevel != null) {
+        await this.previewAdmin(q, lat, lng, adminLevel);
+      } else if (boundaryLevel != null) {
+        await this.previewBorder(q, lat, lng, boundaryLevel);
+      } else {
+        await this.previewFeature(q, lat, lng, tag!);
+      }
+    } finally {
+      this.finding.set(false);
     }
-    this.finding.set(false);
+  }
 
+  /** Bound a lookup with a 10s timeout + swallow errors, so a throttled Overpass can't trap the
+   *  seeker on "Finding…". */
+  private race<T>(p: Promise<T>): Promise<T | null> {
+    return Promise.race([p.catch(() => null), new Promise<null>((res) => setTimeout(() => res(null), 10000))]);
+  }
+
+  /** Matching/measuring on a point feature: preview the seeker's nearest such place. */
+  private async previewFeature(q: QuestionCatalogItem, lat: number, lng: number, tag: string): Promise<void> {
+    const nearest = this.nearestPlace(await this.race(this.overpass.pois(lat, lng, 15, tag)), lat, lng);
     if (nearest) {
       this.refPreview.emit({ questionId: q.id, category: q.category, name: nearest.name, lat: nearest.lat, lng: nearest.lng });
       this.close();
     } else {
       this.askGeneric(q); // no nearby reference — ask directly (server computes / falls back)
     }
+  }
+
+  /** "Same division?" — preview the administrative area (megye/település/kerület) containing the seeker. */
+  private async previewAdmin(q: QuestionCatalogItem, lat: number, lng: number, level: number): Promise<void> {
+    const boundary = await this.race(this.overpass.adminBoundary(lat, lng, level));
+    if (boundary) {
+      const [clng, clat] = centroid(boundary).geometry.coordinates;
+      this.refPreview.emit({ questionId: q.id, category: q.category, name: String(boundary.properties?.['name'] ?? ''), lat: clat, lng: clng, region: boundary });
+      this.close();
+    } else {
+      this.askGeneric(q);
+    }
+  }
+
+  /** "Closer to the border?" — preview the nearest point on that boundary line to the seeker. */
+  private async previewBorder(q: QuestionCatalogItem, lat: number, lng: number, level: number): Promise<void> {
+    const boundary = await this.race(this.overpass.adminBoundary(lat, lng, level));
+    const snapped = boundary ? this.nearestOnBoundary(boundary, lat, lng) : null;
+    if (snapped && boundary) {
+      this.refPreview.emit({ questionId: q.id, category: q.category, name: String(boundary.properties?.['name'] ?? 'border'), lat: snapped.lat, lng: snapped.lng });
+      this.close();
+    } else {
+      this.askGeneric(q);
+    }
+  }
+
+  /** The nearest point on a boundary polygon's outline (across all rings) to a point. */
+  private nearestOnBoundary(boundary: Feature<Polygon | MultiPolygon>, lat: number, lng: number): { lat: number; lng: number } | null {
+    const here = point([lng, lat]);
+    const asLines = polygonToLine(boundary);
+    const lines = asLines.type === 'FeatureCollection' ? asLines.features : [asLines];
+    let best: { lat: number; lng: number; dist: number } | null = null;
+    for (const line of lines) {
+      const snap = nearestPointOnLine(line as any, here, { units: 'kilometers' });
+      const dist = (snap.properties.dist as number) ?? Infinity;
+      if (!best || dist < best.dist) {
+        const [blng, blat] = snap.geometry.coordinates;
+        best = { lat: blat, lng: blng, dist };
+      }
+    }
+
+    return best ? { lat: best.lat, lng: best.lng } : null;
   }
 
   private nearestPlace(fc: FeatureCollection<Point> | null, lat: number, lng: number): NearbyPlace | null {

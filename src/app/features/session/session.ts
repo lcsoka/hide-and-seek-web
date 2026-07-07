@@ -1,5 +1,6 @@
 import { Component, computed, DestroyRef, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Feature, MultiPolygon, Polygon } from 'geojson';
 import { ActiveCurse, GameState, PlayerView, Position, QuestionCatalogItem } from '../../core/models';
 import { ALL_TRANSIT_MODES } from '../../core/maps/overpass';
 import { UnitsService } from '../../core/services/units.service';
@@ -79,13 +80,16 @@ export class SessionView {
 
     return p ? { lat: p.lat, lng: p.lng, radiusM: p.radiusM } : null;
   });
-  // A reference place the seeker is previewing for a measuring/matching question before asking.
-  readonly refPreview = signal<{ questionId: string; category: string; name: string; lat: number; lng: number; fromLat: number | null; fromLng: number | null } | null>(null);
+  // A reference the seeker is previewing for a measuring/matching question before asking: a place,
+  // their containing admin area (region), or the nearest border point.
+  readonly refPreview = signal<{ questionId: string; category: string; name: string; lat: number; lng: number; fromLat: number | null; fromLng: number | null; region: Feature<Polygon | MultiPolygon> | null } | null>(null);
   readonly refPreviewMarker = computed(() => {
     const p = this.refPreview();
 
     return p ? { lat: p.lat, lng: p.lng, fromLat: p.fromLat, fromLng: p.fromLng, label: p.name } : null;
   });
+  // The admin polygon (megye/település/kerület) to highlight for a "same division?" preview.
+  readonly refPreviewRegion = computed(() => this.refPreview()?.region ?? null);
   // Which mobile drawer is open (icon-button HUD). Desktop shows the full side panel instead.
   readonly mobileDrawer = signal<'hide' | 'questions' | 'hand' | 'seeker' | null>(null);
   // Host's End-game confirmation (a single HUD control, not a per-panel button).
@@ -355,11 +359,11 @@ export class SessionView {
 
   /** Seeker picked a measuring/matching question: preview its reference place on the map (with a
    *  line from their position) for confirmation. */
-  onRefPreview(s: GameState, ev: { questionId: string; category: string; name: string; lat: number; lng: number }): void {
+  onRefPreview(s: GameState, ev: { questionId: string; category: string; name: string; lat: number; lng: number; region?: Feature<Polygon | MultiPolygon> | null }): void {
     this.pickerOpen.set(false);
     this.radarPreview.set(null);
     const me = this.me(s);
-    this.refPreview.set({ ...ev, fromLat: me?.lat ?? null, fromLng: me?.lng ?? null });
+    this.refPreview.set({ ...ev, fromLat: me?.lat ?? null, fromLng: me?.lng ?? null, region: ev.region ?? null });
   }
 
   /** Confirm the previewed reference — ask the question against it (server uses this exact place). */

@@ -1,6 +1,6 @@
 import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, input, output, viewChild } from '@angular/core';
 import { bbox } from '@turf/turf';
-import { Feature, FeatureCollection, GeoJsonObject, Point } from 'geojson';
+import { Feature, FeatureCollection, GeoJsonObject, MultiPolygon, Point, Polygon } from 'geojson';
 import * as L from 'leaflet';
 import { TranslocoModule } from '@jsverse/transloco';
 import { MapAnnotation } from '../../core/maps/map.model';
@@ -59,6 +59,8 @@ export class DeductionMap {
   // A reference place the seeker is previewing for a measuring/matching question (with a dashed
   // line from their own position) before committing to ask.
   readonly refPreview = input<{ lat: number; lng: number; fromLat?: number | null; fromLng?: number | null; label?: string } | null>(null);
+  // The administrative area (megye/település/kerület) to highlight for a "same division?" preview.
+  readonly regionPreview = input<Feature<Polygon | MultiPolygon> | null>(null);
   readonly players = input<PlayerView[]>([]); // visible players (seekers see themselves + teammates)
   readonly meId = input<string | null>(null);
   // Dev question harness: an evaluated question's geometry to overlay. Null in normal play.
@@ -76,6 +78,7 @@ export class DeductionMap {
   private lastRouteSig = '';
   private lastPreviewSig = '';
   private lastRefSig = '';
+  private lastRegionSig = '';
   private lastEvalSig = '';
   private userMoved = false;
   private programmaticMove = false;
@@ -93,6 +96,7 @@ export class DeductionMap {
       this.thermoMarker();
       this.radarPreview();
       this.refPreview();
+      this.regionPreview();
       this.evalResult();
       this.players();
       this.transitRoutes.displayed();
@@ -288,6 +292,27 @@ export class DeductionMap {
       }
     } else {
       this.lastRefSig = '';
+    }
+
+    // The seeker's containing administrative area, highlighted before asking a "same division?"
+    // question — a cyan outline + light fill, framed once so they see which megye/kerület they're in.
+    const region = this.regionPreview();
+    const regionSig = region ? String(region.properties?.['name'] ?? 'region') : '';
+    if (region) {
+      const layer = L.geoJSON(region as GeoJsonObject, { style: { color: '#0891b2', weight: 2.5, fillColor: '#0891b2', fillOpacity: 0.12 }, interactive: false });
+      layer.addTo(this.overlay);
+      if (regionSig !== this.lastRegionSig) {
+        this.lastRegionSig = regionSig;
+        try {
+          this.programmaticMove = true;
+          this.map.fitBounds(layer.getBounds(), { padding: [40, 40], maxZoom: 14, animate: true, duration: 0.5 });
+          setTimeout(() => (this.programmaticMove = false), 600);
+        } catch {
+          this.programmaticMove = false;
+        }
+      }
+    } else {
+      this.lastRegionSig = '';
     }
 
     // Dev question harness: the evaluated question's geometry — seeker + hider points, the seeker's
