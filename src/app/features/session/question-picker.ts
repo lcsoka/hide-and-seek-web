@@ -51,6 +51,7 @@ export class QuestionPicker {
   readonly iconSrc = (c: string) => this.category.categoryIconSrc(c);
   readonly color = (c: string) => this.category.categoryMeta(c).color;
   readonly qIconName = (q: QuestionCatalogItem) => this.category.questionIconName(`${q.title} ${q.key}`, q.category);
+  readonly catColor = (c: string) => this.category.categoryColor(c);
   readonly qLabel = (title: string) => this.category.questionShortLabel(title);
   /** Distance-based categories get inline chips; the rest get a grid of subject tiles. */
   readonly isParametric = computed(() => this.selected() === 'radar' || this.selected() === 'thermometer');

@@ -68,6 +68,7 @@ export class CardDeck {
 
   readonly meta = (c: string) => this.category.categoryMeta(c);
   readonly catIcon = (c: string | null | undefined) => this.category.categoryIconName(c ?? '');
+  readonly catColor = (c: string | null | undefined) => this.category.categoryColor(c ?? '');
   readonly qIcon = (subject: string | null | undefined, c: string | null | undefined) =>
     this.category.questionIconName(subject ?? '', c ?? '');
   readonly confirmCard = signal<HandCard | null>(null);

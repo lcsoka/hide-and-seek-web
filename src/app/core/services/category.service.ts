@@ -7,7 +7,7 @@ export class CategoryService {
   private readonly CATEGORY_META: Record<string, CategoryMeta> = {
     radar: { icon: '📡', label: 'Radar', hint: 'Are you within a distance of me?', color: '#EE8A3B' },
     thermometer: { icon: '🌡️', label: 'Thermometer', hint: 'Hotter or colder as I travel?', color: '#D9534F' },
-    matching: { icon: '🧩', label: 'Matching', hint: 'Is your nearest place the same as mine?', color: '#1E2A44' },
+    matching: { icon: '🧩', label: 'Matching', hint: 'Is your nearest place the same as mine?', color: '#3D5A9C' },
     measuring: { icon: '📏', label: 'Measuring', hint: 'Closer or further from a place than me?', color: '#5E9ED0' },
     tentacles: { icon: '🐙', label: 'Tentacles', hint: 'Which nearby place are you closest to?', color: '#8E76B4' },
     photo: { icon: '📷', label: 'Photo', hint: 'Ask for a photo clue.', color: '#4FA65B' },
@@ -31,6 +31,11 @@ export class CategoryService {
   /** The app-icon name for a category, falling back to a generic help glyph. */
   categoryIconName(category: string): string {
     return this.CATEGORY_ICON_NAME[category] ?? 'help';
+  }
+
+  /** The category's brand colour (hex) — used to tint its question/subject icons. */
+  categoryColor(category: string): string {
+    return this.categoryMeta(category).color;
   }
 
   /**

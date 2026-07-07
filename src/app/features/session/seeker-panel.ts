@@ -47,6 +47,7 @@ export class SeekerPanel {
   // Journey log newest-first; only completed legs (with an alight time).
   readonly journey = computed(() => [...(this.transit()?.log ?? [])].filter((l) => l.alight.at != null).reverse());
   readonly history = computed(() => [...this.deduction.annotations()].reverse());
+  readonly catColor = (c: string) => this.category.categoryColor(c);
   // Done curses (time ran out / task completed) disappear — only show active ones.
   readonly curses = computed(() => this.state().curses.filter((c) => c.status === 'active'));
 

@@ -72,7 +72,7 @@
             @for (q of categoryQuestions(); track q.id) {
               <button (click)="pickQuestion(q)"
                       class="flex flex-col items-center gap-1 rounded-2xl border border-gray-200 p-2.5 text-center transition hover:border-rose-400 hover:bg-rose-50 dark:border-gray-700 dark:hover:border-rose-600 dark:hover:bg-rose-950">
-                <app-icon [name]="qIconName(q)" [size]="26" class="text-rose-600 dark:text-rose-400" />
+                <app-icon [name]="qIconName(q)" [size]="26" [style.color]="catColor(selected() ?? q.category)" />
                 <span class="text-[11px] leading-tight text-gray-600 dark:text-gray-300">{{ qLabel(q.title) }}</span>
               </button>
             } @empty {

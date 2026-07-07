@@ -35,7 +35,7 @@ import { Icon } from '../../shared/icon';
               <ul class="space-y-1.5">
                 @for (c of cats; track c) {
                   <li class="flex items-start gap-2">
-                    <app-icon [name]="catIcon(c)" [size]="20" class="mt-0.5 shrink-0 text-rose-600 dark:text-rose-400" />
+                    <app-icon [name]="catIcon(c)" [size]="20" class="mt-0.5 shrink-0" [style.color]="catColor(c)" />
                     <span><span class="font-medium">{{ t('category.' + c) }}</span> — <span class="text-gray-600 dark:text-gray-300">{{ t('categoryHint.' + c) }}</span></span>
                   </li>
                 }
@@ -67,4 +67,5 @@ export class HowToPlay {
   readonly cats = ['radar', 'thermometer', 'matching', 'measuring', 'tentacles', 'photo'];
   readonly meta = (c: string) => this.category.categoryMeta(c);
   readonly catIcon = (c: string) => this.category.categoryIconName(c);
+  readonly catColor = (c: string) => this.category.categoryColor(c);
 }
