@@ -30,9 +30,10 @@ const CAT_ICON: Record<string, string> = {
   templateUrl: './hud-next.html',
   styles: [
     `
-      .b { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 9px 2px; border: none; border-radius: 16px; font-size: 10.5px; font-weight: 500; }
-      .b > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .b:active { transform: scale(0.96); }
+      .seg { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 2px; border: none; border-radius: 20px; font-size: 10px; font-weight: 500; transition: transform .1s; }
+      .seg > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .seg.on { font-weight: 600; }
+      .seg:active { transform: scale(0.94); }
       @keyframes hudbreathe { 0%, 100% { box-shadow: 0 6px 16px rgba(2,6,23,.14); } 50% { box-shadow: 0 6px 16px rgba(2,6,23,.14), 0 0 0 4px rgba(56,189,248,.22); } }
       .breathe { animation: hudbreathe 2.4s ease-in-out infinite; }
       @media (prefers-reduced-motion: reduce) { .breathe { animation: none; } }

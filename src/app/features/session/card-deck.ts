@@ -11,6 +11,7 @@ import { UnitsService } from '../../core/services/units.service';
 import { TranslocoModule } from '@jsverse/transloco';
 import { ImageUpload } from './image-upload';
 import { PlayerAvatar } from '../../shared/player-avatar';
+import { Icon } from '../../shared/icon';
 
 interface TentaclePlace {
   name: string;
@@ -22,7 +23,7 @@ interface TentaclePlace {
 /** The hider's hand: see the full pending question, confirm the answer, play cards. */
 @Component({
   selector: 'app-card-deck',
-  imports: [ImageUpload, TranslocoModule, PlayerAvatar],
+  imports: [ImageUpload, TranslocoModule, PlayerAvatar, Icon],
   templateUrl: './card-deck.html',
   styles: [
     `
@@ -235,6 +236,23 @@ export class CardDeck {
     }
 
     return 'bg-gradient-to-br from-purple-600 to-indigo-800';
+  }
+
+  /** Collectible-card theme per type: accent colour (border/ribbon/button), tinted art panel, emblem. */
+  cardColor(card: HandCard): string {
+    return card.type === 'time_bonus' ? '#d97706' : card.type === 'powerup' ? '#0284c7' : '#7c3aed';
+  }
+
+  cardTintClass(card: HandCard): string {
+    return card.type === 'time_bonus'
+      ? 'bg-amber-50 dark:bg-amber-950/40'
+      : card.type === 'powerup'
+        ? 'bg-sky-50 dark:bg-sky-950/40'
+        : 'bg-violet-50 dark:bg-violet-950/40';
+  }
+
+  cardEmblem(card: HandCard): string {
+    return card.type === 'time_bonus' ? 'hourglass' : card.type === 'powerup' ? 'bolt' : 'curse';
   }
 
   cardTitle(card: HandCard): string {

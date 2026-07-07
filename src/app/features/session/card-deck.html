@@ -218,24 +218,33 @@
 
   @if (show('hand')) {
   @if (hand().length) {
-    <div class="grid grid-cols-2 gap-2">
+    <div class="grid grid-cols-2 gap-2.5">
       @for (c of hand(); track c.uid; let i = $index) {
-        <div class="relative flex h-36 flex-col justify-between rounded-xl p-2.5 text-white shadow-lg ring-1 ring-white/20"
-             [class]="cardClass(c)" [class.card-draw]="i >= animatingFrom()">
-          <button (click)="discard(c)" [disabled]="busy()" [title]="t('deck.discard')"
-                  class="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-black/25 text-xs leading-none hover:bg-black/45 disabled:opacity-40">✕</button>
-          <div class="min-h-0 pr-5">
-            <div class="text-[11px] font-bold leading-tight">{{ c.name ?? cardTitle(c) }}</div>
-            @if (c.description) { <div class="mt-1 line-clamp-4 text-[9px] leading-snug opacity-80">{{ c.description }}</div> }
+        <div class="relative flex h-44 flex-col overflow-hidden rounded-xl border-2 bg-white shadow-md dark:bg-gray-900"
+             [style.borderColor]="cardColor(c)" [class.card-draw]="i >= animatingFrom()">
+          <button (click)="discard(c)" [disabled]="busy()" [attr.aria-label]="t('deck.discard')" [title]="t('deck.discard')"
+                  class="absolute right-1 top-1 z-10 grid h-5 w-5 place-items-center rounded-full bg-black/35 text-white hover:bg-black/55 disabled:opacity-40"><app-icon name="x" [size]="12" /></button>
+
+          <div class="px-2 py-1 pr-6 text-[10px] font-bold leading-tight text-white" [style.background]="cardColor(c)">{{ c.name ?? cardTitle(c) }}</div>
+
+          <div class="relative m-1.5 flex flex-1 items-center justify-center rounded-lg" [class]="cardTintClass(c)">
+            <span [style.color]="cardColor(c)"><app-icon [name]="cardEmblem(c)" [size]="42" /></span>
+            @if (c.type === 'time_bonus') {
+              <span class="absolute bottom-1 right-1.5 text-sm font-extrabold" [style.color]="cardColor(c)">+{{ c.minutes }}′</span>
+            }
           </div>
-          @if (c.type === 'time_bonus') {
-            <span class="block rounded bg-white/20 py-1 text-center text-[10px] font-bold uppercase tracking-wide">{{ t('deck.banked') }}</span>
-          } @else {
-            <button (click)="playCard(c)" [disabled]="busy() || (c.power === 'veto' && !pending())"
-                    class="block w-full rounded bg-white/25 py-1 text-center text-[10px] font-bold uppercase tracking-wide hover:bg-white/40 disabled:opacity-40">
-              {{ t('deck.play') }}
-            </button>
-          }
+
+          <div class="px-1.5 pb-1.5">
+            @if (c.cost) { <div class="mb-1 line-clamp-2 text-center text-[8.5px] leading-tight text-gray-500 dark:text-gray-400">{{ c.cost }}</div> }
+            @if (c.type === 'time_bonus') {
+              <span class="block rounded-md py-1 text-center text-[9px] font-bold uppercase tracking-wide text-white" [style.background]="cardColor(c)">{{ t('deck.banked') }}</span>
+            } @else {
+              <button (click)="playCard(c)" [disabled]="busy() || (c.power === 'veto' && !pending())"
+                      class="block w-full rounded-md py-1 text-center text-[9px] font-bold uppercase tracking-wide text-white transition hover:brightness-110 disabled:opacity-40" [style.background]="cardColor(c)">
+                {{ t('deck.play') }}
+              </button>
+            }
+          </div>
         </div>
       }
     </div>
