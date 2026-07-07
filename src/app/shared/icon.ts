@@ -36,6 +36,7 @@ const ICONS: Record<string, string> = {
   // Card emblems.
   hourglass: '<path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>',
   bolt: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>',
   tentacles: '<path d="M12 4a5 5 0 0 0-5 5v3"/><path d="M12 4a5 5 0 0 1 5 5v3"/><circle cx="10" cy="9" r=".7" fill="currentColor" stroke="none"/><circle cx="14" cy="9" r=".7" fill="currentColor" stroke="none"/><path d="M7 12c-1 1.6-1 3.6 0 5.2"/><path d="M10.6 12.5c-.6 2-.6 4 0 6"/><path d="M13.4 12.5c.6 2 .6 4 0 6"/><path d="M17 12c1 1.6 1 3.6 0 5.2"/>',
 };
 

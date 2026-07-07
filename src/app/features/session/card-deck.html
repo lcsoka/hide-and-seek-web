@@ -223,7 +223,7 @@
         <div class="relative flex h-52 flex-col overflow-hidden rounded-xl border-2 bg-white shadow-md dark:bg-gray-900"
              [style.borderColor]="cardColor(c)" [class.card-draw]="i >= animatingFrom()">
           <button (click)="discard(c)" [disabled]="busy()" [attr.aria-label]="t('deck.discard')" [title]="t('deck.discard')"
-                  class="absolute right-1 top-1 z-10 grid h-5 w-5 place-items-center rounded-full bg-black/35 text-white hover:bg-black/55 disabled:opacity-40"><app-icon name="x" [size]="12" /></button>
+                  class="absolute right-1 top-1 z-10 grid h-6 w-6 place-items-center rounded-full bg-black/30 text-white hover:bg-black/55 disabled:opacity-40"><app-icon name="trash" [size]="13" /></button>
 
           <div class="px-2 py-1 pr-6 text-[10px] font-bold leading-tight text-white" [style.background]="cardColor(c)">{{ c.name ?? cardTitle(c) }}</div>
 
