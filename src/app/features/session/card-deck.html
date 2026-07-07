@@ -57,6 +57,18 @@
                             (uploaded)="confirmPlayWithPhoto($event)" />
           <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">{{ t('common.cancel') }}</button>
         </div>
+      } @else if (c.needs_word) {
+        <p class="text-xs font-medium text-purple-700 dark:text-purple-300">{{ t('deck.hangmanWord') }}</p>
+        <input [value]="castWord()" (input)="castWord.set($any($event.target).value)"
+               (keyup.enter)="wordReady() && confirmPlayWithWord()"
+               maxlength="16" autocapitalize="characters" autocomplete="off" spellcheck="false"
+               [placeholder]="t('deck.hangmanPlaceholder')"
+               class="w-full rounded-lg border border-purple-300 bg-white p-2 text-center text-lg font-bold uppercase tracking-widest text-purple-900 outline-none focus:border-purple-500 dark:border-purple-700 dark:bg-gray-900 dark:text-purple-100" />
+        <p class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('deck.hangmanHint') }}</p>
+        <div class="flex gap-2">
+          <button (click)="confirmPlayWithWord()" [disabled]="busy() || !wordReady()" class="flex-1 rounded-lg bg-purple-600 p-2 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-40">{{ t('deck.castIt') }}</button>
+          <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">{{ t('common.cancel') }}</button>
+        </div>
       } @else {
         <div class="flex gap-2">
           <button (click)="confirmPlay()" [disabled]="busy()" class="flex-1 rounded-lg bg-purple-600 p-2 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-40">{{ t('deck.castIt') }}</button>

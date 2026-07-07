@@ -66,6 +66,8 @@ export interface HandCard {
   description: string | null;
   /** This curse requires the hider to attach a photo (e.g. a Street View screenshot) to cast it. */
   needs_photo?: boolean;
+  /** This curse (the Hidden Hangman) requires the hider to type a word for the seekers to guess. */
+  needs_word?: boolean;
 }
 
 /** Cards the hider just drew and must choose `keep` of. */

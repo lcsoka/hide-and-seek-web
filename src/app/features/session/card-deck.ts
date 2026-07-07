@@ -67,6 +67,8 @@ export class CardDeck {
 
   readonly meta = (c: string) => this.category.categoryMeta(c);
   readonly confirmCard = signal<HandCard | null>(null);
+  // The word the hider types when casting the Hidden Hangman (min 4 letters).
+  readonly castWord = signal('');
 
   // A 'choose' curse (The Drained Brain) awaiting the hider's category picks.
   readonly curseChoice = computed(() => this.state().curse_choice);
@@ -357,8 +359,24 @@ export class CardDeck {
     }
   }
 
+  /** Whether the typed hangman word is long enough to cast (server enforces the full rule). */
+  readonly wordReady = computed(() => this.castWord().trim().length >= 4);
+
+  /** Cast the Hidden Hangman with the word the hider typed for the seekers to guess. */
+  async confirmPlayWithWord(): Promise<void> {
+    const card = this.confirmCard();
+    const word = this.castWord().trim();
+    if (!card || word.length < 4) {
+      return;
+    }
+    this.confirmCard.set(null);
+    this.castWord.set('');
+    await this.act('play_curse', { card_uid: card.uid, word });
+  }
+
   cancelPlay(): void {
     this.confirmCard.set(null);
+    this.castWord.set('');
   }
 
   /** The seeker who asked a past question (for the answer-history author row), or null. */
