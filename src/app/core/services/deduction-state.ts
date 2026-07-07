@@ -131,8 +131,16 @@ export class DeductionState {
         return;
       }
       // Fetch every newly-seen OSM question concurrently and commit them in ONE update,
-      // so the candidate isn't recomputed once per clue as each fetch trickles in.
-      const fresh = s.questions.filter((q) => isOsmCategory(q.category) && q.ask.lat != null && q.ask.feature && !this.osmSeen.has(q.seq));
+      // so the candidate isn't recomputed once per clue as each fetch trickles in. A question
+      // carries EITHER a point feature (nearest X) OR an admin/boundary level (zone match /
+      // distance-to-border) — both cut the map, so don't require a feature here.
+      const fresh = s.questions.filter(
+        (q) =>
+          isOsmCategory(q.category) &&
+          q.ask.lat != null &&
+          (q.ask.feature || q.ask.admin_level != null || q.ask.boundary_level != null) &&
+          !this.osmSeen.has(q.seq),
+      );
       if (!fresh.length) {
         return;
       }
