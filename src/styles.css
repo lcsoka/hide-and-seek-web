@@ -5,7 +5,6 @@
 @theme {
   --color-brand: #e11d48;        /* primary action + brand (rose) — every main CTA */
   --color-brand-strong: #be123c; /* brand hover / pressed */
-  --color-brand-deep: #9f1239;   /* brand "lip"/base under tactile game buttons */
   --color-seeker: #2563eb;       /* the seeker's role identity (chip + map markers) */
   --color-hider: #f43f5e;        /* the hider's role identity + survival time */
   --color-curse: #7c3aed;        /* curses + the candidate area */
@@ -115,6 +114,21 @@ app-root { display: block; height: 100%; }
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 .jl-dist-label.leaflet-tooltip::before { display: none; }
+
+/* Matching/measuring reference tooltips on the hider's map. The hider's OWN nearest ("Te: …") is a
+   bold rose pill that stands out; the seeker's reference ("Kereső: …") is a quieter cyan pill, so
+   the hider can instantly tell the two places apart. */
+.jl-ref-you.leaflet-tooltip {
+  background: #f43f5e; color: #fff; border: none; border-radius: 9999px;
+  padding: 2px 10px; font-weight: 700; font-size: 12px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.jl-ref-seeker.leaflet-tooltip {
+  background: #0891b2; color: #fff; border: none; border-radius: 9999px;
+  padding: 1px 9px; font-weight: 600; font-size: 11px; opacity: 0.95; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.jl-ref-you.leaflet-tooltip::before { border-top-color: #f43f5e; }
+.jl-ref-seeker.leaflet-tooltip::before { border-top-color: #0891b2; }
+
 @media (prefers-reduced-motion: reduce) {
   .jl-candidate-run { animation: none; }
 }

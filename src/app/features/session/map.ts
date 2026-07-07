@@ -250,18 +250,21 @@ export class MapView {
     const hider = located.find((p) => p.role === 'hider');
     if (qref && (qref.seekerClosest || qref.yourClosest)) {
       const fitPts: L.LatLngExpression[] = [];
+      // The seeker's reference (cyan, "Kereső: …") — what the seeker is comparing against.
       if (qref.seekerClosest) {
         const { lat, lng, name } = qref.seekerClosest;
         L.marker([lat, lng], { icon: glyphIcon('search', { color: '#0891b2', size: 24 }) })
-          .bindTooltip(name ?? 'A kereső legközelebbije', { direction: 'top' })
+          .bindTooltip(`Kereső: ${name ?? 'legközelebbi hely'}`, { permanent: true, direction: 'top', offset: [0, -12], className: 'jl-ref-seeker' })
           .addTo(this.overlay);
         fitPts.push([lat, lng]);
       }
       const dist = qref.yourDistanceLabel ?? null;
+      // The hider's OWN nearest (rose, emphasised, "Te: …") — the place THEY must compare, with a
+      // dashed line straight to them so it's unmistakable which one is theirs.
       if (qref.yourClosest) {
         const { lat, lng, name } = qref.yourClosest;
-        L.marker([lat, lng], { icon: glyphIcon('seek', { color: '#f43f5e', size: 24 }) })
-          .bindTooltip(name ?? 'A te legközelebbid', { permanent: true, direction: 'top', offset: [0, -14] })
+        L.marker([lat, lng], { icon: glyphIcon('pin', { color: '#f43f5e', emphasis: true, size: 34 }) })
+          .bindTooltip(`Te: ${name ?? 'legközelebbi hely'}`, { permanent: true, direction: 'top', offset: [0, -18], className: 'jl-ref-you' })
           .addTo(this.overlay);
         fitPts.push([lat, lng]);
         if (hider) {
