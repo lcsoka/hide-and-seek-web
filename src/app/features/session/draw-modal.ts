@@ -3,11 +3,12 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { HandCard, PendingDraw } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { SessionStore } from '../../core/services/session-store';
+import { Icon } from '../../shared/icon';
 
 /** Reveal of the cards the hider just drew; they keep `keep` of them. */
 @Component({
   selector: 'app-draw-modal',
-  imports: [TranslocoModule],
+  imports: [TranslocoModule, Icon],
   templateUrl: './draw-modal.html',
   styles: [
     `
@@ -64,15 +65,25 @@ export class DrawModal {
     this.selected.set(next);
   }
 
-  cardClass(card: HandCard): string {
-    if (card.type === 'time_bonus') {
-      return 'bg-gradient-to-br from-emerald-600 to-green-800';
-    }
-    if (card.type === 'powerup') {
-      return 'bg-gradient-to-br from-sky-600 to-blue-800';
-    }
+  /** Collectible-card theme (matches the hand); colours come from the branded style tokens. */
+  cardColor(card: HandCard): string {
+    return card.type === 'time_bonus'
+      ? 'var(--color-timebonus)'
+      : card.type === 'powerup'
+        ? 'var(--color-powerup)'
+        : 'var(--color-curse)';
+  }
 
-    return 'bg-gradient-to-br from-purple-600 to-indigo-800';
+  cardTintClass(card: HandCard): string {
+    return card.type === 'time_bonus'
+      ? 'bg-amber-50 dark:bg-amber-950/40'
+      : card.type === 'powerup'
+        ? 'bg-sky-50 dark:bg-sky-950/40'
+        : 'bg-violet-50 dark:bg-violet-950/40';
+  }
+
+  cardEmblem(card: HandCard): string {
+    return card.type === 'time_bonus' ? 'hourglass' : card.type === 'powerup' ? 'bolt' : 'curse';
   }
 
   async confirm(): Promise<void> {

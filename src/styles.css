@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/* Branded colour tokens — the single source of truth for the game's palette. Change a value
+   here and every `bg-brand` / `text-seeker` / `border-curse` etc. across the app updates. */
+@theme {
+  --color-brand: #e11d48;        /* primary action + brand (rose) — every main CTA */
+  --color-brand-strong: #be123c; /* brand hover / pressed */
+  --color-seeker: #2563eb;       /* the seeker's role identity (chip + map markers) */
+  --color-hider: #f43f5e;        /* the hider's role identity + survival time */
+  --color-curse: #7c3aed;        /* curses + the candidate area */
+  --color-timebonus: #d97706;    /* time-bonus cards */
+  --color-powerup: #0284c7;      /* powerup cards */
+  --color-incoming: #0ea5e9;     /* an incoming question / clue reference */
+  --color-transit: #f59e0b;      /* transit + travel + time */
+}
+
 /* Theme follows the OS. Tailwind v4's default `dark:` variant is already `prefers-color-scheme`,
    and `color-scheme: light dark` lets native controls (form fields, scrollbars) match too. Both
    the landing and the in-app game ship light + dark styling, so the whole app is consistent. */

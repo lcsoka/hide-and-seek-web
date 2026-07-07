@@ -220,22 +220,26 @@
   @if (hand().length) {
     <div class="grid grid-cols-2 gap-2.5">
       @for (c of hand(); track c.uid; let i = $index) {
-        <div class="relative flex h-44 flex-col overflow-hidden rounded-xl border-2 bg-white shadow-md dark:bg-gray-900"
+        <div class="relative flex h-52 flex-col overflow-hidden rounded-xl border-2 bg-white shadow-md dark:bg-gray-900"
              [style.borderColor]="cardColor(c)" [class.card-draw]="i >= animatingFrom()">
           <button (click)="discard(c)" [disabled]="busy()" [attr.aria-label]="t('deck.discard')" [title]="t('deck.discard')"
                   class="absolute right-1 top-1 z-10 grid h-5 w-5 place-items-center rounded-full bg-black/35 text-white hover:bg-black/55 disabled:opacity-40"><app-icon name="x" [size]="12" /></button>
 
           <div class="px-2 py-1 pr-6 text-[10px] font-bold leading-tight text-white" [style.background]="cardColor(c)">{{ c.name ?? cardTitle(c) }}</div>
 
-          <div class="relative m-1.5 flex flex-1 items-center justify-center rounded-lg" [class]="cardTintClass(c)">
-            <span [style.color]="cardColor(c)"><app-icon [name]="cardEmblem(c)" [size]="42" /></span>
+          <div class="relative mx-1.5 mt-1.5 flex h-12 items-center justify-center rounded-lg" [class]="cardTintClass(c)">
+            <span [style.color]="cardColor(c)"><app-icon [name]="cardEmblem(c)" [size]="30" /></span>
             @if (c.type === 'time_bonus') {
-              <span class="absolute bottom-1 right-1.5 text-sm font-extrabold" [style.color]="cardColor(c)">+{{ c.minutes }}′</span>
+              <span class="absolute right-2 text-base font-extrabold" [style.color]="cardColor(c)">+{{ c.minutes }}′</span>
             }
           </div>
 
+          <div class="min-h-0 flex-1 px-2 pt-1.5">
+            @if (c.description) { <p class="line-clamp-4 text-[9px] leading-snug text-gray-600 dark:text-gray-300">{{ c.description }}</p> }
+          </div>
+
           <div class="px-1.5 pb-1.5">
-            @if (c.cost) { <div class="mb-1 line-clamp-2 text-center text-[8.5px] leading-tight text-gray-500 dark:text-gray-400">{{ c.cost }}</div> }
+            @if (c.cost) { <div class="mb-1 line-clamp-1 text-center text-[8.5px] font-medium leading-tight" [style.color]="cardColor(c)">{{ c.cost }}</div> }
             @if (c.type === 'time_bonus') {
               <span class="block rounded-md py-1 text-center text-[9px] font-bold uppercase tracking-wide text-white" [style.background]="cardColor(c)">{{ t('deck.banked') }}</span>
             } @else {

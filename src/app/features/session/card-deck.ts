@@ -227,20 +227,14 @@ export class CardDeck {
     return this.placeDistance(Math.round(distanceMeters(me, { lat: pt.lat, lng: pt.lng })));
   }
 
-  cardClass(card: HandCard): string {
-    if (card.type === 'time_bonus') {
-      return 'bg-gradient-to-br from-emerald-600 to-green-800';
-    }
-    if (card.type === 'powerup') {
-      return 'bg-gradient-to-br from-sky-600 to-blue-800';
-    }
-
-    return 'bg-gradient-to-br from-purple-600 to-indigo-800';
-  }
-
-  /** Collectible-card theme per type: accent colour (border/ribbon/button), tinted art panel, emblem. */
+  /** Collectible-card theme per type: accent colour (border/ribbon/button), tinted art panel, emblem.
+   *  Colours come from the branded tokens in styles.css so they change in one place. */
   cardColor(card: HandCard): string {
-    return card.type === 'time_bonus' ? '#d97706' : card.type === 'powerup' ? '#0284c7' : '#7c3aed';
+    return card.type === 'time_bonus'
+      ? 'var(--color-timebonus)'
+      : card.type === 'powerup'
+        ? 'var(--color-powerup)'
+        : 'var(--color-curse)';
   }
 
   cardTintClass(card: HandCard): string {
