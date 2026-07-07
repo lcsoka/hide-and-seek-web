@@ -25,6 +25,12 @@ export class MapView {
   readonly previewZone = input<{ lat: number; lng: number; radiusM: number } | null>(null);
   // The seeker's current question, drawn so the hider sees what's being asked.
   readonly questionMarker = input<{ lat: number; lng: number; radiusM?: number | null; label?: string } | null>(null);
+  // Matching/measuring references: the seeker's nearest place (what's compared) and the hider's
+  // OWN nearest (so they see what's closest to THEM), with a line from the hider to it. Hider-only.
+  readonly questionRef = input<{
+    seekerClosest: { name: string | null; lat: number; lng: number } | null;
+    yourClosest: { name: string | null; lat: number; lng: number } | null;
+  } | null>(null);
   // Round-over reveal of where the hider was hiding.
   readonly reveal = input<{ lat: number; lng: number; label?: string } | null>(null);
   // The game's allowed transit modes — which stops bound the carved zone.
@@ -37,6 +43,7 @@ export class MapView {
   private overlay?: L.LayerGroup;
   private centred = false;
   private wasPicking = false; // tracks picking sessions so a re-pick (e.g. Move) re-zooms
+  private fittedRefKey = ''; // one-shot fit per question so far-away references come into view
   private readonly hiding = inject(HidingState);
   private readonly transitRoutes = inject(TransitRoutes);
   private readonly transitService = inject(TransitService);
@@ -65,6 +72,7 @@ export class MapView {
       this.highlight();
       this.previewZone();
       this.questionMarker();
+      this.questionRef();
       this.reveal();
       this.carveNeighbors();
       this.transitRoutes.displayed();
@@ -223,6 +231,45 @@ export class MapView {
       L.marker([qm.lat, qm.lng], { icon: markerIcon('❓', { color: '#2563eb', size: 28 }) })
         .bindTooltip(qm.label ?? 'Question asked here', { permanent: true, direction: 'top', offset: [0, -18] })
         .addTo(this.overlay);
+    }
+
+    // Matching/measuring: show the reference places so the hider can answer "closer / same?"
+    // spatially — the seeker's nearest (cyan) and, with a line from the hider, their OWN nearest
+    // (rose). For point-feature measuring (no separate hider nearest) the line runs to the shared
+    // reference. One-shot fit brings a far reference (e.g. a border point) into view.
+    const qref = this.questionRef();
+    const hider = located.find((p) => p.role === 'hider');
+    if (qref && (qref.seekerClosest || qref.yourClosest)) {
+      const fitPts: L.LatLngExpression[] = [];
+      if (qref.seekerClosest) {
+        const { lat, lng, name } = qref.seekerClosest;
+        L.marker([lat, lng], { icon: markerIcon('🔍', { color: '#0891b2', size: 24 }) })
+          .bindTooltip(name ?? 'A kereső legközelebbije', { direction: 'top' })
+          .addTo(this.overlay);
+        fitPts.push([lat, lng]);
+      }
+      if (qref.yourClosest) {
+        const { lat, lng, name } = qref.yourClosest;
+        L.marker([lat, lng], { icon: markerIcon('🎯', { color: '#f43f5e', size: 24 }) })
+          .bindTooltip(name ?? 'A te legközelebbid', { permanent: true, direction: 'top', offset: [0, -14] })
+          .addTo(this.overlay);
+        fitPts.push([lat, lng]);
+        if (hider) {
+          L.polyline([[hider.lat, hider.lng], [lat, lng]], { color: '#f43f5e', weight: 2, dashArray: '6 6', opacity: 0.9 }).addTo(this.overlay);
+        }
+      } else if (qref.seekerClosest && hider) {
+        L.polyline([[hider.lat, hider.lng], [qref.seekerClosest.lat, qref.seekerClosest.lng]], { color: '#f43f5e', weight: 2, dashArray: '6 6', opacity: 0.9 }).addTo(this.overlay);
+      }
+      if (hider) {
+        fitPts.push([hider.lat, hider.lng]);
+      }
+      const key = `${qref.seekerClosest?.lat},${qref.seekerClosest?.lng}|${qref.yourClosest?.lat},${qref.yourClosest?.lng}`;
+      if (fitPts.length >= 2 && this.fittedRefKey !== key) {
+        this.fittedRefKey = key;
+        this.map.fitBounds(L.latLngBounds(fitPts).pad(0.25), { animate: true });
+      }
+    } else {
+      this.fittedRefKey = '';
     }
 
     // A picking session is the hider choosing a spot: a previewed zone with no committed one

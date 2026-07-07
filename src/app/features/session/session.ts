@@ -290,16 +290,35 @@ export class SessionView {
     if (!q) {
       return null;
     }
-    // Matching/measuring: show WHERE the seeker's closest object is, not just their spot.
-    if (q.reference) {
-      const feat = (q.params?.feature ?? 'place').replace(/_/g, ' ');
-      return { lat: q.reference.lat, lng: q.reference.lng, label: `Seeker's closest ${feat}${q.reference.name ? ': ' + q.reference.name : ''}` };
+    // Matching/measuring references (seeker's + hider's nearest) are drawn by the richer
+    // questionRef layer, so only the ask circle (radar) is a plain marker here.
+    if (q.reference || q.hider_nearest) {
+      return null;
     }
     if (q.ask?.lat == null || q.ask.lng == null) {
       return null;
     }
 
     return { lat: q.ask.lat, lng: q.ask.lng, radiusM: q.params?.radius_m ?? null, label: q.title ?? 'Question asked here' };
+  }
+
+  /** Matching/measuring reference places for the hider's map: the seeker's nearest (what's
+   *  compared) and the hider's OWN nearest, so they see on the map what's closest to them. */
+  hiderQuestionRef(s: GameState): {
+    seekerClosest: { name: string | null; lat: number; lng: number } | null;
+    yourClosest: { name: string | null; lat: number; lng: number } | null;
+  } | null {
+    if (this.role(s) !== 'hider') {
+      return null;
+    }
+    const q = s.pending_question;
+    if (!q) {
+      return null;
+    }
+    const seekerClosest = q.reference ?? null;
+    const yourClosest = q.hider_nearest?.lat != null && q.hider_nearest?.lng != null ? q.hider_nearest : null;
+
+    return seekerClosest || yourClosest ? { seekerClosest, yourClosest } : null;
   }
 
   /** i18n key for the current state's status hint, or '' if it has none. */

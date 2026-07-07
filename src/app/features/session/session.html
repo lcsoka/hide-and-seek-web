@@ -20,7 +20,7 @@
       } @else {
         <app-map class="game-map block h-full" [players]="s.players" [meId]="myId()" [zone]="s.hiding_zone"
                  [stations]="hidingStations(s)" [highlight]="hidingHighlight(s)" [previewZone]="hidingPreviewZone(s)"
-                 [questionMarker]="hiderQuestionMarker(s)" [reveal]="revealMarker(s)" [transitModes]="transitModes(s)" [zoneRule]="zoneRule(s)" (mapClick)="onMapClick($event)" />
+                 [questionMarker]="hiderQuestionMarker(s)" [questionRef]="hiderQuestionRef(s)" [reveal]="revealMarker(s)" [transitModes]="transitModes(s)" [zoneRule]="zoneRule(s)" (mapClick)="onMapClick($event)" />
       }
     </div>
 
