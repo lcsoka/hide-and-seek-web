@@ -13,6 +13,7 @@ import { DiceRoller } from './dice-roller';
 import { HangmanGame } from './hangman-game';
 import { ImageUpload } from './image-upload';
 import { Icon } from '../../shared/icon';
+import { MediaViewerService } from '../../shared/media-viewer';
 
 /** Seeker side panel: an Ask button, the numbered history (with photo clues), and curses. */
 @Component({
@@ -26,6 +27,7 @@ export class SeekerPanel {
   private readonly clock = inject(Clock);
   private readonly transitRoutes = inject(TransitRoutes);
   private readonly category = inject(CategoryService);
+  readonly media = inject(MediaViewerService);
   private readonly transitService = inject(TransitService);
   readonly deduction = inject(DeductionState);
 

@@ -12,6 +12,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { ImageUpload } from './image-upload';
 import { PlayerAvatar } from '../../shared/player-avatar';
 import { Icon } from '../../shared/icon';
+import { MediaViewerService } from '../../shared/media-viewer';
 
 interface TentaclePlace {
   name: string;
@@ -50,6 +51,7 @@ export class CardDeck {
   private readonly overpass = inject(OverpassService);
   private readonly category = inject(CategoryService);
   private readonly unitsService = inject(UnitsService);
+  readonly media = inject(MediaViewerService);
 
   readonly state = input.required<GameState>();
   readonly sessionId = input.required<string>();

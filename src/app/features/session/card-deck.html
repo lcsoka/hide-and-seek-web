@@ -202,9 +202,9 @@
             <span class="shrink-0 font-mono font-bold text-purple-700 dark:text-purple-300">⏳ {{ left }}</span>
           } @else if (c.status === 'completed') {
             @if (c.proof_url) {
-              <a [href]="c.proof_url" target="_blank" rel="noopener" class="shrink-0">
+              <button type="button" (click)="media.open(c.proof_url)" class="shrink-0">
                 <img [src]="c.proof_url" alt="Proof" class="h-9 w-9 rounded object-cover ring-1 ring-black/10" />
-              </a>
+              </button>
             } @else {
               <span class="shrink-0 text-green-600 dark:text-green-400">{{ t('seeker.done') }}</span>
             }
@@ -274,9 +274,9 @@
             }
           </div>
           @if (q.answer?.answer === 'photo' && q.answer?.photo_url) {
-            <a [href]="q.answer!.photo_url!" target="_blank" rel="noopener" class="shrink-0">
+            <button type="button" (click)="media.open(q.answer!.photo_url!)" class="shrink-0">
               <img [src]="q.answer!.photo_url!" alt="Your photo" class="h-9 w-9 rounded object-cover ring-1 ring-black/10" />
-            </a>
+            </button>
           } @else {
             <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" [class]="historyChip(q)">{{ t('answer.' + (q.answer?.answer || 'none')) }}</span>
           }

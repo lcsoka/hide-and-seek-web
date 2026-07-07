@@ -7,10 +7,11 @@ import { Language } from './core/services/language';
 import { Seo } from './core/services/seo';
 import { MaintenanceOverlay } from './shared/maintenance-overlay';
 import { UpdateToast } from './shared/update-toast';
+import { MediaViewer } from './shared/media-viewer';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MaintenanceOverlay, UpdateToast],
+  imports: [RouterOutlet, MaintenanceOverlay, UpdateToast, MediaViewer],
   template: `
     <!-- Base fill layer: a plain fixed element paints the WHOLE viewport incl. the safe areas
          (iOS can skip painting a scroll container's background into the home-indicator band, which
@@ -21,6 +22,7 @@ import { UpdateToast } from './shared/update-toast';
     </div>
     <app-maintenance-overlay />
     <app-update-toast />
+    <app-media-viewer />
   `,
 })
 export class App {
