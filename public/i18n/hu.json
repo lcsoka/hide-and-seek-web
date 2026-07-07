@@ -264,6 +264,7 @@
     "blocked": "🧿 Egy átok blokkolja a kérdéseket — töröld lent, hogy újra kérdezhess.",
     "waitingAnswer": "Várakozás a bújó válaszára…",
     "asksOpen": "A kérdezés a keresés kezdetekor nyílik meg.",
+    "needLocation": "Előbb be kell töltődnie a helyzetednek — a kérdéseket a te pozíciódhoz mérjük.",
     "noQuestions": "Még nincs feltett kérdés — koppints a „Tegyél fel kérdést”-re.",
     "ignored": "Kihagyva a következtetésből",
     "curses": "Átkok",

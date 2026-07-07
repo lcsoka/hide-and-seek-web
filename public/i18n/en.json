@@ -264,6 +264,7 @@
     "blocked": "🧿 A curse is blocking questions — clear it below to ask again.",
     "waitingAnswer": "Waiting for the hider to answer…",
     "asksOpen": "Asking opens once seeking begins.",
+    "needLocation": "Wait for your location to load first — questions are measured from your position.",
     "noQuestions": "No questions asked yet — tap “Ask a question”.",
     "ignored": "Ignored in the deduction",
     "curses": "Curses",

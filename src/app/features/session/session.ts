@@ -327,6 +327,15 @@ export class SessionView {
   }
 
   openAsk(): void {
+    // Every question is asked relative to the seeker's own position (radar centre, nearest place,
+    // border distance…), so block asking until we have their GPS fix.
+    const s = this.store.state();
+    const me = s ? this.me(s) : undefined;
+    if (!me || me.lat == null || me.lng == null) {
+      this.actionError.set(this.transloco.translate('seeker.needLocation'));
+
+      return;
+    }
     const sessionId = this.id();
     if (!this.catalog().length && sessionId) {
       // Session-scoped so the host's own custom questions are askable in their games.
