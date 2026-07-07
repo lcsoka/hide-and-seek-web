@@ -39,7 +39,10 @@ const ICONS: Record<string, string> = {
 /** A single bespoke line icon: `<app-icon name="ask" [size]="20" />`. Colour inherits (currentColor). */
 @Component({
   selector: 'app-icon',
-  template: '<span class="inline-flex" [innerHTML]="html()"></span>',
+  template: '<span [innerHTML]="html()" style="display:inline-flex"></span>',
+  // A tight inline-flex box with no line-height so the glyph sits dead-centre in flex buttons
+  // (an inline host leaves a baseline gap that pushes the icon off-centre).
+  host: { style: 'display:inline-flex;align-items:center;justify-content:center;line-height:0' },
   encapsulation: ViewEncapsulation.None,
 })
 export class Icon {

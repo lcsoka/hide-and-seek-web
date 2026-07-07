@@ -63,22 +63,22 @@
     <div class="pointer-events-auto flex items-stretch gap-2">
       @if (isHider()) {
         @if (hiding()) {
-          <button (click)="openDrawer.emit('hide')" class="b pri bg-rose-600 text-white shadow-lg"><app-icon name="hide" [size]="21" /><span>{{ t('hud.hide') }}</span></button>
+          <button (click)="openDrawer.emit('hide')" class="b bg-rose-600 text-white shadow-lg"><app-icon name="hide" [size]="22" /><span>{{ t('hud.hide') }}</span></button>
         } @else {
-          <button (click)="openDrawer.emit('questions')" class="b pri relative bg-sky-500 text-white shadow-lg">
-            <app-icon name="inbox" [size]="21" /><span>{{ t('hud.questions') }}</span>
-            @if (pending()) { <span class="absolute right-2.5 top-2 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900"></span> }
+          <button (click)="openDrawer.emit('questions')" class="b relative bg-sky-500 text-white shadow-lg">
+            <app-icon name="inbox" [size]="22" /><span>{{ t('hud.questions') }}</span>
+            @if (pending()) { <span class="absolute right-2 top-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900"></span> }
           </button>
-          <button (click)="openDrawer.emit('hand')" class="b bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="cards" [size]="21" /><span>{{ t('hud.hand') }}</span></button>
+          <button (click)="openDrawer.emit('hand')" class="b bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="cards" [size]="22" /><span>{{ t('hud.hand') }}</span></button>
         }
       } @else if (isSeeker()) {
-        <button (click)="openAsk.emit()" class="b pri bg-blue-600 text-white shadow-lg"><app-icon name="ask" [size]="21" /><span>{{ t('hud.ask') }}</span></button>
+        <button (click)="openAsk.emit()" class="b bg-blue-600 text-white shadow-lg"><app-icon name="ask" [size]="22" /><span>{{ t('hud.ask') }}</span></button>
         <button (click)="onTransit() ? openDrawer.emit('seeker') : openBoard.emit()" class="b shadow-lg backdrop-blur" [class]="onTransit() ? 'bg-indigo-600 text-white' : 'bg-white/95 text-slate-600 dark:bg-gray-900/95 dark:text-slate-200'">
-          <app-icon name="train" [size]="21" /><span>{{ onTransit() ? t('hud.alight') : t('hud.transit') }}</span>
+          <app-icon name="train" [size]="22" /><span>{{ onTransit() ? t('hud.alight') : t('hud.transit') }}</span>
         </button>
-        <button (click)="openDrawer.emit('seeker')" class="b bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="history" [size]="21" /><span>{{ t('hud.info') }}</span></button>
+        <button (click)="openDrawer.emit('seeker')" class="b bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="history" [size]="22" /><span>{{ t('hud.info') }}</span></button>
       }
-      <button (click)="recenter.emit()" [attr.aria-label]="t('hud.recenter')" class="b icn bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="locate" [size]="21" /></button>
+      <button (click)="recenter.emit()" class="b bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="locate" [size]="22" /><span>{{ t('hud.recenter') }}</span></button>
     </div>
   </div>
   }
