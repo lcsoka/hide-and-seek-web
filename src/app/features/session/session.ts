@@ -20,6 +20,7 @@ import { SessionStore } from '../../core/services/session-store';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { GameTimerService } from '../../core/services/game-timer.service';
 import { GameTimer } from '../../core/services/game-timer.model';
+import { formatCountdown } from '../../core/services/clock';
 import { DeductionMap } from '../map/deduction-map';
 import { CardDeck } from './card-deck';
 import { CurseAlert } from './curse-alert';
@@ -125,6 +126,18 @@ export class SessionView {
     const s = this.store.state();
 
     return s ? this.gameTimer.computeGameTimer(s, this.offset) : null;
+  });
+
+  /** The hider's live survival time during seeking (their score is how long they last), or null. */
+  readonly hiderSurvival = computed<string | null>(() => {
+    this.tick();
+    const s = this.store.state();
+    const start = s?.timers?.seeking_started_at;
+    if (!s || this.role(s) !== 'hider' || start == null || !(s.state === 'seeking' || s.state === 'endgame')) {
+      return null;
+    }
+
+    return formatCountdown(Math.max(0, Math.floor((Date.now() + this.offset) / 1000 - start)));
   });
 
   constructor() {

@@ -9,7 +9,12 @@
       </button>
     </div>
 
-    @if (timer(); as tm) {
+    @if (survival(); as sv) {
+      <div class="pointer-events-auto shrink-0 rounded-2xl bg-rose-600 px-3 py-1 text-center text-white shadow-md backdrop-blur">
+        <div class="text-[9px] font-semibold uppercase tracking-widest opacity-75">{{ t('hud.survived') }}</div>
+        <div class="font-mono text-lg font-bold leading-none tabular-nums sm:text-xl">{{ sv }}</div>
+      </div>
+    } @else if (timer(); as tm) {
       <div class="pointer-events-auto shrink-0 rounded-2xl px-3 py-1 text-center shadow-md backdrop-blur"
            [class]="tm.urgent ? 'bg-red-600 text-white' : 'bg-gray-900/85 text-white'">
         <div class="text-[9px] font-semibold uppercase tracking-widest opacity-70">{{ t(tm.label) }}</div>
@@ -68,8 +73,8 @@
         }
       } @else if (isSeeker()) {
         <button (click)="openAsk.emit()" class="b pri bg-blue-600 text-white shadow-lg"><app-icon name="ask" [size]="21" /><span>{{ t('hud.ask') }}</span></button>
-        <button (click)="openBoard.emit()" class="b shadow-lg backdrop-blur" [class]="onTransit() ? 'bg-indigo-600 text-white' : 'bg-white/95 text-slate-600 dark:bg-gray-900/95 dark:text-slate-200'">
-          <app-icon name="train" [size]="21" /><span>{{ onTransit() ? (transitLine() || t('transit.onboard')) : t('hud.transit') }}</span>
+        <button (click)="onTransit() ? openDrawer.emit('seeker') : openBoard.emit()" class="b shadow-lg backdrop-blur" [class]="onTransit() ? 'bg-indigo-600 text-white' : 'bg-white/95 text-slate-600 dark:bg-gray-900/95 dark:text-slate-200'">
+          <app-icon name="train" [size]="21" /><span>{{ onTransit() ? t('hud.alight') : t('hud.transit') }}</span>
         </button>
         <button (click)="openDrawer.emit('seeker')" class="b bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="history" [size]="21" /><span>{{ t('hud.info') }}</span></button>
       }

@@ -200,7 +200,9 @@
     "transit": "Közlekedés",
     "info": "Infó",
     "recenter": "Hol vagyok",
-    "incomingQuestion": "Bejövő kérdés"
+    "incomingQuestion": "Bejövő kérdés",
+    "survived": "túlélve",
+    "alight": "Leszállás"
   },
   "endGame": {
     "title": "Befejezed a játékot?",

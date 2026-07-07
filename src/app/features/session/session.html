@@ -28,7 +28,7 @@
     <div class="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 to-transparent"></div>
 
     @if (hud.useNext()) {
-      <app-hud-next [state]="s" [timer]="timer()" [role]="role(s)" [canEndGame]="canEndGame(s)" [calculating]="hidingCalculating()" [active]="activePlay(s)"
+      <app-hud-next [state]="s" [timer]="timer()" [survival]="hiderSurvival()" [role]="role(s)" [canEndGame]="canEndGame(s)" [calculating]="hidingCalculating()" [active]="activePlay(s)"
                     (openAsk)="openAsk()" (openBoard)="boardOpen.set(true)" (openDrawer)="mobileDrawer.set($event)" (recenter)="recenter()" (endGame)="confirmEnd.set(true)" />
     } @else {
       <app-game-hud [joinCode]="s.join_code" [timer]="timer()" [role]="role(s)" [stateLabel]="s.state" [calculating]="hidingCalculating()"

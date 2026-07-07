@@ -43,6 +43,7 @@ const CAT_ICON: Record<string, string> = {
 export class HudNext {
   readonly state = input.required<GameState>();
   readonly timer = input<GameTimer | null>(null);
+  readonly survival = input<string | null>(null); // hider's live survival time during seeking
   readonly role = input<string | null>(null);
   readonly canEndGame = input(false);
   readonly calculating = input(false);

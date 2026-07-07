@@ -12,9 +12,10 @@ export class HudPreference {
 
   private load(): boolean {
     try {
-      return localStorage.getItem(this.key) === '1';
+      // Default = the new HUD (dogfooding); only an explicit opt-out ('0') falls back to classic.
+      return localStorage.getItem(this.key) !== '0';
     } catch {
-      return false;
+      return true;
     }
   }
 
