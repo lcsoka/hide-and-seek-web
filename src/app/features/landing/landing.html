@@ -9,7 +9,7 @@
   <!-- Top bar (stays fixed while the hero below scrolls) -->
   <header class="relative z-10 flex shrink-0 items-center justify-between p-4 pt-[max(1rem,env(safe-area-inset-top))] sm:p-6 sm:pt-[max(1.5rem,env(safe-area-inset-top))]">
     <div class="font-display flex items-center gap-2 text-lg font-bold tracking-tight">
-      <span class="grid h-8 w-8 place-items-center rounded-lg bg-rose-600 text-sm">🚇</span> Hide <span class="text-rose-500 dark:text-rose-400">&amp;</span> Seek
+      <span class="grid h-8 w-8 place-items-center rounded-lg bg-rose-600 text-white"><app-icon name="pin" [size]="18" /></span> Hide <span class="text-rose-500 dark:text-rose-400">&amp;</span> Seek
       <span class="rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:bg-rose-500/20 dark:text-rose-300">beta</span>
     </div>
     <div class="flex items-center gap-2">
@@ -34,7 +34,6 @@
     }
 
     <div class="jl-rise space-y-3">
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-900/5 px-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-900/10 backdrop-blur dark:bg-white/10 dark:text-white/80 dark:ring-white/15">📍 {{ t('landing.badge') }}</span>
       <h1 class="font-display text-6xl font-bold leading-[0.95] tracking-tight sm:text-7xl">
         Hide <span class="text-rose-500">&amp;</span> Seek
       </h1>
@@ -46,10 +45,10 @@
       <div class="jl-rise space-y-2">
         @for (s of activeSessions(); track s.id) {
           <button (click)="resume(s)" class="flex w-full items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-left transition hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/40 dark:hover:bg-rose-950/60">
-            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-rose-600 text-lg">🎮</span>
+            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-rose-600 text-white"><app-icon name="gamepad" [size]="20" /></span>
             <span class="min-w-0 flex-1">
               <span class="block text-sm font-semibold text-rose-900 dark:text-rose-100">{{ t('landing.resumeTitle') }}<span class="capitalize"> · {{ s.city }}</span></span>
-              <span class="block text-xs text-rose-700/80 dark:text-rose-300/80">{{ t('state.' + s.state) }} · {{ s.players_count }} 👥 @if (s.is_host) { · {{ t('lobby.host') }} }</span>
+              <span class="flex items-center gap-1 text-xs text-rose-700/80 dark:text-rose-300/80">{{ t('state.' + s.state) }} · {{ s.players_count }} <app-icon name="users" [size]="13" /> @if (s.is_host) { · {{ t('lobby.host') }} }</span>
             </span>
             <span class="shrink-0 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white">{{ t('landing.resume') }}</span>
           </button>
@@ -73,7 +72,7 @@
       }
       <button (click)="startGame()" [disabled]="!name.trim()"
               class="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 p-4 text-base font-semibold text-white shadow-lg shadow-rose-600/30 transition hover:bg-rose-500 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-rose-600 dark:shadow-rose-950/50">
-        ▶ {{ t('landing.startGame') }}
+        <app-icon name="play" [size]="18" /> {{ t('landing.startGame') }}
       </button>
       <button (click)="joinOpen.set(true)" [disabled]="!name.trim()"
               class="w-full rounded-xl border border-gray-300 bg-white/70 p-3.5 font-medium text-gray-800 backdrop-blur transition hover:bg-white active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/70 dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:disabled:hover:bg-white/5">
@@ -88,7 +87,7 @@
     <div class="jl-rise grid grid-cols-3 gap-2 text-center" style="animation-delay: 0.16s">
       @for (s of steps; track s.key) {
         <div class="rounded-xl border border-gray-200 bg-white/70 p-3 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:shadow-none">
-          <div class="text-2xl">{{ s.icon }}</div>
+          <div class="flex justify-center text-rose-600 dark:text-rose-400"><app-icon [name]="s.icon" [size]="26" /></div>
           <div class="mt-1 text-xs font-medium leading-snug text-gray-600 dark:text-white/75">{{ t('landing.how.' + s.key) }}</div>
         </div>
       }
@@ -122,7 +121,7 @@
       <div class="max-h-[88vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-t-3xl bg-white p-5 text-gray-900 shadow-2xl ring-1 ring-gray-200 sm:m-3 sm:rounded-3xl dark:bg-gray-900 dark:text-white dark:ring-white/10" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between">
           <h2 class="font-display text-xl font-bold">{{ t('landing.startGame') }}</h2>
-          <button (click)="createOpen.set(false)" class="text-xl text-gray-400 hover:text-gray-700 dark:text-white/50 dark:hover:text-white">✕</button>
+          <button (click)="createOpen.set(false)" class="text-gray-400 hover:text-gray-700 dark:text-white/50 dark:hover:text-white"><app-icon name="x" [size]="22" /></button>
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -184,7 +183,7 @@
       <div class="w-full max-w-md space-y-4 rounded-t-3xl bg-white p-5 text-gray-900 shadow-2xl ring-1 ring-gray-200 sm:m-3 sm:rounded-3xl dark:bg-gray-900 dark:text-white dark:ring-white/10" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between">
           <h2 class="font-display text-xl font-bold">{{ t('landing.joinTitle') }}</h2>
-          <button (click)="joinOpen.set(false)" class="text-xl text-gray-400 hover:text-gray-700 dark:text-white/50 dark:hover:text-white">✕</button>
+          <button (click)="joinOpen.set(false)" class="text-gray-400 hover:text-gray-700 dark:text-white/50 dark:hover:text-white"><app-icon name="x" [size]="22" /></button>
         </div>
         <input [(ngModel)]="joinCode" [placeholder]="t('landing.joinCode')" autocapitalize="characters" maxlength="8"
                class="w-full rounded-xl border border-gray-300 bg-white p-4 text-center font-mono text-2xl uppercase tracking-[0.3em] text-gray-900 placeholder-gray-400 focus:border-rose-400 focus:outline-none dark:border-white/15 dark:bg-white/10 dark:text-white dark:placeholder-white/30" />

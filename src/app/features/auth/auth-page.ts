@@ -5,6 +5,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { AuthStore } from '../../core/services/auth-store';
 import { LangToggle } from '../../shared/lang-toggle';
 import { MapBackdrop } from '../../shared/map-backdrop';
+import { Icon } from '../../shared/icon';
 
 type Mode = 'login' | 'register' | 'forgot';
 
@@ -16,7 +17,7 @@ type Mode = 'login' | 'register' | 'forgot';
  */
 @Component({
   selector: 'app-auth-page',
-  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop],
+  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop, Icon],
   host: { class: 'block h-full' },
   templateUrl: './auth-page.html',
 })

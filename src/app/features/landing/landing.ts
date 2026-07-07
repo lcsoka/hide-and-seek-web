@@ -12,10 +12,11 @@ import { AppFooter } from '../../shared/app-footer';
 import { InstallBanner } from '../../shared/install-banner';
 import { LangToggle } from '../../shared/lang-toggle';
 import { MapBackdrop } from '../../shared/map-backdrop';
+import { Icon } from '../../shared/icon';
 
 @Component({
   selector: 'app-landing',
-  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop, AppFooter, InstallBanner],
+  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop, AppFooter, InstallBanner, Icon],
   host: { class: 'block h-full' },
   templateUrl: './landing.html',
 })
@@ -39,7 +40,7 @@ export class Landing {
   readonly sizes = ['small', 'medium', 'large'];
   readonly allModes = TRANSIT_MODES;
   readonly modes = signal<string[]>(['metro', 'tram']);
-  readonly steps = [{ key: 'hide', icon: '🙈' }, { key: 'ask', icon: '🔎' }, { key: 'catch', icon: '🎯' }];
+  readonly steps = [{ key: 'hide', icon: 'hide' }, { key: 'ask', icon: 'ask' }, { key: 'catch', icon: 'seek' }];
 
   name = '';
   city = 'budapest';
