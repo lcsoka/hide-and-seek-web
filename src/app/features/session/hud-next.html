@@ -1,0 +1,82 @@
+<ng-container *transloco="let t">
+  <div class="pointer-events-none absolute inset-x-0 top-0 z-[600] flex items-start justify-between gap-1.5 px-2.5 pt-[max(0.6rem,env(safe-area-inset-top))] sm:px-4">
+    <div class="pointer-events-auto flex min-w-0 items-center gap-1.5">
+      <a routerLink="/" [attr.aria-label]="t('common.leave')"
+         class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/90 text-gray-700 shadow-md backdrop-blur dark:bg-gray-900/85 dark:text-gray-200"><app-icon name="arrow" [size]="19" /></a>
+      <button (click)="copyCode()" class="flex min-w-0 items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1.5 shadow-md backdrop-blur dark:bg-gray-900/85">
+        <span class="shrink-0 text-gray-400"><app-icon name="ticket" [size]="15" /></span>
+        <span class="truncate font-mono text-sm font-semibold tracking-[0.14em] text-gray-900 dark:text-white">{{ copied() ? t('common.copied') : state().join_code }}</span>
+      </button>
+    </div>
+
+    @if (timer(); as tm) {
+      <div class="pointer-events-auto shrink-0 rounded-2xl px-3 py-1 text-center shadow-md backdrop-blur"
+           [class]="tm.urgent ? 'bg-red-600 text-white' : 'bg-gray-900/85 text-white'">
+        <div class="text-[9px] font-semibold uppercase tracking-widest opacity-70">{{ t(tm.label) }}</div>
+        <div class="font-mono text-lg font-bold leading-none tabular-nums sm:text-xl">{{ tm.text }}</div>
+      </div>
+    }
+
+    <div class="pointer-events-auto flex shrink-0 items-center gap-1.5">
+      <button (click)="helpOpen.set(true)" [attr.aria-label]="t('intro.howToPlay')"
+              class="grid h-9 w-9 place-items-center rounded-full bg-white/90 text-gray-700 shadow-md backdrop-blur dark:bg-gray-900/85 dark:text-gray-200"><app-icon name="help" [size]="18" /></button>
+      @if (role(); as r) {
+        <span class="flex items-center gap-1 rounded-full px-2 py-1.5 text-xs font-semibold text-white shadow-md" [class]="r === 'hider' ? 'bg-rose-600' : 'bg-blue-600'">
+          <app-icon [name]="r === 'hider' ? 'hide' : 'seek'" [size]="15" /><span class="hidden sm:inline">{{ t('role.' + r) }}</span>
+        </span>
+      }
+      @if (canEndGame()) {
+        <button (click)="endGame.emit()" [attr.aria-label]="t('action.end_game')"
+                class="grid h-9 w-9 place-items-center rounded-full bg-white/90 text-red-600 shadow-md backdrop-blur dark:bg-gray-900/85 dark:text-red-400"><app-icon name="flag" [size]="17" /></button>
+      }
+    </div>
+  </div>
+
+  @if (calculating()) {
+    <div class="pointer-events-none absolute inset-x-0 top-16 z-[600] flex justify-center sm:top-20">
+      <span class="pointer-events-auto flex items-center gap-2 rounded-full bg-amber-500/90 px-3 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur">
+        <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>{{ t('hud.calculating') }}
+      </span>
+    </div>
+  }
+
+  @if (active()) {
+  <div class="pointer-events-none absolute inset-x-0 bottom-0 z-[700] px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
+    @if (isHider() && !hiding() && pending(); as q) {
+      <button (click)="openDrawer.emit('questions')"
+              class="breathe pointer-events-auto mb-2 flex w-full items-center gap-3 rounded-2xl bg-white/95 p-2.5 text-left shadow-lg ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10">
+        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-100 text-sky-600 dark:bg-sky-950 dark:text-sky-400"><app-icon [name]="catIcon(q.category)" [size]="22" /></span>
+        <span class="min-w-0 flex-1">
+          <span class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+            <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-70"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-sky-500"></span></span>{{ t('hud.incomingQuestion') }}
+          </span>
+          <span class="block truncate text-sm font-semibold">{{ q.title || t('category.' + (q.category ?? '')) }}</span>
+        </span>
+      </button>
+    }
+
+    <div class="pointer-events-auto flex items-stretch gap-2">
+      @if (isHider()) {
+        @if (hiding()) {
+          <button (click)="openDrawer.emit('hide')" class="b pri bg-rose-600 text-white shadow-lg"><app-icon name="hide" [size]="21" /><span>{{ t('hud.hide') }}</span></button>
+        } @else {
+          <button (click)="openDrawer.emit('questions')" class="b pri relative bg-sky-500 text-white shadow-lg">
+            <app-icon name="inbox" [size]="21" /><span>{{ t('hud.questions') }}</span>
+            @if (pending()) { <span class="absolute right-2.5 top-2 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900"></span> }
+          </button>
+          <button (click)="openDrawer.emit('hand')" class="b bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="cards" [size]="21" /><span>{{ t('hud.hand') }}</span></button>
+        }
+      } @else if (isSeeker()) {
+        <button (click)="openAsk.emit()" class="b pri bg-blue-600 text-white shadow-lg"><app-icon name="ask" [size]="21" /><span>{{ t('hud.ask') }}</span></button>
+        <button (click)="openBoard.emit()" class="b shadow-lg backdrop-blur" [class]="onTransit() ? 'bg-indigo-600 text-white' : 'bg-white/95 text-slate-600 dark:bg-gray-900/95 dark:text-slate-200'">
+          <app-icon name="train" [size]="21" /><span>{{ onTransit() ? (transitLine() || t('transit.onboard')) : t('hud.transit') }}</span>
+        </button>
+        <button (click)="openDrawer.emit('seeker')" class="b bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="history" [size]="21" /><span>{{ t('hud.info') }}</span></button>
+      }
+      <button (click)="recenter.emit()" [attr.aria-label]="t('hud.recenter')" class="b icn bg-white/95 text-slate-600 shadow-lg backdrop-blur dark:bg-gray-900/95 dark:text-slate-200"><app-icon name="locate" [size]="21" /></button>
+    </div>
+  </div>
+  }
+
+  <app-how-to-play [open]="helpOpen()" (closeChange)="helpOpen.set($event)" />
+</ng-container>

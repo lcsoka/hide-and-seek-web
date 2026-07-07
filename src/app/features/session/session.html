@@ -27,8 +27,13 @@
     <!-- Scrim so the HUD stays legible over bright map tiles -->
     <div class="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 to-transparent"></div>
 
-    <app-game-hud [joinCode]="s.join_code" [timer]="timer()" [role]="role(s)" [stateLabel]="s.state" [calculating]="hidingCalculating()"
-                  [canEndGame]="canEndGame(s)" (endGame)="confirmEnd.set(true)" />
+    @if (hud.useNext()) {
+      <app-hud-next [state]="s" [timer]="timer()" [role]="role(s)" [canEndGame]="canEndGame(s)" [calculating]="hidingCalculating()" [active]="activePlay(s)"
+                    (openAsk)="openAsk()" (openBoard)="boardOpen.set(true)" (openDrawer)="mobileDrawer.set($event)" (recenter)="recenter()" (endGame)="confirmEnd.set(true)" />
+    } @else {
+      <app-game-hud [joinCode]="s.join_code" [timer]="timer()" [role]="role(s)" [stateLabel]="s.state" [calculating]="hidingCalculating()"
+                    [canEndGame]="canEndGame(s)" (endGame)="confirmEnd.set(true)" />
+    }
 
     <!-- End-game confirmation (host) — a single control lives in the HUD, not on every panel. -->
     @if (confirmEnd()) {
@@ -171,8 +176,9 @@
       </div>
     </aside>
 
-    <!-- Mobile icon-button HUD (active play): each opens a drawer so the map stays visible. -->
+    <!-- Mobile drawers (shared by both HUDs); the classic FAB bar only shows for the classic HUD. -->
     @if (activePlay(s)) {
+      @if (!hud.useNext()) {
       <div class="jl-rise pointer-events-none absolute inset-x-0 bottom-0 z-[700] flex items-end justify-center gap-3 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden" *transloco="let t">
         @if (role(s) === 'hider') {
           @if (s.state === 'hiding') {
@@ -203,6 +209,7 @@
           <span class="text-2xl leading-none">📍</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.recenter') }}</span>
         </button>
       </div>
+      }
 
       @if (mobileDrawer(); as d) {
         <div class="jl-fade fixed inset-0 z-[800] flex items-end bg-black/50 backdrop-blur-sm lg:hidden" (click)="mobileDrawer.set(null)">

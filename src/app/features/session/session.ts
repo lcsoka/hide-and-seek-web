@@ -12,6 +12,7 @@ import { DeductionState } from '../../core/services/deduction-state';
 import { DevMode } from '../../core/services/dev-mode';
 import { QuestionEvalResult } from '../../core/services/debug-api';
 import { HidingState } from '../../core/services/hiding-state';
+import { HudPreference } from '../../core/services/hud-preference';
 import { LocationTracker } from '../../core/services/location';
 import { PlayerStore } from '../../core/services/player-store';
 import { Realtime } from '../../core/services/realtime';
@@ -26,6 +27,7 @@ import { DevTools } from './dev-tools';
 import { DrawModal } from './draw-modal';
 import { FoundAlert } from './found-alert';
 import { GameHud } from './game-hud';
+import { HudNext } from './hud-next';
 import { HiderPanel } from './hider-panel';
 import { HostPanel } from './host-panel';
 import { LobbyPanel } from './lobby-panel';
@@ -49,7 +51,7 @@ const OBJECTIVE_STATES = new Set(['hider_hiding', 'hider_seeking', 'hider_endgam
 @Component({
   selector: 'app-session',
   host: { class: 'block h-full w-full overflow-hidden' },
-  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, PushNudge, FoundAlert],
+  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, HudNext, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, PushNudge, FoundAlert],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -59,6 +61,7 @@ export class SessionView {
   private readonly location = inject(LocationTracker);
   private readonly players = inject(PlayerStore);
   readonly store = inject(SessionStore);
+  readonly hud = inject(HudPreference);
   readonly deduction = inject(DeductionState);
   readonly hiding = inject(HidingState);
   private readonly unitsService = inject(UnitsService);

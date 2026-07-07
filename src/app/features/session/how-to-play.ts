@@ -1,6 +1,7 @@
 import { Component, inject, input, output } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
 import { CategoryService } from '../../core/services/category.service';
+import { HudPreference } from '../../core/services/hud-preference';
 
 /** A "How to play" reference sheet: the goal, each role, and the question types. */
 @Component({
@@ -39,6 +40,18 @@ import { CategoryService } from '../../core/services/category.service';
                 }
               </ul>
             </section>
+            <section class="border-t border-gray-200 pt-3 dark:border-gray-700">
+              <label class="flex cursor-pointer items-center justify-between gap-3">
+                <span class="min-w-0">
+                  <span class="block font-semibold">{{ t('howto.newHud') }}</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400">{{ t('howto.newHudHint') }}</span>
+                </span>
+                <button type="button" (click)="hud.toggle()" role="switch" [attr.aria-checked]="hud.useNext()"
+                        class="relative h-6 w-11 shrink-0 rounded-full transition-colors" [class]="hud.useNext() ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'">
+                  <span class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all" [class]="hud.useNext() ? 'left-[22px]' : 'left-0.5'"></span>
+                </button>
+              </label>
+            </section>
           </div>
         </div>
       </div>
@@ -47,6 +60,7 @@ import { CategoryService } from '../../core/services/category.service';
 })
 export class HowToPlay {
   private readonly category = inject(CategoryService);
+  readonly hud = inject(HudPreference);
   readonly open = input(false);
   readonly closeChange = output<boolean>();
   readonly cats = ['radar', 'thermometer', 'matching', 'measuring', 'tentacles', 'photo'];

@@ -199,7 +199,8 @@
     "ask": "Ask",
     "transit": "Transit",
     "info": "Info",
-    "recenter": "Find me"
+    "recenter": "Find me",
+    "incomingQuestion": "Incoming question"
   },
   "endGame": {
     "title": "End the game?",
@@ -448,7 +449,9 @@
     "hider": "Hide near a transit station. Answer questions truthfully — but every question the seekers ask hands you a card. Play curses to slow them and bank time bonuses.",
     "seekerTitle": "If you're a Seeker 🔎",
     "seeker": "Ask questions to rule out parts of the map, then ride transit toward what's left. When close, declare endgame and reach the hider to catch them.",
-    "questionsTitle": "Question types"
+    "questionsTitle": "Question types",
+    "newHud": "New interface (beta)",
+    "newHudHint": "Try the new, cleaner HUD. You can switch back any time."
   },
   "legal": {
     "title": "Legal",

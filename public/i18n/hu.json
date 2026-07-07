@@ -199,7 +199,8 @@
     "ask": "Kérdés",
     "transit": "Közlekedés",
     "info": "Infó",
-    "recenter": "Hol vagyok"
+    "recenter": "Hol vagyok",
+    "incomingQuestion": "Bejövő kérdés"
   },
   "endGame": {
     "title": "Befejezed a játékot?",
@@ -448,7 +449,9 @@
     "hider": "Bújj el egy megálló közelében. Válaszolj őszintén a kérdésekre — de minden feltett kérdés egy lapot ad neked. Játssz ki átkokat a lassításukra, és gyűjts időbónuszokat.",
     "seekerTitle": "Ha te vagy a Kereső 🔎",
     "seeker": "Tegyél fel kérdéseket a térkép egyes részeinek kizárásához, majd menj tömegközlekedéssel a maradék felé. Ha közel vagy, indítsd a hajrát, és érj a bújóhoz, hogy elkapd.",
-    "questionsTitle": "Kérdéstípusok"
+    "questionsTitle": "Kérdéstípusok",
+    "newHud": "Új felület (béta)",
+    "newHudHint": "Próbáld ki az új, letisztultabb kezelőfelületet. Bármikor visszakapcsolhatsz."
   },
   "legal": {
     "title": "Jogi tudnivalók",
