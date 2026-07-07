@@ -12,7 +12,7 @@ import { OverpassService, POI_TYPES, TRANSIT_MODES } from '../../core/maps/overp
 import { Position } from '../../core/models';
 import { DeductionMap } from './deduction-map';
 
-type Mode = 'idle' | 'radar' | 'thermo' | 'border' | 'zone' | 'tentacle';
+type Mode = 'idle' | 'radar' | 'thermo' | 'tentacle';
 
 interface PendingTentacle {
   lat: number;
@@ -67,8 +67,6 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
               @case ('thermo') {
                 @if (pendingA()) { Click for point B (warm end). } @else { Click for point A (cold end). }
               }
-              @case ('border') { Click the map at the seeker's position for the border question. }
-              @case ('zone') { Click the seeker's position to match its {{ zoneName() }}. }
               @case ('tentacle') { Click the centre to find nearby {{ tentacleLabel() }}s. }
               @default { Pick a play area, then add questions and click the map. }
             }
@@ -84,10 +82,14 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
               @for (r of radarChips; track r) { <button (click)="askRadar(r)" [class]="btnOutline">{{ r }} km</button> }
             </div>
             <div class="flex flex-wrap items-center gap-2">
+              <select [ngModel]="zoneLevel()" (ngModelChange)="zoneLevel.set($event)" [class]="sel">
+                @for (z of zoneLevels; track z.level) { <option [ngValue]="z.level">{{ z.name }}</option> }
+              </select>
               <button (click)="askZoneFromSeeker()" [class]="btn">Same {{ zoneName() }}</button>
               <button (click)="askBorderFromSeeker(2)" [class]="btn">Country border</button>
               <button (click)="askBorderFromSeeker(6)" [class]="btnOutline">County border</button>
             </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">"Same {{ zoneName() }}" answered "different" rules out the SEEKER's {{ zoneName() }} — the only thing we learn (we can't know which other {{ zoneName() }} the hider is in).</p>
           </section>
 
           <section class="space-y-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
@@ -128,21 +130,9 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
             <div class="flex flex-wrap gap-2">
               <button (click)="loadBorder(2)" [class]="btnOutline">Show country border</button>
               <button (click)="loadBorder(6)" [class]="btnOutline">Show county border</button>
-              <button (click)="startBorderQuestion()" [disabled]="!country()" [class]="btn">Add border question</button>
               <button (click)="clearBorders()" [class]="btnOutline">Clear</button>
             </div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Load the country border, then add a "closer to the border than me?" question.</p>
-          </section>
-
-          <section class="space-y-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
-            <h2 class="font-semibold">Zone match</h2>
-            <div class="flex flex-wrap items-center gap-2">
-              <select [ngModel]="zoneLevel()" (ngModelChange)="zoneLevel.set($event)" [class]="sel">
-                @for (z of zoneLevels; track z.level) { <option [ngValue]="z.level">{{ z.name }}</option> }
-              </select>
-              <button (click)="setMode('zone')" [class]="mode() === 'zone' ? btnActive : btn">Add zone question</button>
-            </div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">"Is the hider in the same {{ zoneName() }} as me?" — keeps the matching zone or removes it.</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Just overlays for context — ask border questions from the panel above.</p>
           </section>
 
           <section class="space-y-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
@@ -380,12 +370,6 @@ export class MapPage {
     });
   }
 
-  startBorderQuestion(): void {
-    if (this.country()) {
-      this.setMode('border');
-    }
-  }
-
   clearBorders(): void {
     this.country.set(null);
     this.county.set(null);
@@ -429,24 +413,6 @@ export class MapPage {
         this.add({ id: crypto.randomUUID(), type: 'thermometer', aLat: a.lat, aLng: a.lng, bLat: p.lat, bLng: p.lng, warmer: true });
         this.setMode('idle');
       }
-    } else if (this.mode() === 'border') {
-      const country = this.country();
-      if (country) {
-        const region = measuringRegionToBorder(country as never, p.lat, p.lng);
-        this.add({ id: crypto.randomUUID(), type: 'region', label: 'Country border', region, within: true, yesLabel: 'Closer', noLabel: 'Farther' });
-      }
-      this.setMode('idle');
-    } else if (this.mode() === 'zone') {
-      const level = this.zoneLevel();
-      const name = this.zoneName();
-      this.setMode('idle');
-      void this.run(async () => {
-        const boundary = await this.overpass.adminBoundary(p.lat, p.lng, level);
-        if (!boundary) {
-          throw new Error(`No ${name} boundary here.`);
-        }
-        this.add({ id: crypto.randomUUID(), type: 'region', label: `Same ${name}`, region: boundary as Poly, within: true, yesLabel: 'Same', noLabel: 'Different' });
-      });
     } else if (this.mode() === 'tentacle') {
       const type = POI_TYPES.find((t) => t.id === this.tentacleType());
       const radiusKm = this.tentacleRadiusKm();
