@@ -68,6 +68,9 @@ export class DeductionMap {
   readonly evalResult = input<QuestionEvalResult | null>(null);
   // The national border, drawn as a static frame in a different colour from the play area.
   readonly nationalBorder = input<Feature<Polygon | MultiPolygon> | null>(null);
+  // Draggable pins for the dev sandbox (e.g. the seeker + hider); each drag emits markerMoved.
+  readonly dragMarkers = input<{ id: string; lat: number; lng: number; label: string; color: string }[]>([]);
+  readonly markerMoved = output<{ id: string; lat: number; lng: number }>();
   readonly mapClick = output<Position>();
 
   private readonly transitRoutes = inject(TransitRoutes);
@@ -103,6 +106,7 @@ export class DeductionMap {
       this.regionPreview();
       this.evalResult();
       this.nationalBorder();
+      this.dragMarkers();
       this.players();
       this.transitRoutes.displayed();
       this.render();
@@ -393,6 +397,16 @@ export class DeductionMap {
       }
     } else {
       this.lastEvalSig = '';
+    }
+
+    // Draggable sandbox pins (e.g. the seeker + hider): drag one and the cuts re-evaluate.
+    for (const m of this.dragMarkers()) {
+      const marker = L.marker([m.lat, m.lng], { icon: markerIcon(m.label, { color: m.color, size: 32, emphasis: true }), draggable: true, autoPan: true });
+      marker.on('dragend', () => {
+        const ll = marker.getLatLng();
+        this.markerMoved.emit({ id: m.id, lat: ll.lat, lng: ll.lng });
+      });
+      marker.addTo(this.overlay);
     }
 
     // Visible players (the seeker themselves + teammates; the hider is concealed by

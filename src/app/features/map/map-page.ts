@@ -1,4 +1,4 @@
-import { area, bbox } from '@turf/turf';
+import { area, bbox, booleanPointInPolygon, distance, point } from '@turf/turf';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -6,6 +6,7 @@ import { Feature, FeatureCollection, Point } from 'geojson';
 import { CITIES } from '../../core/maps/cities';
 import { applyQuestions, measuringRegionToBorder, playArea, tentacleRegion } from '../../core/deduction/deduction';
 import { DeductionQuestion } from '../../core/deduction/deduction.model';
+import { MAP } from '../../core/maps/map-theme';
 import { Poly } from '../../core/maps/map.model';
 import { OverpassService, POI_TYPES, TRANSIT_MODES } from '../../core/maps/overpass';
 import { Position } from '../../core/models';
@@ -40,6 +41,11 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
         </div>
         <div class="flex items-center gap-2">
           @if (busy()) { <span class="text-xs text-gray-400">loading…</span> }
+          @if (hiderInside() !== null) {
+            <span class="rounded px-2 py-1 text-xs font-semibold" [class]="hiderInside() ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200'">
+              🙈 {{ hiderInside() ? 'inside' : 'outside' }}
+            </span>
+          }
           @if (remainingKm2(); as km2) {
             <span class="rounded bg-gray-200 px-2 py-1 text-xs dark:bg-gray-800">remaining ≈ {{ km2 }} km²</span>
           }
@@ -53,8 +59,8 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="space-y-2">
           <app-deduction-map class="block h-[26rem]" [candidate]="candidate()" [questions]="questions()" [stations]="stations()"
-                             [points]="pendingTentacle()?.pois ?? null" [overlays]="overlays()"
-                             [autoZoom]="autoZoom()" (mapClick)="onMapClick($event)" />
+                             [points]="pendingTentacle()?.pois ?? null" [overlays]="overlays()" [dragMarkers]="dragMarkers()"
+                             [autoZoom]="autoZoom()" (markerMoved)="onMarkerMoved($event)" (mapClick)="onMapClick($event)" />
           <p class="text-xs text-gray-500 dark:text-gray-400">
             @switch (mode()) {
               @case ('radar') { Click the map to drop a radar centre. }
@@ -70,6 +76,20 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
         </div>
 
         <div class="space-y-4 text-sm">
+          <section class="space-y-2 rounded-xl border border-rose-200 bg-rose-50 p-3 dark:border-rose-900 dark:bg-rose-950/40">
+            <h2 class="font-semibold">Ask from 🔍 (answered by 🙈)</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Drag the seeker + hider on the map. Each question is asked from the seeker and answered by the hider's real position, then cuts the map — a consistent answer never excludes the hider. Retract any question with Remove.</p>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-medium">Radar within</span>
+              @for (r of radarChips; track r) { <button (click)="askRadar(r)" [class]="btnOutline">{{ r }} km</button> }
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button (click)="askZoneFromSeeker()" [class]="btn">Same {{ zoneName() }}</button>
+              <button (click)="askBorderFromSeeker(2)" [class]="btn">Country border</button>
+              <button (click)="askBorderFromSeeker(6)" [class]="btnOutline">County border</button>
+            </div>
+          </section>
+
           <section class="space-y-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
             <h2 class="font-semibold">Play area</h2>
             <div class="flex flex-wrap items-center gap-2">
@@ -203,6 +223,7 @@ export class MapPage {
   readonly cities = CITIES;
   readonly transitModes = TRANSIT_MODES;
   readonly zoneLevels = ZONE_LEVELS;
+  readonly radarChips = [1, 2, 5, 10, 25];
   readonly zoneLevel = signal(6);
   readonly zoneName = computed(() => ZONE_LEVELS.find((z) => z.level === this.zoneLevel())?.name ?? 'zone');
 
@@ -224,6 +245,14 @@ export class MapPage {
   readonly country = signal<Feature | null>(null);
   readonly county = signal<Feature | null>(null);
 
+  // Sandbox test pins: drag the seeker + hider, ask questions from the seeker, watch the cuts.
+  readonly seeker = signal<Position>({ lat: 47.4979, lng: 19.0402 });
+  readonly hider = signal<Position>({ lat: 47.5065, lng: 19.049 });
+  readonly dragMarkers = computed(() => [
+    { id: 'seeker', lat: this.seeker().lat, lng: this.seeker().lng, label: '🔍', color: MAP.seeker },
+    { id: 'hider', lat: this.hider().lat, lng: this.hider().lng, label: '🙈', color: MAP.hider },
+  ]);
+
   readonly questions = signal<DeductionQuestion[]>([]);
   readonly mode = signal<Mode>('idle');
   readonly pendingA = signal<Position | null>(null);
@@ -244,10 +273,63 @@ export class MapPage {
 
     return c ? Math.round(area(c) / 1_000_000).toLocaleString() : null;
   });
+  // Is the hider still inside the surviving candidate? (Consistency check as you ask/drag.)
+  readonly hiderInside = computed(() => {
+    const c = this.candidate();
+
+    return c ? booleanPointInPolygon(point([this.hider().lng, this.hider().lat]), c as never) : null;
+  });
 
   constructor() {
     // Default the play area to the real city border (falls back to the radius if Overpass fails).
     void this.loadCityBorder();
+    this.resetPins();
+  }
+
+  private resetPins(): void {
+    const c = this.city();
+    this.seeker.set({ lat: c.lat, lng: c.lng });
+    this.hider.set({ lat: +(c.lat + 0.02).toFixed(5), lng: +(c.lng + 0.03).toFixed(5) });
+  }
+
+  onMarkerMoved(e: { id: string; lat: number; lng: number }): void {
+    (e.id === 'seeker' ? this.seeker : this.hider).set({ lat: e.lat, lng: e.lng });
+  }
+
+  /** Ask a radar of the given radius FROM the seeker; the answer is the real hider distance. */
+  askRadar(radiusKm: number): void {
+    const s = this.seeker();
+    const within = distance(point([s.lng, s.lat]), point([this.hider().lng, this.hider().lat]), { units: 'kilometers' }) <= radiusKm;
+    this.add({ id: crypto.randomUUID(), type: 'radar', lat: s.lat, lng: s.lng, radiusKm, within });
+  }
+
+  /** "Same {zone} as me?" from the seeker; the answer is whether the hider is in the seeker's area. */
+  async askZoneFromSeeker(): Promise<void> {
+    const level = this.zoneLevel();
+    const name = this.zoneName();
+    await this.run(async () => {
+      const s = this.seeker();
+      const boundary = await this.overpass.adminBoundary(s.lat, s.lng, level);
+      if (!boundary) {
+        throw new Error(`No ${name} boundary at the seeker.`);
+      }
+      const same = booleanPointInPolygon(point([this.hider().lng, this.hider().lat]), boundary as never);
+      this.add({ id: crypto.randomUUID(), type: 'region', label: `Same ${name}`, region: boundary as Poly, within: same, yesLabel: 'Same', noLabel: 'Different' });
+    });
+  }
+
+  /** "Closer to the border than me?" from the seeker; the answer is whether the hider is in the band. */
+  async askBorderFromSeeker(level: 2 | 6): Promise<void> {
+    await this.run(async () => {
+      const s = this.seeker();
+      const boundary = await this.overpass.adminBoundary(s.lat, s.lng, level);
+      if (!boundary) {
+        throw new Error('No boundary found.');
+      }
+      const region = measuringRegionToBorder(boundary as never, s.lat, s.lng);
+      const closer = booleanPointInPolygon(point([this.hider().lng, this.hider().lat]), region as never);
+      this.add({ id: crypto.randomUUID(), type: 'region', label: level === 2 ? 'Country border' : 'County border', region, within: closer, yesLabel: 'Closer', noLabel: 'Farther' });
+    });
   }
 
   selectCity(slug: string): void {
@@ -255,6 +337,7 @@ export class MapPage {
     this.baseArea.set(null);
     this.stations.set(null);
     this.clearBorders();
+    this.resetPins();
     void this.loadCityBorder();
   }
 
