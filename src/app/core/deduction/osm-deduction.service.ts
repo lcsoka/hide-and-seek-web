@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { bbox, booleanPointInPolygon, circle, distance, nearestPoint, point, voronoi } from '@turf/turf';
 import { ResolvedQuestion } from '../models';
-import { tentacleRegion } from './deduction';
+import { measuringRegionToBorder, tentacleRegion } from './deduction';
 import { Poly } from '../maps/map.model';
 import { OverpassService } from '../maps/overpass';
 
@@ -43,7 +43,7 @@ export class OsmDeductionService {
    * server reasoned over. Returns the region to keep plus whether to keep inside it.
    */
   async region(q: ResolvedQuestion): Promise<{ region: Poly; within: boolean } | null> {
-    const { lat, lng, feature, radius_m, admin_level } = q.ask;
+    const { lat, lng, feature, radius_m, admin_level, boundary_level } = q.ask;
     const tag = feature ? FEATURE_TAGS[feature] : undefined;
     const answer = q.answer?.answer;
     // No answer (e.g. a question that couldn't be computed) must not cut the map.
@@ -57,6 +57,14 @@ export class OsmDeductionService {
       const boundary = await this.overpass.adminBoundary(lat, lng, admin_level);
 
       return boundary ? { region: boundary as Poly, within: answer === 'yes' } : null;
+    }
+
+    // Border measuring ("closer to the {international/county} border than me?"): the band within the
+    // seeker's OWN distance of that boundary line — keep inside (closer) or outside (further).
+    if (q.category === 'measuring' && boundary_level != null) {
+      const boundary = await this.overpass.adminBoundary(lat, lng, boundary_level);
+
+      return boundary ? { region: measuringRegionToBorder(boundary, lat, lng), within: answer === 'closer' } : null;
     }
 
     if (!tag) {

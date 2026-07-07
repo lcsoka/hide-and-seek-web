@@ -45,7 +45,7 @@ export interface ResolvedQuestion {
   manual?: boolean; // the hider's own input set the answer (amendable for a short window)
   amended?: boolean; // the hider corrected this answer after the fact
   answer: QuestionAnswer | null;
-  ask: { lat: number | null; lng: number | null; radius_m: number | null; feature: string | null; admin_level?: number | null; start_lat: number | null; start_lng: number | null };
+  ask: { lat: number | null; lng: number | null; radius_m: number | null; feature: string | null; admin_level?: number | null; boundary_level?: number | null; start_lat: number | null; start_lng: number | null };
   end: { lat: number | null; lng: number | null };
 }
 
