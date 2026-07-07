@@ -26,7 +26,7 @@
 
     @if (running(); as t) {
       <div class="space-y-2 rounded-xl border-2 border-amber-400 bg-amber-50 p-3 dark:border-amber-600 dark:bg-amber-950">
-        <div class="flex items-center gap-2 text-sm font-semibold">🌡️ {{ tr('seeker.thermoRunning') }}</div>
+        <div class="flex items-center gap-2 text-sm font-semibold"><app-icon name="thermo" [size]="16" /> {{ tr('seeker.thermoRunning') }}</div>
         <p class="text-xs text-gray-600 dark:text-gray-300">{{ tr('seeker.thermoTravel', { dist: t.distance_label }) }}</p>
         <button (click)="stopThermometer()" class="w-full rounded-lg bg-amber-600 p-2.5 font-semibold text-white hover:bg-amber-700">{{ tr('seeker.stopSend') }}</button>
       </div>
@@ -54,7 +54,7 @@
         <div class="flex items-center gap-2 rounded-lg bg-indigo-50 p-2 text-sm dark:bg-indigo-950">
           @if (tr2.line) {
             <span class="grid h-6 min-w-6 place-items-center rounded px-1 text-xs font-bold text-white" [style.background]="mode(tr2.mode ?? 'stop').color">{{ tr2.line }}</span>
-          } @else { <span>🚆</span> }
+          } @else { <app-icon name="train" [size]="16" class="text-indigo-700 dark:text-indigo-300" /> }
           <span class="text-indigo-800 dark:text-indigo-300">{{ tr('transit.onboard') }}</span>
         </div>
         <button (click)="alight()" class="w-full rounded-xl bg-indigo-600 p-3 font-semibold text-white hover:bg-indigo-700">{{ tr('transit.alight') }}</button>
@@ -69,7 +69,7 @@
             <li class="flex items-center gap-2 rounded-lg border border-gray-200 px-2 py-1.5 text-xs dark:border-gray-700">
               @if (leg.line) {
                 <span class="grid h-5 min-w-5 shrink-0 place-items-center rounded px-1 font-bold text-white" [style.background]="mode(leg.mode ?? 'stop').color">{{ leg.line }}</span>
-              } @else { <span class="shrink-0">🚆</span> }
+              } @else { <app-icon name="train" [size]="14" class="shrink-0 text-gray-500 dark:text-gray-400" /> }
               <span class="min-w-0 flex-1 truncate">{{ leg.board_stop || leg.display_name }}</span>
               <span class="shrink-0 font-medium text-gray-500 dark:text-gray-400">{{ legSummary(leg) }}</span>
             </li>
@@ -98,7 +98,7 @@
         <button (click)="deduction.toggleDismiss(a.seq)" type="button"
                 class="shrink-0 rounded-md p-1 text-base text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 [title]="deduction.isDismissed(a.seq) ? tr('seeker.restore') : tr('seeker.ignore')">
-          {{ deduction.isDismissed(a.seq) ? '↩︎' : '🚫' }}
+          @if (deduction.isDismissed(a.seq)) { <app-icon name="undo" [size]="16" /> } @else { <app-icon name="ban" [size]="16" /> }
         </button>
       </div>
     } @empty {
@@ -118,7 +118,7 @@
               @if (c.description) { <div class="text-xs text-gray-600 dark:text-gray-300">{{ c.description }}</div> }
             </div>
             @if (countdown(c); as left) {
-              <span class="shrink-0 rounded-full bg-purple-600 px-2 py-0.5 font-mono text-xs font-bold text-white">⏳ {{ left }}</span>
+              <span class="inline-flex shrink-0 items-center gap-1 rounded-full bg-purple-600 px-2 py-0.5 font-mono text-xs font-bold text-white"><app-icon name="hourglass" [size]="12" /> {{ left }}</span>
             } @else if (c.status === 'completed') {
               <span class="shrink-0 font-medium text-green-600 dark:text-green-400">{{ tr('seeker.done') }}</span>
             }

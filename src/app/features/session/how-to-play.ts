@@ -14,7 +14,7 @@ import { Icon } from '../../shared/icon';
         <div class="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl dark:bg-gray-900 sm:rounded-3xl" (click)="$event.stopPropagation()">
           <div class="mb-3 flex items-center justify-between">
             <h2 class="text-lg font-bold">{{ t('howto.title') }}</h2>
-            <button (click)="closeChange.emit(false)" class="text-xl text-gray-400 hover:text-gray-600">✕</button>
+            <button (click)="closeChange.emit(false)" class="text-xl text-gray-400 hover:text-gray-600"><app-icon name="x" [size]="22" /></button>
           </div>
 
           <div class="space-y-4 text-sm">

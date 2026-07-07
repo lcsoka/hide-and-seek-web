@@ -64,7 +64,7 @@
       <div class="pointer-events-none absolute inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[850] flex justify-center px-4" *transloco="let t">
         <div class="jl-pop pointer-events-auto flex items-center gap-2 rounded-full bg-red-600/95 px-4 py-2 text-sm font-medium text-white shadow-xl backdrop-blur">
           <span>{{ err }}</span>
-          <button (click)="actionError.set(null)" [attr.aria-label]="t('common.cancel')" class="ml-1 text-base leading-none opacity-80 hover:opacity-100">✕</button>
+          <button (click)="actionError.set(null)" [attr.aria-label]="t('common.cancel')" class="ml-1 leading-none opacity-80 hover:opacity-100"><app-icon name="x" [size]="16" /></button>
         </div>
       </div>
     }
@@ -80,7 +80,7 @@
     @if (radarPreview(); as rp) {
       <div class="pointer-events-none absolute inset-x-0 top-28 z-[750] flex justify-center px-4">
         <div class="jl-pop pointer-events-auto flex items-center gap-2 rounded-full bg-white/95 py-1.5 pl-4 pr-1.5 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10">
-          <span class="text-sm font-semibold">📡 {{ rp.label }}</span>
+          <span class="inline-flex items-center gap-1.5 text-sm font-semibold"><app-icon name="radar" [size]="15" /> {{ rp.label }}</span>
           <button (click)="cancelRadar()" class="rounded-full px-3 py-1.5 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-white">{{ 'common.cancel' | transloco }}</button>
           <button (click)="confirmRadar(s)" class="rounded-full bg-rose-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-rose-700">{{ 'picker.confirmAsk' | transloco }}</button>
         </div>
@@ -91,8 +91,8 @@
     @if (refPreview(); as rp) {
       <div class="pointer-events-none absolute inset-x-0 top-28 z-[750] flex justify-center px-4">
         <div class="jl-pop pointer-events-auto flex items-center gap-2 rounded-full bg-white/95 py-1.5 pl-4 pr-1.5 shadow-2xl ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/95 dark:ring-white/10">
-          <span class="max-w-[9rem] truncate text-sm font-semibold">📍 {{ rp.name }}</span>
-          @if (refPreviewDist(s); as d) { <span class="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">📏 {{ d }}</span> }
+          <span class="inline-flex max-w-[10rem] items-center gap-1.5 text-sm font-semibold"><app-icon name="pin" [size]="15" class="shrink-0" /> <span class="truncate">{{ rp.name }}</span></span>
+          @if (refPreviewDist(s); as d) { <span class="inline-flex shrink-0 items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300"><app-icon name="ruler" [size]="12" /> {{ d }}</span> }
           <button (click)="cancelRef()" class="rounded-full px-3 py-1.5 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-white">{{ 'common.cancel' | transloco }}</button>
           <button (click)="confirmRef(s)" class="rounded-full bg-rose-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-rose-700">{{ 'picker.confirmAsk' | transloco }}</button>
         </div>
@@ -183,30 +183,30 @@
         @if (role(s) === 'hider') {
           @if (s.state === 'hiding') {
             <button (click)="mobileDrawer.set('hide')" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
-              <span class="text-2xl leading-none">🙈</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.hide') }}</span>
+              <app-icon name="hide" [size]="24" class="text-gray-700 dark:text-gray-200" /><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.hide') }}</span>
             </button>
           } @else {
             <button (click)="mobileDrawer.set('questions')" class="pointer-events-auto relative flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
-              <span class="text-2xl leading-none">💬</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.questions') }}</span>
+              <app-icon name="inbox" [size]="24" class="text-gray-700 dark:text-gray-200" /><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.questions') }}</span>
               @if (s.pending_question) { <span class="absolute -right-0.5 -top-0.5 h-3 w-3 animate-pulse rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900"></span> }
             </button>
             <button (click)="mobileDrawer.set('hand')" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
-              <span class="text-2xl leading-none">🃏</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.hand') }}</span>
+              <app-icon name="cards" [size]="24" class="text-gray-700 dark:text-gray-200" /><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.hand') }}</span>
             </button>
           }
         } @else if (role(s) === 'seeker') {
           <button (click)="openAsk()" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
-            <span class="text-2xl leading-none">💭</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.ask') }}</span>
+            <app-icon name="ask" [size]="24" class="text-gray-700 dark:text-gray-200" /><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.ask') }}</span>
           </button>
           <button (click)="boardOpen.set(true)" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
-            <span class="text-2xl leading-none">🚆</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.transit') }}</span>
+            <app-icon name="train" [size]="24" class="text-gray-700 dark:text-gray-200" /><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.transit') }}</span>
           </button>
           <button (click)="mobileDrawer.set('seeker')" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
-            <span class="text-2xl leading-none">📋</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.info') }}</span>
+            <app-icon name="history" [size]="24" class="text-gray-700 dark:text-gray-200" /><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.info') }}</span>
           </button>
         }
         <button (click)="recenter()" class="pointer-events-auto flex min-w-16 flex-col items-center gap-0.5 rounded-2xl bg-white/95 px-3 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur transition active:scale-95 dark:bg-gray-900/95 dark:ring-white/10">
-          <span class="text-2xl leading-none">📍</span><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.recenter') }}</span>
+          <app-icon name="locate" [size]="24" class="text-gray-700 dark:text-gray-200" /><span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">{{ t('hud.recenter') }}</span>
         </button>
       </div>
       }
@@ -216,7 +216,7 @@
           <div class="jl-sheet max-h-[80vh] w-full overflow-y-auto rounded-t-3xl bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl dark:bg-gray-900" (click)="$event.stopPropagation()" *transloco="let t">
             <div class="mb-3 flex items-center justify-between">
               <h2 class="font-display text-lg font-bold">{{ t('hud.' + (d === 'seeker' ? 'info' : d)) }}</h2>
-              <button (click)="mobileDrawer.set(null)" class="text-xl text-gray-400 hover:text-gray-600">✕</button>
+              <button (click)="mobileDrawer.set(null)" class="text-gray-400 hover:text-gray-600"><app-icon name="x" [size]="20" /></button>
             </div>
             @switch (d) {
               @case ('hide') { <app-hider-panel [state]="s" [sessionId]="s.session_id" [meId]="myId()" /> }

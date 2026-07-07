@@ -6,7 +6,7 @@
       <div class="jl-sheet max-h-[90dvh] w-full max-w-md space-y-4 overflow-y-auto rounded-t-3xl bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-left text-gray-900 shadow-2xl sm:max-h-[85vh] sm:rounded-3xl sm:pb-5 dark:bg-gray-900 dark:text-white" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between">
           <h2 class="font-display text-lg font-bold">{{ t('feedback.title') }}</h2>
-          <button (click)="close()" class="text-xl text-gray-400 hover:text-gray-700 dark:hover:text-white">✕</button>
+          <button (click)="close()" class="text-xl text-gray-400 hover:text-gray-700 dark:hover:text-white"><app-icon name="x" [size]="20" /></button>
         </div>
 
         @if (sent()) {
@@ -17,10 +17,10 @@
           <div class="flex gap-2">
             <button type="button" (click)="type = 'suggestion'"
                     [class]="type === 'suggestion' ? 'bg-rose-600 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
-                    class="flex-1 rounded-xl p-2.5 text-sm font-semibold transition">💡 {{ t('feedback.typeSuggestion') }}</button>
+                    class="flex flex-1 items-center justify-center gap-1.5 rounded-xl p-2.5 text-sm font-semibold transition"><app-icon name="lightbulb" [size]="16" /> {{ t('feedback.typeSuggestion') }}</button>
             <button type="button" (click)="type = 'bug'"
                     [class]="type === 'bug' ? 'bg-rose-600 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
-                    class="flex-1 rounded-xl p-2.5 text-sm font-semibold transition">🐞 {{ t('feedback.typeBug') }}</button>
+                    class="flex flex-1 items-center justify-center gap-1.5 rounded-xl p-2.5 text-sm font-semibold transition"><app-icon name="bug" [size]="16" /> {{ t('feedback.typeBug') }}</button>
           </div>
 
           <textarea [(ngModel)]="message" [placeholder]="t('feedback.message')" rows="4" maxlength="5000"

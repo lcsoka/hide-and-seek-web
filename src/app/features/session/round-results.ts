@@ -1,12 +1,13 @@
 import { Component, computed, input } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
 import { GameState } from '../../core/models';
+import { Icon } from '../../shared/icon';
 import { PlayerAvatar } from '../../shared/player-avatar';
 
 /** End-of-round (and end-of-game) screen: the reveal, who caught whom, standings, recap. */
 @Component({
   selector: 'app-round-results',
-  imports: [TranslocoModule, PlayerAvatar],
+  imports: [TranslocoModule, PlayerAvatar, Icon],
   templateUrl: './round-results.html',
 })
 export class RoundResults {

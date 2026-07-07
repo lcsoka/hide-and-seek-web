@@ -4,16 +4,17 @@ import { Router, RouterLink } from '@angular/router';
 import { ApiClient } from '../../core/services/api-client';
 import { PlayerStore } from '../../core/services/player-store';
 import { TokenStore } from '../../core/services/token-store';
+import { Icon } from '../../shared/icon';
 
 /** Dev launcher: spin up a test game (opens the REAL game UI with debug tools) or open one. */
 @Component({
   selector: 'app-dev-index',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, Icon],
   template: `
     <main class="mx-auto w-full max-w-md space-y-6 p-4 sm:p-6">
       <h1 class="text-center text-2xl font-bold">Simulate a game</h1>
-      <p class="text-center text-sm text-gray-500 dark:text-gray-400">
-        Opens the real game with a 🛠 debug drawer (simulate GPS, seed bots, drive the flow).
+      <p class="inline-flex flex-wrap items-center justify-center gap-1 text-center text-sm text-gray-500 dark:text-gray-400">
+        Opens the real game with a <app-icon name="wrench" [size]="14" /> debug drawer (simulate GPS, seed bots, drive the flow).
         To play multiplayer, share the join code and open it in other browsers.
       </p>
 
@@ -27,8 +28,8 @@ import { TokenStore } from '../../core/services/token-store';
                 class="w-full rounded-lg bg-rose-600 p-3 font-medium text-white hover:bg-rose-700 disabled:opacity-50">
           Create &amp; play
         </button>
-        <a routerLink="/dev/duo" class="block rounded-lg border border-gray-300 p-3 text-center font-medium hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800">
-          👥 Duo view — watch a host &amp; seeker(s) play side by side
+        <a routerLink="/dev/duo" class="flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 p-3 text-center font-medium hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800">
+          <app-icon name="users" [size]="16" /> Duo view — watch a host &amp; seeker(s) play side by side
         </a>
       </section>
 

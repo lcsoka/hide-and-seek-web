@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
 import { Push } from '../core/services/push';
+import { Icon } from './icon';
 
 const DISMISS_KEY = 'jl_push_nudge_dismissed';
 
@@ -11,7 +12,7 @@ const DISMISS_KEY = 'jl_push_nudge_dismissed';
  */
 @Component({
   selector: 'app-push-nudge',
-  imports: [TranslocoModule],
+  imports: [TranslocoModule, Icon],
   templateUrl: './push-nudge.html',
 })
 export class PushNudge {

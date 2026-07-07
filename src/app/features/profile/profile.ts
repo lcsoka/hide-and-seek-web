@@ -7,12 +7,13 @@ import { ApiClient } from '../../core/services/api-client';
 import { AuthStore } from '../../core/services/auth-store';
 import { Push } from '../../core/services/push';
 import { AppFooter } from '../../shared/app-footer';
+import { Icon } from '../../shared/icon';
 
 /** Account screen: display name, email, avatar; register (if guest), or log out. */
 @Component({
   selector: 'app-profile',
   host: { class: 'block min-h-[100dvh] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white' },
-  imports: [RouterLink, FormsModule, TranslocoModule, AppFooter],
+  imports: [RouterLink, FormsModule, TranslocoModule, AppFooter, Icon],
   templateUrl: './profile.html',
 })
 export class ProfilePage {

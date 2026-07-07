@@ -3,14 +3,14 @@ import { CategoryMeta } from './category.model';
 
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
-  /** Display metadata per question category (icon, label, one-line hint). */
+  /** Display metadata per question category (label, one-line hint, brand colour). */
   private readonly CATEGORY_META: Record<string, CategoryMeta> = {
-    radar: { icon: '📡', label: 'Radar', hint: 'Are you within a distance of me?', color: '#EE8A3B' },
-    thermometer: { icon: '🌡️', label: 'Thermometer', hint: 'Hotter or colder as I travel?', color: '#D9534F' },
-    matching: { icon: '🧩', label: 'Matching', hint: 'Is your nearest place the same as mine?', color: '#3D5A9C' },
-    measuring: { icon: '📏', label: 'Measuring', hint: 'Closer or further from a place than me?', color: '#5E9ED0' },
-    tentacles: { icon: '🐙', label: 'Tentacles', hint: 'Which nearby place are you closest to?', color: '#8E76B4' },
-    photo: { icon: '📷', label: 'Photo', hint: 'Ask for a photo clue.', color: '#4FA65B' },
+    radar: { label: 'Radar', hint: 'Are you within a distance of me?', color: '#EE8A3B' },
+    thermometer: { label: 'Thermometer', hint: 'Hotter or colder as I travel?', color: '#D9534F' },
+    matching: { label: 'Matching', hint: 'Is your nearest place the same as mine?', color: '#3D5A9C' },
+    measuring: { label: 'Measuring', hint: 'Closer or further from a place than me?', color: '#5E9ED0' },
+    tentacles: { label: 'Tentacles', hint: 'Which nearby place are you closest to?', color: '#8E76B4' },
+    photo: { label: 'Photo', hint: 'Ask for a photo clue.', color: '#4FA65B' },
   };
 
   /** Path to the category's SVG badge (in web/public/icons/questions). */
@@ -64,31 +64,8 @@ export class CategoryService {
     return this.categoryIconName(category);
   }
 
-  /** Subject keyword → emoji, most-specific first. Used to give each question an icon. */
-  private readonly QUESTION_ICONS: [string, string][] = [
-    ['museum', '🏛️'], ['library', '📚'], ['hospital', '🏥'], ['zoo', '🦁'], ['aquarium', '🐠'],
-    ['amusement', '🎢'], ['theme', '🎢'], ['movie', '🎬'], ['cinema', '🎬'], ['theater', '🎬'],
-    ['metro', '🚇'], ['subway', '🚇'], ['platform', '🚉'], ['rail', '🚉'], ['train', '🚉'], ['station', '🚉'],
-    // 'street' before 'tree' — "s·tree·t" contains "tree" as a substring.
-    ['street', '🛣️'], ['park', '🌳'], ['tree', '🌳'], ['selfie', '🤳'], ['sky', '☁️'], ['worship', '⛪'], ['church', '⛪'],
-    ['grocery', '🛒'], ['restaurant', '🍽️'], ['water', '🌊'], ['structure', '🗼'], ['tower', '🗼'],
-    ['golf', '⛳'], ['airport', '✈️'], ['bridge', '🌉'], ['building', '🏢'], ['sea', '🌊'],
-  ];
-
   categoryMeta(category: string): CategoryMeta {
-    return this.CATEGORY_META[category] ?? { icon: '❓', label: category, hint: '', color: '#6B7280' };
-  }
-
-  /** An icon for a specific question (by its subject), falling back to the category icon. */
-  questionIcon(text: string, category: string): string {
-    const haystack = text.toLowerCase();
-    for (const [keyword, icon] of this.QUESTION_ICONS) {
-      if (haystack.includes(keyword)) {
-        return icon;
-      }
-    }
-
-    return this.categoryMeta(category).icon;
+    return this.CATEGORY_META[category] ?? { label: category, hint: '', color: '#6B7280' };
   }
 
   /** The subject part of a question title ("Photo — Tree" → "Tree"). */

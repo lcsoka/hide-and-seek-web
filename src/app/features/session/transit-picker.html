@@ -21,7 +21,7 @@
                 <app-icon [name]="mode(l.mode).icon" [size]="18" [style.color]="mode(l.mode).color" />
                 <span class="grid h-6 min-w-6 place-items-center rounded px-1.5 text-xs font-bold text-white" [style.background]="l.colour || mode(l.mode).color">{{ l.ref }}</span>
                 @if (l.destinations.length) {
-                  <span class="min-w-0 flex-1 truncate text-xs text-gray-600 dark:text-gray-300">↔ {{ l.destinations.join(' / ') }}</span>
+                  <span class="min-w-0 flex-1 truncate text-xs text-gray-600 dark:text-gray-300">{{ l.destinations.join(' / ') }}</span>
                 } @else {
                   <span class="min-w-0 flex-1 truncate text-xs text-gray-500">{{ mode(l.mode).label }}</span>
                 }

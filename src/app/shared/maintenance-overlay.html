@@ -1,7 +1,7 @@
 @if (maintenance.down()) {
   <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-gray-950/80 p-6 backdrop-blur-sm" *transloco="let t">
     <div class="w-full max-w-sm space-y-4 rounded-3xl bg-white p-6 text-center shadow-2xl dark:bg-gray-900">
-      <div class="text-5xl">🛠️</div>
+      <div class="flex justify-center"><app-icon name="wrench" [size]="48" /></div>
       <h1 class="text-xl font-bold">{{ t('maintenance.title') }}</h1>
       <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('maintenance.body') }}</p>
       <button (click)="maintenance.check()"

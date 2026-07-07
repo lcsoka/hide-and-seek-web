@@ -11,6 +11,7 @@ import { Poly } from '../../core/maps/map.model';
 import { OverpassService, POI_TYPES, TRANSIT_MODES } from '../../core/maps/overpass';
 import { Position } from '../../core/models';
 import { DeductionMap } from './deduction-map';
+import { Icon } from '../../shared/icon';
 
 type Mode = 'idle' | 'radar' | 'thermo' | 'tentacle';
 
@@ -31,7 +32,7 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
 
 @Component({
   selector: 'app-map-page',
-  imports: [FormsModule, RouterLink, DeductionMap],
+  imports: [FormsModule, RouterLink, DeductionMap, Icon],
   template: `
     <main class="mx-auto w-full max-w-6xl space-y-4 px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
       <header class="flex flex-wrap items-center justify-between gap-2">
@@ -42,8 +43,8 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
         <div class="flex items-center gap-2">
           @if (busy()) { <span class="text-xs text-gray-400">loading…</span> }
           @if (hiderInside() !== null) {
-            <span class="rounded px-2 py-1 text-xs font-semibold" [class]="hiderInside() ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200'">
-              🙈 {{ hiderInside() ? 'inside' : 'outside' }}
+            <span class="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold" [class]="hiderInside() ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200'">
+              <app-icon name="hide" [size]="13" /> {{ hiderInside() ? 'inside' : 'outside' }}
             </span>
           }
           @if (remainingKm2(); as km2) {
@@ -75,7 +76,7 @@ const ZONE_LEVELS: { level: number; name: string }[] = [
 
         <div class="space-y-4 text-sm">
           <section class="space-y-2 rounded-xl border border-rose-200 bg-rose-50 p-3 dark:border-rose-900 dark:bg-rose-950/40">
-            <h2 class="font-semibold">Ask from 🔍 (answered by 🙈)</h2>
+            <h2 class="flex items-center gap-1 font-semibold">Ask from <app-icon name="search" [size]="14" /> (answered by <app-icon name="hide" [size]="14" />)</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400">Drag the seeker + hider on the map. Each question is asked from the seeker and answered by the hider's real position, then cuts the map — a consistent answer never excludes the hider. Retract any question with Remove.</p>
             <div class="flex flex-wrap items-center gap-2">
               <span class="text-xs font-medium">Radar within</span>
@@ -239,8 +240,8 @@ export class MapPage {
   readonly seeker = signal<Position>({ lat: 47.4979, lng: 19.0402 });
   readonly hider = signal<Position>({ lat: 47.5065, lng: 19.049 });
   readonly dragMarkers = computed(() => [
-    { id: 'seeker', lat: this.seeker().lat, lng: this.seeker().lng, label: '🔍', color: MAP.seeker },
-    { id: 'hider', lat: this.hider().lat, lng: this.hider().lng, label: '🙈', color: MAP.hider },
+    { id: 'seeker', lat: this.seeker().lat, lng: this.seeker().lng, label: 'S', color: MAP.seeker },
+    { id: 'hider', lat: this.hider().lat, lng: this.hider().lng, label: 'H', color: MAP.hider },
   ]);
 
   readonly questions = signal<DeductionQuestion[]>([]);

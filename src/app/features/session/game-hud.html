@@ -28,7 +28,7 @@
     }
     @if (canEndGame()) {
       <button (click)="endGame.emit()" [attr.aria-label]="tr('action.end_game')" [title]="tr('action.end_game')"
-              class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/85 text-base text-red-600 shadow-lg backdrop-blur transition hover:bg-red-600 hover:text-white sm:h-9 sm:w-9 dark:bg-gray-900/80 dark:text-red-400">⏹</button>
+              class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/85 text-base text-red-600 shadow-lg backdrop-blur transition hover:bg-red-600 hover:text-white sm:h-9 sm:w-9 dark:bg-gray-900/80 dark:text-red-400"><app-icon name="stop" [size]="18" /></button>
     }
   </div>
 </div>

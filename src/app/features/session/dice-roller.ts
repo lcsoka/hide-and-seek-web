@@ -2,10 +2,12 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { ActiveCurse } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { SessionStore } from '../../core/services/session-store';
+import { Icon } from '../../shared/icon';
 
 /** Rolls the dice a curse requires (server-authoritative), with a spin animation. */
 @Component({
   selector: 'app-dice-roller',
+  imports: [Icon],
   template: `
     <div class="space-y-1">
       <div class="flex items-center gap-2">
@@ -17,7 +19,7 @@ import { SessionStore } from '../../core/services/session-store';
         </div>
         <button (click)="roll()" [disabled]="rolling()"
                 class="rounded-lg bg-purple-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-50">
-          🎲 Roll
+          <app-icon name="dice" [size]="16" /> Roll
         </button>
       </div>
       @if (!rolling() && result(); as r) {

@@ -10,7 +10,7 @@
   }
   @if (show('question') && survivalText(); as surv) {
     <div class="flex items-center justify-between rounded-xl bg-rose-600 px-3 py-2 text-white">
-      <span class="text-sm font-medium opacity-90">🙈 {{ t('deck.hiddenFor') }}</span>
+      <span class="inline-flex items-center gap-1.5 text-sm font-medium opacity-90"><app-icon name="hide" [size]="14" /> {{ t('deck.hiddenFor') }}</span>
       <div class="flex items-baseline gap-2">
         @if (timeBonusMin() > 0) { <span class="text-xs font-semibold opacity-90">+{{ timeBonusMin() }} {{ t('deck.minBanked') }}</span> }
         <span class="font-mono text-2xl font-bold tabular-nums">{{ surv }}</span>
@@ -21,7 +21,7 @@
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-bold">{{ t('deck.yourHand') }} <span class="text-sm font-medium" [class]="handFull() ? 'text-rose-500' : 'text-gray-400'">{{ hand().length }}/{{ handLimit() }}</span></h2>
       @if (timeBonusMin() > 0) {
-        <span class="rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white">⏱️ +{{ timeBonusMin() }} {{ t('deck.minBanked') }}</span>
+        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white"><app-icon name="clock" [size]="14" /> +{{ timeBonusMin() }} {{ t('deck.minBanked') }}</span>
       }
     </div>
   }
@@ -90,14 +90,14 @@
       @if (q.reference; as ref) {
         <div class="rounded-lg bg-white/70 p-2 text-sm dark:bg-gray-900/60">
           <span class="text-gray-500 dark:text-gray-400">{{ t('deck.seekerClosest') }}</span> <b>{{ ref.name || t('deck.unnamedPlace') }}</b>
-          @if (!q.hider_nearest && distFromHider(ref); as d) { <span class="text-gray-500 dark:text-gray-400"> · 📏 {{ d }}</span> }
+          @if (!q.hider_nearest && distFromHider(ref); as d) { <span class="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"> · <app-icon name="ruler" [size]="14" /> {{ d }}</span> }
         </div>
       }
       @if (q.hider_nearest; as hn) {
         <div class="rounded-lg bg-white/70 p-2 text-sm dark:bg-gray-900/60">
           <span class="text-gray-500 dark:text-gray-400">{{ t('deck.yourNearest') }}</span>
           @if (hn.name) { <b>{{ hn.name }}</b> }
-          @if (distFromHider(hn); as d) { <b class="text-gray-700 dark:text-gray-200">📏 {{ d }}</b> }
+          @if (distFromHider(hn); as d) { <b class="inline-flex items-center gap-1 text-gray-700 dark:text-gray-200"><app-icon name="ruler" [size]="14" /> {{ d }}</b> }
           @else if (!hn.name) { <b>{{ t('deck.unnamedPlace') }}</b> }
         </div>
       }
@@ -199,7 +199,7 @@
         <div class="flex items-center justify-between gap-2 rounded-lg border border-purple-300 bg-purple-50 p-2 text-xs dark:border-purple-700 dark:bg-purple-950">
           <span class="min-w-0 flex-1 truncate font-medium">{{ c.name ?? t('seeker.curse') }}</span>
           @if (countdown(c); as left) {
-            <span class="shrink-0 font-mono font-bold text-purple-700 dark:text-purple-300">⏳ {{ left }}</span>
+            <span class="inline-flex shrink-0 items-center gap-1 font-mono font-bold text-purple-700 dark:text-purple-300"><app-icon name="hourglass" [size]="14" /> {{ left }}</span>
           } @else if (c.status === 'completed') {
             @if (c.proof_url) {
               <button type="button" (click)="media.open(c.proof_url)" class="shrink-0">

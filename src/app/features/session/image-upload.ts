@@ -15,7 +15,7 @@ export class ImageUpload {
   private readonly api = inject(ApiClient);
 
   readonly sessionId = input.required<string>();
-  readonly label = input('📷 Upload photo');
+  readonly label = input('Upload photo');
   readonly cssClass = input('inline-block cursor-pointer rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700');
   readonly uploaded = output<string>();
 

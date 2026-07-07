@@ -16,7 +16,7 @@
   @if (finished() && winner(); as w) {
     <div class="rounded-lg bg-amber-100 p-3 dark:bg-amber-950">
       <p class="flex items-center gap-2 text-sm font-semibold text-amber-800 dark:text-amber-300">
-        <span>🏆</span>
+        <app-icon name="trophy" [size]="18" />
         <app-player-avatar [name]="w.display_name" [avatar]="avatarOf(w.player_id)" [seed]="w.player_id" [size]="24" />
         <span>{{ w.display_name ?? '—' }} — {{ t('results.winnerLong') }} ({{ duration(w.total_hiding_time_s) }})</span>
       </p>
@@ -43,8 +43,8 @@
 
   @if (reveal(); as r) {
     <div class="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
-      <span>❓ {{ r.questions_count }} {{ t('results.questions') }}</span>
-      <span>🎴 {{ r.curses_played }} {{ t('results.curses') }}</span>
+      <span class="inline-flex items-center gap-1"><app-icon name="help" [size]="14" /> {{ r.questions_count }} {{ t('results.questions') }}</span>
+      <span class="inline-flex items-center gap-1"><app-icon name="curse" [size]="14" /> {{ r.curses_played }} {{ t('results.curses') }}</span>
     </div>
   }
 

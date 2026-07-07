@@ -1,13 +1,15 @@
 import { Component, input } from '@angular/core';
 import { ActiveCurse } from '../../core/models';
+import { Icon } from '../../shared/icon';
 
 /** Full-screen flash shown to a seeker the moment a new curse lands on them. */
 @Component({
   selector: 'app-curse-alert',
+  imports: [Icon],
   template: `
     <div class="pointer-events-none fixed inset-0 z-[900] flex items-center justify-center bg-black/30">
       <div class="curse-pop max-w-sm rounded-3xl bg-purple-900/95 px-8 py-6 text-center text-white shadow-2xl ring-2 ring-purple-400">
-        <div class="curse-shake text-5xl">💥🧙‍♂️</div>
+        <div class="curse-shake"><app-icon name="curse" [size]="56" /></div>
         <div class="mt-2 text-xs font-bold uppercase tracking-[0.25em] text-purple-300">You've been cursed</div>
         <div class="mt-1 text-2xl font-extrabold">{{ curse().name }}</div>
         @if (curse().description) { <div class="mx-auto mt-2 text-sm text-purple-100">{{ curse().description }}</div> }

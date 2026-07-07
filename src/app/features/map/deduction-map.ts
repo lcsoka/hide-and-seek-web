@@ -275,7 +275,7 @@ export class DeductionMap {
       }
       if (a.point) {
         L.marker([a.point.lat, a.point.lng], { icon: markerIcon(String(a.n), { color: '#0f172a', size: 24 }) })
-          .bindTooltip(`#${a.n} ${a.icon} ${a.effect}`, { permanent: true, direction: 'top', offset: [0, -12], opacity: 0.95 })
+          .bindTooltip(`#${a.n} ${a.effect}`, { permanent: true, direction: 'top', offset: [0, -12], opacity: 0.95 })
           .addTo(this.overlay);
       }
     }

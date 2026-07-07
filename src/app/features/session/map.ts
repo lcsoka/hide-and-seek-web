@@ -127,7 +127,7 @@ export class MapView {
   /**
    * Draw the carved hiding zone: original radius (dashed), slices cut away by a nearer
    * station (red), the final zone (bold amber outline), and — for the committed zone — the
-   * bounding stations (🚉). Falls back to a plain circle until the stops load.
+   * bounding stations. Falls back to a plain circle until the stops load.
    */
   private drawCarvedZone(center: { lat: number; lng: number }, radiusM: number, showPins: boolean): void {
     const neighbors = this.carveNeighbors() ?? [];
@@ -227,7 +227,7 @@ export class MapView {
     for (const st of disperse(this.stations())) {
       const meta = this.transitService.transitMeta(st.modes?.[0] ?? 'stop');
       L.marker([st.lat, st.lng], { icon: glyphIcon(meta.icon, { color: meta.color, size: 22 }) })
-        .bindTooltip(`${meta.icon} ${st.name ?? 'stop'}`)
+        .bindTooltip(st.name ?? 'stop')
         .addTo(this.overlay);
     }
     // The seeker's current question: where it was asked (+ radar radius), so the hider

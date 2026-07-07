@@ -11,7 +11,7 @@
             {{ t('picker.ask') }}
           }
         </h2>
-        <button (click)="close()" class="text-xl text-gray-400 hover:text-gray-600">✕</button>
+        <button (click)="close()" class="text-xl text-gray-400 hover:text-gray-600"><app-icon name="x" [size]="22" /></button>
       </div>
 
       @if (!selected()) {

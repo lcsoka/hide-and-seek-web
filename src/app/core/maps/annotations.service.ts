@@ -29,7 +29,6 @@ export class AnnotationsService {
    */
   build(questions: ResolvedQuestion[], units: Units, t: Translate): MapAnnotation[] {
     return questions.map((q, i) => {
-      const meta = this.category.categoryMeta(q.category);
       const answer = q.answer?.answer ?? '';
       const place = q.answer?.feature_name ?? null;
       const askPoint = q.ask.lat != null && q.ask.lng != null ? { lat: q.ask.lat, lng: q.ask.lng } : null;
@@ -37,7 +36,7 @@ export class AnnotationsService {
         ? { lat: q.answer.feature_lat, lng: q.answer.feature_lng, name: place }
         : undefined;
       const iconName = this.category.questionIconName(q.ask.feature ?? '', q.category);
-      const base = { n: i + 1, seq: q.seq, category: q.category, icon: meta.icon, iconName, answer };
+      const base = { n: i + 1, seq: q.seq, category: q.category, iconName, answer };
 
       if (q.category === 'radar' && askPoint) {
         const within = answer === 'yes';

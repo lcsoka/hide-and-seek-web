@@ -4,6 +4,7 @@ import { GameState, QuestionCatalogItem } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
 import { DebugApi, DebugCard, QuestionEvalResult } from '../../core/services/debug-api';
 import { SessionStore } from '../../core/services/session-store';
+import { Icon } from '../../shared/icon';
 
 const STATES = ['lobby', 'role_assignment', 'hiding', 'seeking', 'endgame', 'round_end', 'finished'];
 
@@ -14,7 +15,7 @@ const STATES = ['lobby', 'role_assignment', 'hiding', 'seeking', 'endgame', 'rou
  */
 @Component({
   selector: 'app-dev-tools',
-  imports: [FormsModule],
+  imports: [FormsModule, Icon],
   templateUrl: './dev-tools.html',
 })
 export class DevTools {

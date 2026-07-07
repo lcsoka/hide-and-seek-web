@@ -4,12 +4,13 @@ import { RouterLink } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
 import { CustomCurse, CustomQuestion } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
+import { Icon } from '../../shared/icon';
 
 /** Manage your own custom curses + questions (they join the games you host). */
 @Component({
   selector: 'app-my-content',
   host: { class: 'block min-h-[100dvh] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white' },
-  imports: [FormsModule, RouterLink, TranslocoModule],
+  imports: [FormsModule, RouterLink, TranslocoModule, Icon],
   templateUrl: './my-content.html',
 })
 export class MyContentPage {

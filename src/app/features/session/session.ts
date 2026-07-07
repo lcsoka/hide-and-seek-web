@@ -39,6 +39,7 @@ import { BoardChoice } from './transit-picker.model';
 import { RoundResults } from './round-results';
 import { SeekerPanel } from './seeker-panel';
 import { PushNudge } from '../../shared/push-nudge';
+import { Icon } from '../../shared/icon';
 
 // Actions with a dedicated panel — kept out of the generic button row.
 const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'hangman_guess', 'start_thermometer', 'stop_thermometer', 'board_transit', 'alight_transit', 'claim_found', 'confirm_caught', 'dispute_found', 'amend_answer', 'choose_disabled_categories', 'discard_card'];
@@ -52,7 +53,7 @@ const OBJECTIVE_STATES = new Set(['hider_hiding', 'hider_seeking', 'hider_endgam
 @Component({
   selector: 'app-session',
   host: { class: 'block h-full w-full overflow-hidden' },
-  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, HudNext, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, PushNudge, FoundAlert],
+  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, HudNext, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, PushNudge, FoundAlert, Icon],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -502,7 +503,7 @@ export class SessionView {
     const p = s.last_round?.hider_position;
     const name = s.last_round?.hider_name;
 
-    return p ? { lat: p.lat, lng: p.lng, label: name ? `🫥 ${name} hid here` : '🫥 Hider was here' } : null;
+    return p ? { lat: p.lat, lng: p.lng, label: name ? `${name} hid here` : 'Hider was here' } : null;
   }
 
   /** While a thermometer is running, show its target distance circle on the seeker map. */
@@ -512,7 +513,7 @@ export class SessionView {
       return null;
     }
 
-    return { lat: t.start_lat, lng: t.start_lng, radiusM: t.distance_m, label: `🌡️ Travel ${t.distance_label ?? ''}` };
+    return { lat: t.start_lat, lng: t.start_lng, radiusM: t.distance_m, label: `Travel ${t.distance_label ?? ''}` };
   }
 
   /** Dev-only: tapping the map sets this player's simulated position. */

@@ -1,16 +1,17 @@
 import { Component, input, output } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
 import { FoundClaim } from '../../core/models';
+import { Icon } from '../../shared/icon';
 
 /** Full-screen alert shown to the hider the moment a seeker claims the catch — with the confirm /
  *  dispute actions right here, so they don't have to dig through a drawer to respond. */
 @Component({
   selector: 'app-found-alert',
-  imports: [TranslocoModule],
+  imports: [TranslocoModule, Icon],
   template: `
     <div *transloco="let t" class="jl-fade fixed inset-0 z-[900] flex items-center justify-center bg-black/50 p-6 backdrop-blur-sm">
       <div class="jl-pop w-full max-w-sm space-y-4 rounded-3xl bg-white p-6 text-center shadow-2xl ring-2 ring-rose-400 dark:bg-gray-900">
-        <div class="found-ping text-5xl">🎯</div>
+        <div class="found-ping"><app-icon name="seek" [size]="56" /></div>
         <div class="text-xs font-bold uppercase tracking-[0.25em] text-rose-500">{{ t('found.eyebrow') }}</div>
         <div class="font-display text-2xl font-extrabold">{{ t('found.title') }}</div>
         <p class="text-sm text-gray-500 dark:text-gray-400">

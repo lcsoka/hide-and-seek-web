@@ -2,11 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoModule } from '@jsverse/transloco';
 import { ApiClient } from '../core/services/api-client';
+import { Icon } from './icon';
 
 /** A "Feedback" link that opens a small modal for players to send a bug report or suggestion. */
 @Component({
   selector: 'app-feedback',
-  imports: [FormsModule, TranslocoModule],
+  imports: [FormsModule, TranslocoModule, Icon],
   templateUrl: './feedback.html',
 })
 export class Feedback {

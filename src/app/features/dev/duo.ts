@@ -62,7 +62,7 @@ interface DuoView {
                 <span class="font-semibold">{{ v.name }}
                   <span class="rounded px-1.5 py-0.5 text-xs" [class]="v.role === 'hider' ? 'bg-rose-200 text-rose-800' : 'bg-blue-200 text-blue-800'">{{ v.role }}</span>
                 </span>
-                <a [href]="v.url" target="_blank" rel="noopener" class="text-xs text-rose-600 hover:underline">open in window ↗</a>
+                <a [href]="v.url" target="_blank" rel="noopener" class="text-xs text-rose-600 hover:underline">open in window</a>
               </div>
               <iframe [src]="v.safe" class="min-h-0 flex-1 border-0" [title]="v.name"></iframe>
             </section>

@@ -20,7 +20,6 @@ export interface MapAnnotation {
   n: number;
   seq: number;
   category: string;
-  icon: string;
   /** app-icon name for the question's subject (in-app inline SVG). */
   iconName: string;
   answer: string;
