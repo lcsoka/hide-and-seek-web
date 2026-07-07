@@ -11,6 +11,20 @@ export interface DiceRoll {
   at: number;
 }
 
+/** The Hidden Gallows word puzzle — masked so the raw word never reaches the client. */
+export interface HangmanState {
+  /** One entry per letter: the (accented) character once revealed, else null (a blank). */
+  mask: (string | null)[];
+  /** Correct letters already revealed (accent-folded, uppercase). */
+  guessed: string[];
+  /** Wrong letters tried this round. */
+  wrong: string[];
+  max_wrong: number;
+  /** The guessable buttons (base Latin letters). */
+  alphabet: string[];
+  solved: boolean;
+}
+
 export interface ActiveCurse {
   uid: string | null;
   curse_id: string | null;
@@ -22,6 +36,8 @@ export interface ActiveCurse {
   requires_proof: boolean;
   dice?: DiceSpec | null;
   last_roll?: DiceRoll | null;
+  /** Present on the Hidden Gallows curse — the seekers solve it to lift the asking block. */
+  hangman?: HangmanState | null;
   expires_at: number | null;
   status: 'active' | 'completed' | 'expired';
   proof_url: string | null;

@@ -142,6 +142,9 @@
           @if (c.dice && c.status === 'active') {
             <app-dice-roller [sessionId]="sessionId()" [curse]="c" />
           }
+          @if (c.hangman && c.status === 'active') {
+            <app-hangman-game [sessionId]="sessionId()" [curse]="c" />
+          }
         </div>
       }
     </section>

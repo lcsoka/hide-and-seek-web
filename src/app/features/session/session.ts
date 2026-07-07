@@ -37,7 +37,7 @@ import { SeekerPanel } from './seeker-panel';
 import { PushNudge } from '../../shared/push-nudge';
 
 // Actions with a dedicated panel — kept out of the generic button row.
-const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'start_thermometer', 'stop_thermometer', 'board_transit', 'alight_transit', 'claim_found', 'confirm_caught', 'dispute_found', 'amend_answer', 'choose_disabled_categories', 'discard_card'];
+const PANEL_ACTIONS = ['start', 'assign_hider', 'choose_station', 'confirm_hidden', 'ask_question', 'answer_question', 'play_curse', 'play_powerup', 'keep_cards', 'complete_curse', 'roll_dice', 'hangman_guess', 'start_thermometer', 'stop_thermometer', 'board_transit', 'alight_transit', 'claim_found', 'confirm_caught', 'dispute_found', 'amend_answer', 'choose_disabled_categories', 'discard_card'];
 
 // States that have a one-line status hint (the text lives in i18n under `statusHint.*`).
 const STATUS_HINT_STATES = new Set(['role_assignment', 'hiding', 'seeking', 'endgame', 'round_end', 'finished']);

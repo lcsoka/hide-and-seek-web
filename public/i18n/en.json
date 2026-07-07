@@ -275,6 +275,11 @@
     "restore": "Restore to deduction",
     "ignore": "Ignore in deduction"
   },
+  "hangman": {
+    "solveToAsk": "Solve the word to ask again!",
+    "misses": "Misses",
+    "solved": "🎉 Solved — the curse is lifted!"
+  },
   "deck": {
     "yourHand": "Your hand",
     "minBanked": "min banked",

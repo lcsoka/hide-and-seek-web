@@ -275,6 +275,11 @@
     "restore": "Vissza a következtetésbe",
     "ignore": "Kihagyás a következtetésből"
   },
+  "hangman": {
+    "solveToAsk": "Fejtsd meg a szót, hogy újra kérdezhess!",
+    "misses": "Hibák",
+    "solved": "🎉 Megfejtve — az átok feloldva!"
+  },
   "deck": {
     "yourHand": "A kezed",
     "minBanked": "perc bankolva",
