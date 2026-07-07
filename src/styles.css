@@ -5,6 +5,7 @@
 @theme {
   --color-brand: #e11d48;        /* primary action + brand (rose) — every main CTA */
   --color-brand-strong: #be123c; /* brand hover / pressed */
+  --color-brand-deep: #9f1239;   /* brand "lip"/base under tactile game buttons */
   --color-seeker: #2563eb;       /* the seeker's role identity (chip + map markers) */
   --color-hider: #f43f5e;        /* the hider's role identity + survival time */
   --color-curse: #7c3aed;        /* curses + the candidate area */
