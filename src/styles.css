@@ -69,21 +69,24 @@ app-root { display: block; height: 100%; }
    bright light strip chasing around its perimeter. (Leaflet renders its SVG outside Angular's view
    encapsulation, so this lives in the global sheet.) */
 .jl-candidate {
-  filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.5));
+  filter: drop-shadow(0 0 5px rgba(124, 58, 237, 0.5));
 }
 @keyframes jl-candidate-run {
-  to { stroke-dashoffset: -1600; }
+  to { stroke-dashoffset: -1000; }
 }
+/* pathLength=1000 (set on the path) makes the dash pattern a fraction of the perimeter, so ONE
+   light segment runs at the same relative speed at every zoom (a fixed-px dasharray would multiply
+   + speed up when zoomed in). */
 .jl-candidate-run {
   stroke-linecap: round;
-  stroke-dasharray: 40 260;
-  animation: jl-candidate-run 5.5s linear infinite;
-  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.95)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
+  stroke-dasharray: 14 986;
+  animation: jl-candidate-run 4s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(124, 58, 237, 0.95)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
-/* The national frame — a soft violet glow on the dotted border. */
+/* The national frame — a quiet slate line, barely glowing. */
 .jl-national {
   stroke-linecap: round;
-  filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.5));
+  filter: drop-shadow(0 0 1px rgba(71, 85, 105, 0.4));
 }
 @media (prefers-reduced-motion: reduce) {
   .jl-candidate-run { animation: none; }

@@ -170,11 +170,11 @@ export class DeductionMap {
     this.overlay?.remove();
     this.overlay = L.layerGroup().addTo(this.map);
 
-    // The national border — a dotted violet frame, distinct from the emerald play area. Drawn first
-    // (beneath everything) and never part of the auto-fit.
+    // The national border — a quiet, thin slate frame (drawn first, beneath everything; never part
+    // of the auto-fit) that reads as a structural boundary without competing with the candidate.
     const border = this.nationalBorder();
     if (border) {
-      L.geoJSON(border as GeoJsonObject, { style: { color: MAP.region, weight: 2.5, dashArray: '2 7', fill: false, opacity: 0.75, className: 'jl-national' }, interactive: false }).addTo(this.overlay);
+      L.geoJSON(border as GeoJsonObject, { style: { color: MAP.frame, weight: 1.5, fill: false, opacity: 0.55, className: 'jl-national' }, interactive: false }).addTo(this.overlay);
     }
 
     // The transit line the seeker is previewing in the board picker / currently riding,
@@ -206,10 +206,15 @@ export class DeductionMap {
           renderer: this.fog,
         } as L.GeoJSONOptions & { renderer?: L.SVG }).addTo(this.overlay);
       }
-      // The live candidate outline: a steady emerald base + a bright light "runner" chasing around
+      // The live candidate outline: a steady violet base + a bright light "runner" chasing around
       // the perimeter (both styled in the global sheet — Leaflet SVG is outside Angular's view).
       L.geoJSON(cand as GeoJsonObject, { style: { color: MAP.possible, weight: 2, opacity: 0.55, fill: false, className: 'jl-candidate' } }).addTo(this.overlay);
-      L.geoJSON(cand as GeoJsonObject, { style: { color: '#ffffff', weight: 2.5, fill: false, className: 'jl-candidate-run' } }).addTo(this.overlay);
+      const runner = L.geoJSON(cand as GeoJsonObject, { style: { color: '#ffffff', weight: 2.5, fill: false, className: 'jl-candidate-run' } });
+      runner.addTo(this.overlay);
+      // Normalise the dash pattern to the path length (pathLength=1000) so the light strip stays one
+      // segment at the same relative speed at every zoom — a fixed-pixel dasharray multiplies + speeds
+      // up as you zoom in (the perimeter grows in px).
+      runner.eachLayer((l) => (l as unknown as { _path?: SVGPathElement })._path?.setAttribute('pathLength', '1000'));
     }
 
     for (const overlay of this.overlays()) {
