@@ -19,7 +19,7 @@
       <div class="mt-1 flex flex-wrap items-center gap-1.5">
         @for (m of sel.modes; track m) {
           <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold text-white" [style.background]="mode(m).color">
-            {{ mode(m).icon }} {{ t('mode.' + m) }}
+            <app-icon [name]="mode(m).icon" [size]="13" /> {{ t('mode.' + m) }}
           </span>
         }
         <span class="text-sm text-gray-500 dark:text-gray-400">· {{ sel.distM }} {{ t('hider.metersAway') }}</span>
@@ -36,7 +36,7 @@
           @for (st of others(); track st.name + st.distM) {
             <li>
               <button (click)="selected.set(st)" class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-gray-100 dark:hover:bg-gray-800">
-                <span class="text-base">{{ mode(st.modes[0]).icon }}</span>
+                <app-icon [name]="mode(st.modes[0]).icon" [size]="16" [style.color]="mode(st.modes[0]).color" />
                 <span class="min-w-0 flex-1 truncate">{{ st.name }}</span>
                 <span class="flex shrink-0 gap-1">
                   @for (m of st.modes; track m) {

@@ -1,4 +1,5 @@
 import * as L from 'leaflet';
+import { iconSvg } from '../../shared/icon';
 
 /** Up-to-two-letter initials from a display name ("Anna Kovács" → "AK", "Bo" → "BO"). */
 export function initials(name: string | null | undefined): string {
@@ -35,6 +36,20 @@ export function markerIcon(content: string, opts: { color: string; emphasis?: bo
   const ring = opts.emphasis ? `0 0 0 3px #fff, 0 0 0 5px ${opts.color}` : '0 0 0 2px #fff';
   const html = `<div style="width:${size}px;height:${size}px;border-radius:9999px;background:${opts.color};${isText ? 'color:#fff;' : ''}
     display:flex;align-items:center;justify-content:center;font:700 ${font}px system-ui;box-shadow:${ring};text-shadow:0 1px 1px rgba(0,0,0,.4)">${content}</div>`;
+
+  return L.divIcon({ html, className: 'jl-marker', iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
+}
+
+/**
+ * The same circular badge as `markerIcon`, but filled with a bespoke line icon (white stroke)
+ * instead of text/emoji — so map markers match the rest of the app's icon set.
+ */
+export function glyphIcon(name: string, opts: { color: string; emphasis?: boolean; size?: number }): L.DivIcon {
+  const size = opts.size ?? (opts.emphasis ? 36 : 28);
+  const ring = opts.emphasis ? `0 0 0 3px #fff, 0 0 0 5px ${opts.color}` : '0 0 0 2px #fff';
+  const glyph = iconSvg(name, Math.round(size * 0.58), '#fff', 2.2);
+  const html = `<div style="width:${size}px;height:${size}px;border-radius:9999px;background:${opts.color};
+    display:flex;align-items:center;justify-content:center;box-shadow:${ring};filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${glyph}</div>`;
 
   return L.divIcon({ html, className: 'jl-marker', iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
 }

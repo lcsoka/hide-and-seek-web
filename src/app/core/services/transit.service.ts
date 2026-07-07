@@ -3,15 +3,15 @@ import { TransitMeta } from './transit.model';
 
 @Injectable({ providedIn: 'root' })
 export class TransitService {
-  /** Display metadata per transit mode (label, icon, colour for chips + map markers). */
+  /** Display metadata per transit mode (label, app-icon NAME, colour for chips + map markers). */
   private readonly TRANSIT_META: Record<string, TransitMeta> = {
-    metro: { id: 'metro', label: 'Metro', icon: '🚇', color: '#6366f1' }, // indigo
-    tram: { id: 'tram', label: 'Tram', icon: '🚊', color: '#f59e0b' }, // amber
-    train: { id: 'train', label: 'Train', icon: '🚆', color: '#2563eb' }, // blue
-    light_rail: { id: 'light_rail', label: 'Light rail', icon: '🚈', color: '#0d9488' }, // teal
-    bus: { id: 'bus', label: 'Bus', icon: '🚌', color: '#16a34a' }, // green
-    trolleybus: { id: 'trolleybus', label: 'Trolleybus', icon: '🚎', color: '#9333ea' }, // purple
-    stop: { id: 'stop', label: 'Stop', icon: '📍', color: '#64748b' }, // slate fallback
+    metro: { id: 'metro', label: 'Metro', icon: 'train', color: '#6366f1' }, // indigo
+    tram: { id: 'tram', label: 'Tram', icon: 'tram', color: '#f59e0b' }, // amber
+    train: { id: 'train', label: 'Train', icon: 'train', color: '#2563eb' }, // blue
+    light_rail: { id: 'light_rail', label: 'Light rail', icon: 'tram', color: '#0d9488' }, // teal
+    bus: { id: 'bus', label: 'Bus', icon: 'bus', color: '#16a34a' }, // green
+    trolleybus: { id: 'trolleybus', label: 'Trolleybus', icon: 'trolleybus', color: '#9333ea' }, // purple
+    stop: { id: 'stop', label: 'Stop', icon: 'pin', color: '#64748b' }, // slate fallback
   };
 
   transitMeta(id: string): TransitMeta {

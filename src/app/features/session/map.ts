@@ -1,6 +1,6 @@
 import { afterNextRender, Component, computed, effect, ElementRef, inject, input, output, viewChild } from '@angular/core';
 import * as L from 'leaflet';
-import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
+import { avatarIcon, colorFor, glyphIcon } from '../../core/maps/avatar';
 import { hidingZoneViz } from '../../core/deduction/deduction';
 import { disperse } from '../../core/geo/spread';
 import { HidingState } from '../../core/services/hiding-state';
@@ -102,7 +102,7 @@ export class MapView {
   private drawRefLine(from: { lat: number; lng: number }, to: { lat: number; lng: number }, distLabel: string | null): void {
     const line = L.polyline([[from.lat, from.lng], [to.lat, to.lng]], { color: '#f43f5e', weight: 2, dashArray: '6 6', opacity: 0.9 }).addTo(this.overlay!);
     if (distLabel) {
-      line.bindTooltip(`📏 ${distLabel}`, { permanent: true, direction: 'center', className: 'jl-dist-label' }).openTooltip();
+      line.bindTooltip(distLabel, { permanent: true, direction: 'center', className: 'jl-dist-label' }).openTooltip();
     }
   }
 
@@ -151,7 +151,7 @@ export class MapView {
         .bindTooltip('Cut here — halfway to a nearer station', { direction: 'top' })
         .addTo(this.overlay!);
       if (showPins) {
-        L.marker([cut.station.lat, cut.station.lng], { icon: markerIcon('🚉', { color: '#6b7280', size: 20 }) })
+        L.marker([cut.station.lat, cut.station.lng], { icon: glyphIcon('train', { color: '#6b7280', size: 20 }) })
           .bindTooltip('A nearer station bounds your zone')
           .addTo(this.overlay!);
       }
@@ -226,7 +226,7 @@ export class MapView {
     }
     for (const st of disperse(this.stations())) {
       const meta = this.transitService.transitMeta(st.modes?.[0] ?? 'stop');
-      L.marker([st.lat, st.lng], { icon: markerIcon(meta.icon, { color: meta.color, size: 22 }) })
+      L.marker([st.lat, st.lng], { icon: glyphIcon(meta.icon, { color: meta.color, size: 22 }) })
         .bindTooltip(`${meta.icon} ${st.name ?? 'stop'}`)
         .addTo(this.overlay);
     }
@@ -237,7 +237,7 @@ export class MapView {
       if (qm.radiusM) {
         L.circle([qm.lat, qm.lng], { radius: qm.radiusM, color: '#2563eb', weight: 1.5, dashArray: '5', fillOpacity: 0.05 }).addTo(this.overlay);
       }
-      L.marker([qm.lat, qm.lng], { icon: markerIcon('❓', { color: '#2563eb', size: 28 }) })
+      L.marker([qm.lat, qm.lng], { icon: glyphIcon('help', { color: '#2563eb', size: 28 }) })
         .bindTooltip(qm.label ?? 'Question asked here', { permanent: true, direction: 'top', offset: [0, -18] })
         .addTo(this.overlay);
     }
@@ -252,7 +252,7 @@ export class MapView {
       const fitPts: L.LatLngExpression[] = [];
       if (qref.seekerClosest) {
         const { lat, lng, name } = qref.seekerClosest;
-        L.marker([lat, lng], { icon: markerIcon('🔍', { color: '#0891b2', size: 24 }) })
+        L.marker([lat, lng], { icon: glyphIcon('search', { color: '#0891b2', size: 24 }) })
           .bindTooltip(name ?? 'A kereső legközelebbije', { direction: 'top' })
           .addTo(this.overlay);
         fitPts.push([lat, lng]);
@@ -260,7 +260,7 @@ export class MapView {
       const dist = qref.yourDistanceLabel ?? null;
       if (qref.yourClosest) {
         const { lat, lng, name } = qref.yourClosest;
-        L.marker([lat, lng], { icon: markerIcon('🎯', { color: '#f43f5e', size: 24 }) })
+        L.marker([lat, lng], { icon: glyphIcon('seek', { color: '#f43f5e', size: 24 }) })
           .bindTooltip(name ?? 'A te legközelebbid', { permanent: true, direction: 'top', offset: [0, -14] })
           .addTo(this.overlay);
         fitPts.push([lat, lng]);
@@ -307,7 +307,7 @@ export class MapView {
     // Round-over: reveal the hider's actual spot and centre on it.
     const reveal = this.reveal();
     if (reveal) {
-      L.marker([reveal.lat, reveal.lng], { icon: markerIcon('🫥', { color: '#7c3aed', emphasis: true }) })
+      L.marker([reveal.lat, reveal.lng], { icon: glyphIcon('hide', { color: '#7c3aed', emphasis: true }) })
         .bindTooltip(reveal.label ?? 'Hider was here', { permanent: true, direction: 'top', offset: [0, -22] })
         .addTo(this.overlay);
       this.map.setView([reveal.lat, reveal.lng], 15, { animate: true });

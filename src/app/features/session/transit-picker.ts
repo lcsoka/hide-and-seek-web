@@ -4,11 +4,12 @@ import { TransitRoutes } from '../../core/services/transit-routes';
 import { GroupedLine } from '../../core/services/transit.model';
 import { TransitService } from '../../core/services/transit.service';
 import { BoardChoice } from './transit-picker.model';
+import { Icon } from '../../shared/icon';
 
 /** Board flow: pick a nearby line (grouped by number + mode); tapping it draws its route on the map. */
 @Component({
   selector: 'app-transit-picker',
-  imports: [TranslocoModule],
+  imports: [TranslocoModule, Icon],
   templateUrl: './transit-picker.html',
 })
 export class TransitPicker {

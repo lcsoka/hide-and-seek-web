@@ -5,7 +5,7 @@ import * as L from 'leaflet';
 import { TranslocoModule } from '@jsverse/transloco';
 import { MapAnnotation } from '../../core/maps/map.model';
 import { DeductionQuestion } from '../../core/deduction/deduction.model';
-import { avatarIcon, colorFor, markerIcon } from '../../core/maps/avatar';
+import { avatarIcon, colorFor, glyphIcon, markerIcon } from '../../core/maps/avatar';
 import { MAP } from '../../core/maps/map-theme';
 import { holedMask } from '../../core/deduction/operators';
 import { Poly } from '../../core/maps/map.model';
@@ -269,8 +269,8 @@ export class DeductionMap {
       }
       if (a.feature) {
         // The reference place (closest airport, matched place, nearest tentacle target).
-        L.marker([a.feature.lat, a.feature.lng], { icon: markerIcon('📍', { color: MAP.clue, size: 26 }) })
-          .bindTooltip(a.feature.name ? `📍 ${a.feature.name}` : '📍 reference place', { permanent: true, direction: 'right', offset: [6, 0], opacity: 0.95 })
+        L.marker([a.feature.lat, a.feature.lng], { icon: glyphIcon('pin', { color: MAP.clue, size: 26 }) })
+          .bindTooltip(a.feature.name ? a.feature.name : 'reference place', { permanent: true, direction: 'right', offset: [6, 0], opacity: 0.95 })
           .addTo(this.overlay);
       }
       if (a.point) {
@@ -286,7 +286,7 @@ export class DeductionMap {
       if (thermo.radiusM) {
         L.circle([thermo.lat, thermo.lng], { radius: thermo.radiusM, color: MAP.warm, weight: 1.5, dashArray: '6', fillOpacity: 0.04 }).addTo(this.overlay);
       }
-      L.marker([thermo.lat, thermo.lng], { icon: markerIcon('🌡️', { color: MAP.warm, size: 28 }) })
+      L.marker([thermo.lat, thermo.lng], { icon: glyphIcon('thermo', { color: MAP.warm, size: 28 }) })
         .bindTooltip(thermo.label ?? 'Thermometer start', { permanent: true, direction: 'top', offset: [0, -18] })
         .addTo(this.overlay);
     }
@@ -318,7 +318,7 @@ export class DeductionMap {
     const ref = this.refPreview();
     const refSig = ref ? `${ref.lat}:${ref.lng}` : '';
     if (ref) {
-      L.marker([ref.lat, ref.lng], { icon: markerIcon('📍', { color: MAP.clue, size: 28 }) })
+      L.marker([ref.lat, ref.lng], { icon: glyphIcon('pin', { color: MAP.clue, size: 28 }) })
         .bindTooltip(ref.label ?? 'reference', { permanent: true, direction: 'top', offset: [0, -14], opacity: 0.95 })
         .addTo(this.overlay);
       const pts: L.LatLngExpression[] = [[ref.lat, ref.lng]];
@@ -375,17 +375,17 @@ export class DeductionMap {
         L.circleMarker([c.lat, c.lng], { radius: 4, color: MAP.region, fillColor: MAP.region, fillOpacity: 0.7, weight: 1 }).bindTooltip(c.name ?? 'candidate').addTo(this.overlay);
         pts.push([c.lat, c.lng]);
       }
-      L.marker([ev.seeker.lat, ev.seeker.lng], { icon: markerIcon('🔍', { color: MAP.seeker, size: 26 }) }).bindTooltip('Seeker', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
-      L.marker([ev.hider.lat, ev.hider.lng], { icon: markerIcon('🙈', { color: MAP.hider, size: 26 }) }).bindTooltip('Hider', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
+      L.marker([ev.seeker.lat, ev.seeker.lng], { icon: glyphIcon('search', { color: MAP.seeker, size: 26 }) }).bindTooltip('Seeker', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
+      L.marker([ev.hider.lat, ev.hider.lng], { icon: glyphIcon('hide', { color: MAP.hider, size: 26 }) }).bindTooltip('Hider', { direction: 'top', offset: [0, -12] }).addTo(this.overlay);
       if (ev.matched) {
         L.polyline([[ev.hider.lat, ev.hider.lng], [ev.matched.lat, ev.matched.lng]], { color: MAP.possible, weight: 2, dashArray: '5 5' }).addTo(this.overlay);
-        L.marker([ev.matched.lat, ev.matched.lng], { icon: markerIcon('✅', { color: MAP.possible, size: 28 }) })
+        L.marker([ev.matched.lat, ev.matched.lng], { icon: glyphIcon('check', { color: MAP.possible, size: 28 }) })
           .bindTooltip(`${ev.answer ?? ''} · ${ev.matched.name ?? '(unnamed)'}`, { permanent: true, direction: 'right', offset: [8, 0], opacity: 0.95 })
           .addTo(this.overlay);
         pts.push([ev.matched.lat, ev.matched.lng]);
       }
       if (ev.hider_nearest) {
-        L.marker([ev.hider_nearest.lat, ev.hider_nearest.lng], { icon: markerIcon('📍', { color: MAP.hider, size: 24 }) })
+        L.marker([ev.hider_nearest.lat, ev.hider_nearest.lng], { icon: glyphIcon('pin', { color: MAP.hider, size: 24 }) })
           .bindTooltip(`hider's nearest · ${ev.hider_nearest.name ?? '(unnamed)'}`, { direction: 'right', offset: [8, 0] })
           .addTo(this.overlay);
         pts.push([ev.hider_nearest.lat, ev.hider_nearest.lng]);

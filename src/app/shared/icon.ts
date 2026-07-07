@@ -61,7 +61,22 @@ const ICONS: Record<string, string> = {
   bus: '<path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/>',
   tram: '<rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><path d="M8 15h.01"/><path d="M16 15h.01"/>',
   trolleybus: '<path d="M18 11V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5"/><path d="M6 11h12"/><path d="M6 16h.01"/><path d="M18 16h.01"/><rect width="16" height="16" x="4" y="4" rx="2"/><path d="m8 20-1 2"/><path d="m16 20 1 2"/>',
+  stop: '<rect width="14" height="14" x="5" y="5" rx="2"/>',
+  wrench: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  lightbulb: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+  ban: '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
+  undo: '<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>',
+  dice: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M16 8h.01"/><path d="M8 8h.01"/><path d="M8 16h.01"/><path d="M16 16h.01"/><path d="M12 12h.01"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
 };
+
+/** The inline <svg> markup for an icon (24×24 viewBox). Reused by <app-icon> and Leaflet markers. */
+export function iconSvg(name: string, size = 20, stroke = 'currentColor', strokeWidth = 2): string {
+  return (
+    `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" ` +
+    `stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">${ICONS[name] ?? ''}</svg>`
+  );
+}
 
 /** A single bespoke line icon: `<app-icon name="ask" [size]="20" />`. Colour inherits (currentColor). */
 @Component({
@@ -77,12 +92,5 @@ export class Icon {
   readonly name = input.required<string>();
   readonly size = input(20);
 
-  readonly html = computed<SafeHtml>(() => {
-    const s = this.size();
-
-    return this.san.bypassSecurityTrustHtml(
-      `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" ` +
-        `stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">${ICONS[this.name()] ?? ''}</svg>`,
-    );
-  });
+  readonly html = computed<SafeHtml>(() => this.san.bypassSecurityTrustHtml(iconSvg(this.name(), this.size())));
 }

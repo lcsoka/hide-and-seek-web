@@ -3,7 +3,7 @@
     <div class="max-h-[55vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white/95 p-4 shadow-2xl ring-1 ring-black/10 backdrop-blur dark:bg-gray-900/95 lg:mb-3 lg:rounded-3xl" (click)="$event.stopPropagation()">
       <div class="mb-3 flex items-center justify-between">
         <h2 class="text-lg font-bold">{{ t('transit.boardTitle') }}</h2>
-        <button (click)="close()" class="text-xl text-gray-400 hover:text-gray-600">✕</button>
+        <button (click)="close()" class="text-gray-400 hover:text-gray-600"><app-icon name="x" [size]="22" /></button>
       </div>
 
       <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">{{ t('transit.pickLine') }}</p>
@@ -18,7 +18,7 @@
                       class="flex w-full items-center gap-2 rounded-lg border-2 p-2 text-left text-sm transition"
                       [style.border-color]="l === selectedLine() ? mode(l.mode).color : 'transparent'"
                       [class]="l === selectedLine() ? 'bg-gray-100 dark:bg-gray-800' : 'border border-gray-200 dark:border-gray-700'">
-                <span class="text-base">{{ mode(l.mode).icon }}</span>
+                <app-icon [name]="mode(l.mode).icon" [size]="18" [style.color]="mode(l.mode).color" />
                 <span class="grid h-6 min-w-6 place-items-center rounded px-1.5 text-xs font-bold text-white" [style.background]="l.colour || mode(l.mode).color">{{ l.ref }}</span>
                 @if (l.destinations.length) {
                   <span class="min-w-0 flex-1 truncate text-xs text-gray-600 dark:text-gray-300">↔ {{ l.destinations.join(' / ') }}</span>

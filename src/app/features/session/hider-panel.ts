@@ -5,11 +5,12 @@ import { ApiClient } from '../../core/services/api-client';
 import { HidingState } from '../../core/services/hiding-state';
 import { SessionStore } from '../../core/services/session-store';
 import { TransitService } from '../../core/services/transit.service';
+import { Icon } from '../../shared/icon';
 
 /** Smart hiding: auto-find the nearest station (shared with the map) and confirm in one tap. */
 @Component({
   selector: 'app-hider-panel',
-  imports: [TranslocoModule],
+  imports: [TranslocoModule, Icon],
   templateUrl: './hider-panel.html',
 })
 export class HiderPanel {
