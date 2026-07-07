@@ -1,12 +1,11 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
-import { RouteLine } from '../../core/maps/overpass.model';
 import { TransitRoutes } from '../../core/services/transit-routes';
-import { TransitStop } from '../../core/services/transit.model';
+import { GroupedLine } from '../../core/services/transit.model';
 import { TransitService } from '../../core/services/transit.service';
 import { BoardChoice } from './transit-picker.model';
 
-/** Board flow: pick the nearest stop, then a line; tapping a line draws its route on the map. */
+/** Board flow: pick a nearby line (grouped by number + mode); tapping it draws its route on the map. */
 @Component({
   selector: 'app-transit-picker',
   imports: [TranslocoModule],
@@ -23,57 +22,47 @@ export class TransitPicker {
   readonly board = output<BoardChoice>();
   readonly closeChange = output<boolean>();
 
-  readonly stops = this.transit.stops;
-  readonly routes = this.transit.routes;
+  readonly lines = this.transit.lines;
   readonly busy = this.transit.busy;
   readonly mode = (id: string) => this.transitService.transitMeta(id);
 
-  readonly selectedStop = signal<TransitStop | null>(null);
-  readonly selectedLine = signal<RouteLine | null>(null);
+  readonly selectedLine = signal<GroupedLine | null>(null);
 
   constructor() {
-    // Load nearby stops once the sheet opens with a known location.
+    // Load nearby lines once the sheet opens with a known location.
     effect(() => {
-      if (this.open() && this.seekerLat() != null && this.seekerLng() != null && this.stops() === null) {
-        void this.transit.loadStops(this.seekerLat()!, this.seekerLng()!, this.transitModes());
+      if (this.open() && this.seekerLat() != null && this.seekerLng() != null && this.lines() === null) {
+        void this.transit.loadLines(this.seekerLat()!, this.seekerLng()!, this.transitModes());
       }
     });
   }
 
-  pickStop(stop: TransitStop): void {
-    this.selectedStop.set(stop);
-    this.selectedLine.set(null);
-    this.transit.clearDisplayed();
-    void this.transit.loadRoutes(stop, this.transitModes());
-  }
-
   /** Tapping a line draws its path on the map behind the sheet and arms the Board button. */
-  previewLine(line: RouteLine): void {
+  previewLine(line: GroupedLine): void {
     this.selectedLine.set(line);
-    void this.transit.showRoute(line);
+    void this.transit.showLine(line);
   }
 
   confirmBoard(): void {
-    const stop = this.selectedStop();
     const line = this.selectedLine();
-    if (!stop || !line) {
+    if (!line) {
       return;
     }
-    this.board.emit({ stop_name: stop.name, stop_lat: stop.lat, stop_lng: stop.lng, line: line.ref, mode: line.mode });
+    // Board at the nearest stop serving this line; fall back to the seeker's own position.
+    const stop = this.transit.boardStopFor(line);
+    this.board.emit({
+      stop_name: stop?.name ?? '',
+      stop_lat: stop?.lat ?? this.seekerLat() ?? 0,
+      stop_lng: stop?.lng ?? this.seekerLng() ?? 0,
+      line: line.ref,
+      mode: line.mode,
+    });
     this.closeChange.emit(false);
-    this.selectedStop.set(null);
     this.selectedLine.set(null);
     this.transit.reset();
   }
 
-  back(): void {
-    this.selectedStop.set(null);
-    this.selectedLine.set(null);
-    this.transit.clearDisplayed();
-  }
-
   close(): void {
-    this.selectedStop.set(null);
     this.selectedLine.set(null);
     this.transit.reset();
     this.transit.clearDisplayed();

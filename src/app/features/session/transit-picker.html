@@ -2,62 +2,39 @@
   <div class="fixed inset-x-0 bottom-0 z-[800] flex justify-center" (click)="close()" *transloco="let t">
     <div class="max-h-[55vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white/95 p-4 shadow-2xl ring-1 ring-black/10 backdrop-blur dark:bg-gray-900/95 lg:mb-3 lg:rounded-3xl" (click)="$event.stopPropagation()">
       <div class="mb-3 flex items-center justify-between">
-        <h2 class="flex items-center gap-1 text-lg font-bold">
-          @if (selectedStop()) {
-            <button (click)="back()" class="text-gray-400 hover:text-gray-600">‹</button>
-          }
-          {{ t('transit.boardTitle') }}
-        </h2>
+        <h2 class="text-lg font-bold">{{ t('transit.boardTitle') }}</h2>
         <button (click)="close()" class="text-xl text-gray-400 hover:text-gray-600">✕</button>
       </div>
 
-      @if (!selectedStop()) {
-        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">{{ t('transit.pickStop') }}</p>
-        @if (stops() === null) {
-          <p class="text-sm text-gray-400">{{ t('transit.findingStops') }}</p>
-        } @else if (stops()!.length) {
-          <ul class="space-y-1">
-            @for (s of stops()!; track s.name + s.distM) {
-              <li>
-                <button (click)="pickStop(s)" class="flex w-full items-center gap-2 rounded-lg border border-gray-200 p-2 text-left text-sm hover:border-indigo-400 dark:border-gray-700">
-                  <span class="text-base">{{ mode(s.modes[0]).icon }}</span>
-                  <span class="min-w-0 flex-1 truncate">{{ s.name }}</span>
-                  <span class="shrink-0 text-gray-500">{{ s.distM }} m</span>
-                </button>
-              </li>
-            }
-          </ul>
-        } @else {
-          <p class="text-sm text-gray-400">{{ t('transit.noStops') }}</p>
-        }
-      } @else {
-        <p class="mb-2 text-sm font-medium">{{ selectedStop()!.name }}</p>
-        @if (routes() === null) {
-          <p class="text-sm text-gray-400">{{ t('transit.findingLines') }}</p>
-        } @else if (routes()!.length) {
-          <p class="mb-2 text-xs text-gray-500 dark:text-gray-400">{{ t('transit.pickLine') }}</p>
-          <div class="mb-3 flex flex-wrap gap-1.5">
-            @for (r of routes()!; track r.id) {
-              <button (click)="previewLine(r)"
-                      class="flex items-center gap-1.5 rounded-lg border-2 px-2.5 py-1.5 text-sm transition"
-                      [style.border-color]="r === selectedLine() ? mode(r.mode).color : 'transparent'"
-                      [class]="r === selectedLine() ? 'bg-gray-100 dark:bg-gray-800' : 'border border-gray-200 dark:border-gray-700'">
-                <span class="grid h-5 min-w-5 place-items-center rounded px-1 text-xs font-bold text-white" [style.background]="mode(r.mode).color">{{ r.ref }}</span>
-                @if (r.to) { <span class="max-w-40 truncate text-xs text-gray-600 dark:text-gray-300">→ {{ r.to }}</span> }
+      <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">{{ t('transit.pickLine') }}</p>
+
+      @if (lines() === null) {
+        <p class="text-sm text-gray-400">{{ t('transit.findingLines') }}</p>
+      } @else if (lines()!.length) {
+        <ul class="mb-3 space-y-1">
+          @for (l of lines()!; track l.mode + l.ref) {
+            <li>
+              <button (click)="previewLine(l)"
+                      class="flex w-full items-center gap-2 rounded-lg border-2 p-2 text-left text-sm transition"
+                      [style.border-color]="l === selectedLine() ? mode(l.mode).color : 'transparent'"
+                      [class]="l === selectedLine() ? 'bg-gray-100 dark:bg-gray-800' : 'border border-gray-200 dark:border-gray-700'">
+                <span class="text-base">{{ mode(l.mode).icon }}</span>
+                <span class="grid h-6 min-w-6 place-items-center rounded px-1.5 text-xs font-bold text-white" [style.background]="l.colour || mode(l.mode).color">{{ l.ref }}</span>
+                @if (l.destinations.length) {
+                  <span class="min-w-0 flex-1 truncate text-xs text-gray-600 dark:text-gray-300">↔ {{ l.destinations.join(' / ') }}</span>
+                } @else {
+                  <span class="min-w-0 flex-1 truncate text-xs text-gray-500">{{ mode(l.mode).label }}</span>
+                }
               </button>
-            }
-          </div>
-          <button (click)="confirmBoard()" [disabled]="!selectedLine()"
-                  class="w-full rounded-xl bg-indigo-600 p-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-40">
-            {{ selectedLine() ? t('transit.boardLine', { line: selectedLine()!.ref }) : t('transit.boardTitle') }}
-          </button>
-        } @else {
-          <p class="mb-3 text-sm text-gray-400">{{ t('transit.noLines') }}</p>
-          <button (click)="board.emit({ stop_name: selectedStop()!.name, stop_lat: selectedStop()!.lat, stop_lng: selectedStop()!.lng, line: '', mode: selectedStop()!.modes[0] }); close()"
-                  class="w-full rounded-xl border border-indigo-400 p-2.5 font-semibold text-indigo-700 hover:bg-indigo-50 dark:text-indigo-300">
-            {{ t('transit.boardAnyway') }}
-          </button>
-        }
+            </li>
+          }
+        </ul>
+        <button (click)="confirmBoard()" [disabled]="!selectedLine()"
+                class="w-full rounded-xl bg-indigo-600 p-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-40">
+          {{ selectedLine() ? t('transit.boardLine', { line: selectedLine()!.ref }) : t('transit.boardTitle') }}
+        </button>
+      } @else {
+        <p class="text-sm text-gray-400">{{ t('transit.noLines') }}</p>
       }
     </div>
   </div>
