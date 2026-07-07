@@ -117,12 +117,12 @@
     "hiding": "Elbújás…",
     "pickDifferent": "Válassz másik megállót",
     "none": "Nincs megálló a közelben. Menj közelebb egy megállóhoz.",
-    "relocated": "🚚 Kijátszottad a Költözést",
+    "relocated": "Kijátszottad a Költözést",
     "relocateTravel": "Menj egy új területre, majd válassz lent egy megállót, ahol elbújsz.",
     "relocateConfirm": "Új hely megerősítése",
-    "roam": "🚶 Szabadon mozoghatsz a zónádban",
+    "roam": "Szabadon mozoghatsz a zónádban",
     "roamHint": "Mozogj szabadon a rejtekzónádon belül — a helyed csak akkor rögzül, ha egy kereső elér.",
-    "locked": "🔒 A keresők a zónádban vannak!",
+    "locked": "A keresők a zónádban vannak!",
     "lockedHint": "Elkezdődött a végjáték — maradj pontosan ott, ahol vagy, amíg meg nem találnak."
   },
   "draw": {
@@ -130,7 +130,7 @@
     "tap": "Koppints a megtartani kívánt lapokra.",
     "intoHand": "Ezek a kezedbe kerülnek.",
     "tapCard": "koppints",
-    "kept": "✓ marad",
+    "kept": "marad",
     "keep": "Megtartás {{ chosen }}/{{ keep }}"
   },
   "landing": {
@@ -159,7 +159,7 @@
     "zoneCircle": "Zóna: egyszerű kör",
     "revealSeekers": "Mutasd a keresők helyzetét a bújónak",
     "revealSeekersHint": "Ki = hűséges (a bújó nem látja a közeledő keresőket). Be = lazább.",
-    "openMap": "🗺 Nyomozótérkép megnyitása",
+    "openMap": "Nyomozótérkép megnyitása",
     "createFailed": "Nem sikerült létrehozni a játékot.",
     "joinFailed": "Nem sikerült csatlakozni — ellenőrizd a kódot.",
     "size": {
@@ -191,7 +191,7 @@
     "tapOrRandom": "Koppints egy játékosra, vagy sorsolj véletlenszerűen.",
     "you": "(te)",
     "make": "Legyen ő a bújó",
-    "random": "🎲 Véletlen bújó"
+    "random": "Véletlen bújó"
   },
   "hud": {
     "calculating": "Búvóhely-zóna számítása…",
@@ -212,8 +212,8 @@
     "confirm": "Befejezés"
   },
   "results": {
-    "gameOver": "🏁 Vége a játéknak",
-    "roundOver": "🔚 Kör vége",
+    "gameOver": "Vége a játéknak",
+    "roundOver": "Kör vége",
     "theHider": "A bújó",
     "stayedHidden": "ennyi ideig maradt rejtve:",
     "bonus": "bónusz",
@@ -254,7 +254,7 @@
     "none": "—"
   },
   "seeker": {
-    "reached": "🎯 Elérted a bújót!",
+    "reached": "Elérted a bújót!",
     "iFound": "Megtaláltam!",
     "claimPending": "Várakozás a bújó megerősítésére, hogy elkaptad…",
     "voidedNotice": "A legutóbbi kérdésedre nem lehetett válaszolni — kérdezz újra.",
@@ -264,9 +264,9 @@
     "onMap": "a térképen",
     "thermoRunning": "Hőmérő fut",
     "thermoTravel": "Menj kb. {{ dist }}-t, majd állj meg — a bújó látja a kiindulási → végpontodat.",
-    "stopSend": "⏹ Állj meg és küldd",
+    "stopSend": "Állj meg és küldd",
     "ask": "＋ Tegyél fel kérdést",
-    "blocked": "🧿 Egy átok blokkolja a kérdéseket — töröld lent, hogy újra kérdezhess.",
+    "blocked": "Egy átok blokkolja a kérdéseket — töröld lent, hogy újra kérdezhess.",
     "waitingAnswer": "Várakozás a bújó válaszára…",
     "asksOpen": "A kérdezés a keresés kezdetekor nyílik meg.",
     "needLocation": "Előbb be kell töltődnie a helyzetednek — a kérdéseket a te pozíciódhoz mérjük.",
@@ -274,42 +274,42 @@
     "ignored": "Kihagyva a következtetésből",
     "curses": "Átkok",
     "curse": "Átok",
-    "done": "✓ kész",
-    "findPlace": "🗺️ Keresd meg ezt a helyet:",
-    "submitProof": "📷 Bizonyíték küldése",
+    "done": "kész",
+    "findPlace": "Keresd meg ezt a helyet:",
+    "submitProof": "Bizonyíték küldése",
     "restore": "Vissza a következtetésbe",
     "ignore": "Kihagyás a következtetésből"
   },
   "hangman": {
     "solveToAsk": "Fejtsd meg a szót, hogy újra kérdezhess!",
     "misses": "Hibák",
-    "solved": "🎉 Megfejtve — az átok feloldva!"
+    "solved": "Megfejtve — az átok feloldva!"
   },
   "deck": {
     "yourHand": "A kezed",
     "minBanked": "perc bankolva",
-    "pickDisable": "🧠 Válassz {{ count }} kérdéskategóriát a letiltáshoz",
+    "pickDisable": "Válassz {{ count }} kérdéskategóriát a letiltáshoz",
     "disableBtn": "Letiltás {{ chosen }}/{{ count }}",
     "castPre": "Kijátszod a(z)",
     "castPost": "átkot a keresőkre?",
-    "streetView": "📸 Küldj a keresőknek egy Street View képet — meg kell találniuk.",
-    "sendCast": "📷 Kép küldése és kijátszás",
-    "hangmanWord": "🪢 Gondolj egy szóra, amit a keresőknek ki kell találniuk:",
+    "streetView": "Küldj a keresőknek egy Street View képet — meg kell találniuk.",
+    "sendCast": "Kép küldése és kijátszás",
+    "hangmanWord": "Gondolj egy szóra, amit a keresőknek ki kell találniuk:",
     "hangmanPlaceholder": "pl. VILLAMOS",
     "hangmanHint": "Csak betűk, 4–16 karakter. A keresők nem látják — akasztófát játszanak ellene.",
     "castIt": "Kijátszás",
-    "seekerClosest": "📍 A kereső legközelebbije:",
-    "yourNearest": "🏛️ A te legközelebbid:",
+    "seekerClosest": "A kereső legközelebbije:",
+    "yourNearest": "A te legközelebbid:",
     "unnamedPlace": "egy névtelen hely",
     "takePhoto": "Készíts vagy válassz egy fotót válaszul.",
-    "sendPhoto": "📷 Fotó küldése",
+    "sendPhoto": "Fotó küldése",
     "willAnswer": "Ezt fogod válaszolni",
     "confirmAnswer": "Válasz megerősítése",
     "findingPlaces": "Közeli helyek keresése…",
     "whichNearest": "Melyik van hozzád a legközelebb? Koppints rá.",
-    "outOfRangeNone": "🚫 Hatótávon kívül — egyik sem",
+    "outOfRangeNone": "Hatótávon kívül — egyik sem",
     "computing": "Válasz számítása…",
-    "veto": "🚫 Vétó — kérdés elutasítása",
+    "veto": "Vétó — kérdés elutasítása",
     "answered": "Megválaszolva:",
     "misTapped": "Félrenyomtad? Még módosíthatod.",
     "changeTo": "Módosítás erre:",
@@ -317,10 +317,10 @@
     "awaitingProof": "bizonyítékra vár…",
     "banked": "Bankolva",
     "hiddenFor": "Rejtve",
-    "curseNudge": "💡 Játssz ki egy átkot a keresők lassításához.",
-    "foundClaim": "🔍 {{ name }} szerint megtaláltak! Erősítsd meg a kör lezárásához.",
-    "confirmCaught": "✅ Igen, elkaptak",
-    "notCaught": "✋ Még nem",
+    "curseNudge": "Játssz ki egy átkot a keresők lassításához.",
+    "foundClaim": "{{ name }} szerint megtaláltak! Erősítsd meg a kör lezárásához.",
+    "confirmCaught": "Igen, elkaptak",
+    "notCaught": "Még nem",
     "play": "Kijátszás",
     "noCards": "Még nincs lapod — a keresők kérdéseivel húzol lapokat.",
     "yourAnswers": "A válaszaid",
@@ -334,7 +334,7 @@
   "picker": {
     "ask": "Tegyél fel kérdést",
     "disabled": "Letiltva egy átok által",
-    "disabledLock": "🔒 Letiltva egy átok által",
+    "disabledLock": "Letiltva egy átok által",
     "whichClosest": "Melyik {{ label }} van hozzád a legközelebb?",
     "askClosest": "Kérdezés — a legközelebbim:",
     "couldntLookup": "Nem sikerült közeli helyeket lekérni.",
@@ -351,8 +351,8 @@
     "custom": "egyéni",
     "findingPlaces": "Közeli helyek keresése…",
     "findingRef": "Referenciahely keresése…",
-    "thermoTransit": "🚶 Csak gyalog — szállj le",
-    "cooldown": "⏳ Pihenő"
+    "thermoTransit": "Csak gyalog — szállj le",
+    "cooldown": "Pihenő"
   },
   "timer": {
     "answering": "Bújó válaszol",
@@ -417,8 +417,8 @@
   },
   "transit": {
     "title": "Tömegközlekedés",
-    "board": "🚆 Felszállás",
-    "alight": "🚉 Leszállás",
+    "board": "Felszállás",
+    "alight": "Leszállás",
     "onboard": "Tömegközlekedésen",
     "onboardNote": "A hőmérőt gyalog kell megtenni, ezért leszállásig nem elérhető.",
     "boardTitle": "Felszállás",
@@ -428,30 +428,30 @@
     "boardLine": "Felszállás: {{ line }}"
   },
   "intro": {
-    "hiderTitle": "Te vagy a Bújó 🙈",
+    "hiderTitle": "Te vagy a Bújó",
     "hiderGoal": "Maradj rejtve, ameddig csak tudsz — ez a pontszámod.",
     "hiderAction": "Bújj el egy megálló közelében, majd válaszolj a kérdésekre és játssz ki átkokat, hogy lassítsd a keresőket.",
-    "seekerTitle": "Te vagy a Kereső 🔎",
+    "seekerTitle": "Te vagy a Kereső",
     "seekerGoal": "Találd meg a bújót, amilyen gyorsan csak tudod.",
     "seekerAction": "Tegyél fel kérdéseket a térkép szűkítéséhez, majd menj a bújó felé és kapd el.",
     "gotIt": "Értem",
     "howToPlay": "Hogyan kell játszani"
   },
   "objective": {
-    "hider_hiding": "🙈 Bújj el egy megálló közelében, és erősítsd meg a helyed.",
-    "hider_seeking": "🙈 Maradj rejtve — válaszolj a kérdésekre és játssz ki átkokat, hogy lassítsd őket.",
-    "hider_endgame": "🙈 Maradj rejtve — a keresők egyre közelednek!",
-    "seeker_hiding": "⏳ A bújó éppen elrejtőzik — készülj fel.",
-    "seeker_seeking": "🔎 Tegyél fel kérdéseket a térkép szűkítéséhez, majd menj a bújó felé.",
-    "seeker_endgame": "🎯 Végső hajrá — érj a bújóhoz, hogy elkapd."
+    "hider_hiding": "Bújj el egy megálló közelében, és erősítsd meg a helyed.",
+    "hider_seeking": "Maradj rejtve — válaszolj a kérdésekre és játssz ki átkokat, hogy lassítsd őket.",
+    "hider_endgame": "Maradj rejtve — a keresők egyre közelednek!",
+    "seeker_hiding": "A bújó éppen elrejtőzik — készülj fel.",
+    "seeker_seeking": "Tegyél fel kérdéseket a térkép szűkítéséhez, majd menj a bújó felé.",
+    "seeker_endgame": "Végső hajrá — érj a bújóhoz, hogy elkapd."
   },
   "howto": {
     "title": "Hogyan kell játszani",
     "goalTitle": "Cél",
     "goal": "Az egyik játékos elbújik, a többiek keresik. A bújó pontszáma az, hogy meddig marad rejtve; több kör után a leghosszabb túlélő nyer.",
-    "hiderTitle": "Ha te vagy a Bújó 🙈",
+    "hiderTitle": "Ha te vagy a Bújó",
     "hider": "Bújj el egy megálló közelében. Válaszolj őszintén a kérdésekre — de minden feltett kérdés egy lapot ad neked. Játssz ki átkokat a lassításukra, és gyűjts időbónuszokat.",
-    "seekerTitle": "Ha te vagy a Kereső 🔎",
+    "seekerTitle": "Ha te vagy a Kereső",
     "seeker": "Tegyél fel kérdéseket a térkép egyes részeinek kizárásához, majd menj tömegközlekedéssel a maradék felé. Ha közel vagy, indítsd a hajrát, és érj a bújóhoz, hogy elkapd.",
     "questionsTitle": "Kérdéstípusok",
     "newHud": "Új felület (béta)",
@@ -516,7 +516,7 @@
     "message": "Írd le, mit tapasztaltál vagy mit javasolnál…",
     "contact": "E-mail (opcionális, ha választ szeretnél)",
     "send": "Küldés",
-    "sent": "Köszönjük a visszajelzést! 🙌",
+    "sent": "Köszönjük a visszajelzést!",
     "error": "Nem sikerült elküldeni. Kérlek, próbáld újra."
   },
   "found": {

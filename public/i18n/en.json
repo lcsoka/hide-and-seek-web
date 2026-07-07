@@ -117,12 +117,12 @@
     "hiding": "Hiding…",
     "pickDifferent": "Pick a different stop",
     "none": "No stations found nearby. Move closer to a station.",
-    "relocated": "🚚 You played Move",
+    "relocated": "You played Move",
     "relocateTravel": "Travel to a new area, then pick a station below to hide at.",
     "relocateConfirm": "Confirm new spot",
-    "roam": "🚶 You can roam your zone",
+    "roam": "You can roam your zone",
     "roamHint": "Move freely anywhere inside your hiding zone — your spot only locks when a seeker reaches you.",
-    "locked": "🔒 Seekers are in your zone!",
+    "locked": "Seekers are in your zone!",
     "lockedHint": "The endgame has started — stay exactly where you are until you're found."
   },
   "draw": {
@@ -130,7 +130,7 @@
     "tap": "Tap the cards you want to keep.",
     "intoHand": "These go into your hand.",
     "tapCard": "tap",
-    "kept": "✓ keep",
+    "kept": "keep",
     "keep": "Keep {{ chosen }}/{{ keep }}"
   },
   "landing": {
@@ -159,7 +159,7 @@
     "zoneCircle": "Zone: simple circle",
     "revealSeekers": "Show seeker positions to the hider",
     "revealSeekersHint": "Off = faithful (the hider can't see the seekers closing in). On = casual.",
-    "openMap": "🗺 Open the deduction map",
+    "openMap": "Open the deduction map",
     "createFailed": "Could not create the game.",
     "joinFailed": "Could not join — check the code.",
     "size": {
@@ -191,7 +191,7 @@
     "tapOrRandom": "Tap a player, or roll a random one.",
     "you": "(you)",
     "make": "Make hider",
-    "random": "🎲 Pick a random hider"
+    "random": "Pick a random hider"
   },
   "hud": {
     "calculating": "Calculating hiding zone…",
@@ -212,8 +212,8 @@
     "confirm": "End game"
   },
   "results": {
-    "gameOver": "🏁 Game over",
-    "roundOver": "🔚 Round over",
+    "gameOver": "Game over",
+    "roundOver": "Round over",
     "theHider": "The hider",
     "stayedHidden": "stayed hidden:",
     "bonus": "bonus",
@@ -254,7 +254,7 @@
     "none": "—"
   },
   "seeker": {
-    "reached": "🎯 You've reached the hider!",
+    "reached": "You've reached the hider!",
     "iFound": "I found them!",
     "claimPending": "Waiting for the hider to confirm you caught them…",
     "voidedNotice": "Your last question couldn't be answered — ask again.",
@@ -264,9 +264,9 @@
     "onMap": "on the map",
     "thermoRunning": "Thermometer running",
     "thermoTravel": "Travel about {{ dist }}, then stop — the hider will see your start → end.",
-    "stopSend": "⏹ Stop & send",
+    "stopSend": "Stop & send",
     "ask": "＋ Ask a question",
-    "blocked": "🧿 A curse is blocking questions — clear it below to ask again.",
+    "blocked": "A curse is blocking questions — clear it below to ask again.",
     "waitingAnswer": "Waiting for the hider to answer…",
     "asksOpen": "Asking opens once seeking begins.",
     "needLocation": "Wait for your location to load first — questions are measured from your position.",
@@ -274,42 +274,42 @@
     "ignored": "Ignored in the deduction",
     "curses": "Curses",
     "curse": "Curse",
-    "done": "✓ done",
-    "findPlace": "🗺️ Find this place:",
-    "submitProof": "📷 Submit proof",
+    "done": "done",
+    "findPlace": "Find this place:",
+    "submitProof": "Submit proof",
     "restore": "Restore to deduction",
     "ignore": "Ignore in deduction"
   },
   "hangman": {
     "solveToAsk": "Solve the word to ask again!",
     "misses": "Misses",
-    "solved": "🎉 Solved — the curse is lifted!"
+    "solved": "Solved — the curse is lifted!"
   },
   "deck": {
     "yourHand": "Your hand",
     "minBanked": "min banked",
-    "pickDisable": "🧠 Pick {{ count }} question categories to disable",
+    "pickDisable": "Pick {{ count }} question categories to disable",
     "disableBtn": "Disable {{ chosen }}/{{ count }}",
     "castPre": "Cast",
     "castPost": "on the seekers?",
-    "streetView": "📸 Send the seekers a Street View screenshot — they must find it.",
-    "sendCast": "📷 Send screenshot & cast",
-    "hangmanWord": "🪢 Think of a word for the seekers to guess:",
+    "streetView": "Send the seekers a Street View screenshot — they must find it.",
+    "sendCast": "Send screenshot & cast",
+    "hangmanWord": "Think of a word for the seekers to guess:",
     "hangmanPlaceholder": "e.g. VILLAMOS",
     "hangmanHint": "Letters only, 4–16 characters. The seekers can't see it — they play hangman against it.",
     "castIt": "Cast it",
-    "seekerClosest": "📍 Seeker's closest:",
-    "yourNearest": "🏛️ Your nearest:",
+    "seekerClosest": "Seeker's closest:",
+    "yourNearest": "Your nearest:",
     "unnamedPlace": "an unnamed place",
     "takePhoto": "Take or pick a photo to send back.",
-    "sendPhoto": "📷 Send a photo",
+    "sendPhoto": "Send a photo",
     "willAnswer": "You will answer",
     "confirmAnswer": "Confirm answer",
     "findingPlaces": "Finding nearby places…",
     "whichNearest": "Which of these is your nearest? Tap it.",
-    "outOfRangeNone": "🚫 Out of range — none of these",
+    "outOfRangeNone": "Out of range — none of these",
     "computing": "Computing the answer…",
-    "veto": "🚫 Veto — refuse this question",
+    "veto": "Veto — refuse this question",
     "answered": "Answered",
     "misTapped": "Mis-tapped? You can still change it.",
     "changeTo": "Change to",
@@ -317,10 +317,10 @@
     "awaitingProof": "awaiting proof…",
     "banked": "Banked",
     "hiddenFor": "Hidden for",
-    "curseNudge": "💡 Play a curse to slow the seekers.",
-    "foundClaim": "🔍 {{ name }} says they found you! Confirm to end the round.",
-    "confirmCaught": "✅ Yes, caught",
-    "notCaught": "✋ Not yet",
+    "curseNudge": "Play a curse to slow the seekers.",
+    "foundClaim": "{{ name }} says they found you! Confirm to end the round.",
+    "confirmCaught": "Yes, caught",
+    "notCaught": "Not yet",
     "play": "Play",
     "noCards": "No cards yet — you draw cards as the seekers ask questions.",
     "yourAnswers": "Your answers",
@@ -334,7 +334,7 @@
   "picker": {
     "ask": "Ask a question",
     "disabled": "Disabled by a curse",
-    "disabledLock": "🔒 Disabled by a curse",
+    "disabledLock": "Disabled by a curse",
     "whichClosest": "Which {{ label }} is closest to you?",
     "askClosest": "Ask — my closest is",
     "couldntLookup": "Couldn't look up nearby places.",
@@ -351,8 +351,8 @@
     "custom": "custom",
     "findingPlaces": "Finding nearby places…",
     "findingRef": "Finding your reference place…",
-    "thermoTransit": "🚶 Walk-only — get off transit",
-    "cooldown": "⏳ Cooling down"
+    "thermoTransit": "Walk-only — get off transit",
+    "cooldown": "Cooling down"
   },
   "timer": {
     "answering": "Hider answering",
@@ -417,8 +417,8 @@
   },
   "transit": {
     "title": "Transit",
-    "board": "🚆 Board transit",
-    "alight": "🚉 Get off here",
+    "board": "Board transit",
+    "alight": "Get off here",
     "onboard": "On transit",
     "onboardNote": "The thermometer must be walked, so it's unavailable until you get off.",
     "boardTitle": "Board transit",
@@ -428,30 +428,30 @@
     "boardLine": "Board line {{ line }}"
   },
   "intro": {
-    "hiderTitle": "You're the Hider 🙈",
+    "hiderTitle": "You're the Hider",
     "hiderGoal": "Stay hidden as long as you can — that's your score.",
     "hiderAction": "Hide near a station, then answer questions and play curses to slow the seekers.",
-    "seekerTitle": "You're a Seeker 🔎",
+    "seekerTitle": "You're a Seeker",
     "seekerGoal": "Find the hider as fast as you can.",
     "seekerAction": "Ask questions to shrink the map, then ride toward the hider and catch them.",
     "gotIt": "Got it",
     "howToPlay": "How to play"
   },
   "objective": {
-    "hider_hiding": "🙈 Hide near a station and confirm your spot.",
-    "hider_seeking": "🙈 Stay hidden — answer questions and play curses to slow them.",
-    "hider_endgame": "🙈 Stay hidden — the seekers are closing in!",
-    "seeker_hiding": "⏳ The hider is hiding — get ready.",
-    "seeker_seeking": "🔎 Ask questions to shrink the map, then ride toward the hider.",
-    "seeker_endgame": "🎯 Final approach — reach the hider to catch them."
+    "hider_hiding": "Hide near a station and confirm your spot.",
+    "hider_seeking": "Stay hidden — answer questions and play curses to slow them.",
+    "hider_endgame": "Stay hidden — the seekers are closing in!",
+    "seeker_hiding": "The hider is hiding — get ready.",
+    "seeker_seeking": "Ask questions to shrink the map, then ride toward the hider.",
+    "seeker_endgame": "Final approach — reach the hider to catch them."
   },
   "howto": {
     "title": "How to play",
     "goalTitle": "Goal",
     "goal": "One player hides, the rest seek. The hider's score is how long they survive; over several rounds, the longest survivor wins.",
-    "hiderTitle": "If you're the Hider 🙈",
+    "hiderTitle": "If you're the Hider",
     "hider": "Hide near a transit station. Answer questions truthfully — but every question the seekers ask hands you a card. Play curses to slow them and bank time bonuses.",
-    "seekerTitle": "If you're a Seeker 🔎",
+    "seekerTitle": "If you're a Seeker",
     "seeker": "Ask questions to rule out parts of the map, then ride transit toward what's left. When close, declare endgame and reach the hider to catch them.",
     "questionsTitle": "Question types",
     "newHud": "New interface (beta)",
@@ -516,7 +516,7 @@
     "message": "Tell us what happened or what you'd suggest…",
     "contact": "Email (optional, if you'd like a reply)",
     "send": "Send",
-    "sent": "Thanks for the feedback! 🙌",
+    "sent": "Thanks for the feedback!",
     "error": "Couldn't send. Please try again."
   },
   "found": {
