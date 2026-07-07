@@ -179,6 +179,20 @@ export class SessionView {
       }
     });
 
+    // When the hider's answer window elapses, poll once so the server resolves the overdue
+    // question (lazy timer) and it disappears — even with no realtime event to nudge us.
+    let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
+    effect(() => {
+      const deadline = this.store.state()?.pending_question?.deadline ?? null;
+      clearTimeout(deadlineTimer);
+      if (deadline == null) {
+        return;
+      }
+      const msLeft = deadline * 1000 - this.offset - Date.now();
+      deadlineTimer = setTimeout(() => this.store.refresh(), Math.max(0, msLeft) + 1500);
+    });
+    destroyRef.onDestroy(() => clearTimeout(deadlineTimer));
+
     // Flash a "you've been cursed" alert to seekers when a NEW curse lands. Curses
     // present at first load are marked seen silently (no retro-alert on join/reload).
     effect(() => {
