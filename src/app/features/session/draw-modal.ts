@@ -40,6 +40,8 @@ export class DrawModal {
 
   readonly keep = computed(() => Math.min(this.draw().keep, this.draw().cards.length));
   readonly canConfirm = computed(() => this.selected().size === this.keep());
+  // No real choice: you keep everything you drew — the cards aren't individually selectable.
+  readonly noChoice = computed(() => this.keep() >= this.draw().cards.length);
 
   constructor() {
     // If there's no choice (keep == drawn), pre-select everything.
@@ -56,6 +58,9 @@ export class DrawModal {
   }
 
   toggle(uid: string): void {
+    if (this.noChoice()) {
+      return; // must keep all drawn cards — deselecting isn't allowed
+    }
     const next = new Set(this.selected());
     if (next.has(uid)) {
       next.delete(uid);

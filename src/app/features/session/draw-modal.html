@@ -7,7 +7,7 @@
 
     <div class="grid grid-cols-3 gap-2">
       @for (c of draw().cards; track c.uid; let i = $index) {
-        <button (click)="toggle(c.uid)"
+        <button (click)="toggle(c.uid)" [class.pointer-events-none]="noChoice()"
                 class="card-reveal relative flex h-48 flex-col overflow-hidden rounded-xl border-2 bg-white text-left transition dark:bg-gray-900"
                 [style.borderColor]="cardColor(c)"
                 [class.scale-105]="isSelected(c.uid)"
