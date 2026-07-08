@@ -180,7 +180,9 @@
   },
   "lobby": {
     "title": "Váróterem",
-    "share": "Oszd meg a fenti kódot, hogy másokat is meghívj.",
+    "share": "Oszd meg a kódot vagy a linket, hogy másokat is meghívj.",
+    "code": "Csatlakozási kód",
+    "copyLink": "Link másolása",
     "host": "házigazda",
     "needPlayers": "Legalább 2 játékos kell",
     "start": "Játék indítása",

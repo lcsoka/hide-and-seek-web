@@ -1,6 +1,6 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ActiveSession } from '../../core/models';
 import { TRANSIT_MODES } from '../../core/maps/overpass';
@@ -25,6 +25,7 @@ export class Landing {
   private readonly tokens = inject(TokenStore);
   private readonly players = inject(PlayerStore);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly transloco = inject(TranslocoService);
   readonly auth = inject(AuthStore);
 
@@ -60,6 +61,14 @@ export class Landing {
       }
     });
     void this.loadActiveSessions();
+
+    // Arrived via a shareable invite link (/join/:code): pre-fill the code and open the join
+    // sheet so the invitee only needs their name (if a guest) and one tap.
+    const code = this.route.snapshot.paramMap.get('code');
+    if (code) {
+      this.joinCode = code.toUpperCase();
+      this.joinOpen.set(true);
+    }
   }
 
   /** Load the user's still-live games so they can rejoin one they left. */

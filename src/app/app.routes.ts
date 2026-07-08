@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   { path: '', loadComponent: () => import('./features/landing/landing').then((m) => m.Landing) },
+  // Shareable invite link: opens the landing with the join sheet pre-filled with the code.
+  { path: 'join/:code', loadComponent: () => import('./features/landing/landing').then((m) => m.Landing) },
   { path: 'profile', loadComponent: () => import('./features/profile/profile').then((m) => m.ProfilePage) },
   { path: 'content', loadComponent: () => import('./features/content/my-content').then((m) => m.MyContentPage) },
   { path: 'auth', loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage) },

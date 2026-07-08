@@ -180,7 +180,9 @@
   },
   "lobby": {
     "title": "Waiting room",
-    "share": "Share the code up top to invite players.",
+    "share": "Share the code or link to invite players.",
+    "code": "Join code",
+    "copyLink": "Copy link",
     "host": "host",
     "needPlayers": "Need at least 2 players",
     "start": "Start game",
