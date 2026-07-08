@@ -33,6 +33,10 @@ export class SessionStore {
   // A brief notice to the seeker about their last question's fate (voided / vetoed) so
   // they know to ask again rather than waiting on a vanished question. Auto-clears.
   readonly questionNotice = signal<string | null>(null);
+  // A live "your question resolved" flash for the seekers (answered / vetoed / voided) — a
+  // prominent toast + animation, since the asker otherwise gets no feedback. Live events only
+  // (not replayed on reconnect). Auto-clears.
+  readonly questionResult = signal<{ kind: 'answered' | 'vetoed' | 'voided'; answer?: string | null; category?: string | null } | null>(null);
 
   // The highest event seq the client has seen (from `_seq` on live events / the catch-up cursor).
   // Used to ask the server for only what was missed while the socket was down.
@@ -41,6 +45,11 @@ export class SessionStore {
   private notify(message: string): void {
     this.questionNotice.set(message);
     setTimeout(() => this.questionNotice.set(null), 6000);
+  }
+
+  private flashResult(r: { kind: 'answered' | 'vetoed' | 'voided'; answer?: string | null; category?: string | null }): void {
+    this.questionResult.set(r);
+    setTimeout(() => this.questionResult.set(null), 4500);
   }
 
   setSession(id: string): void {
@@ -71,7 +80,15 @@ export class SessionStore {
       return;
     }
 
-    this.applyNotice(type);
+    // Live: flash a prominent result toast (the seeker UI decides who sees it).
+    if (type === 'QuestionAnswered') {
+      const a = data as { answer?: string | null; category?: string | null } | undefined;
+      this.flashResult({ kind: 'answered', answer: a?.answer ?? null, category: a?.category ?? null });
+    } else if (type === 'QuestionVetoed') {
+      this.flashResult({ kind: 'vetoed' });
+    } else if (type === 'QuestionVoided') {
+      this.flashResult({ kind: 'voided' });
+    }
     this.refresh();
   }
 

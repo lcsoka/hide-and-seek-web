@@ -37,6 +37,7 @@ import { QuestionPicker } from './question-picker';
 import { TransitPicker } from './transit-picker';
 import { BoardChoice } from './transit-picker.model';
 import { RoundResults } from './round-results';
+import { QuestionResultToast } from './question-result-toast';
 import { SeekerPanel } from './seeker-panel';
 import { PushNudge } from '../../shared/push-nudge';
 import { Icon } from '../../shared/icon';
@@ -53,7 +54,7 @@ const OBJECTIVE_STATES = new Set(['hider_hiding', 'hider_seeking', 'hider_endgam
 @Component({
   selector: 'app-session',
   host: { class: 'block h-full w-full overflow-hidden' },
-  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, HudNext, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, PushNudge, FoundAlert, Icon],
+  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, HudNext, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, QuestionResultToast, PushNudge, FoundAlert, Icon],
   templateUrl: './session.html',
 })
 export class SessionView {

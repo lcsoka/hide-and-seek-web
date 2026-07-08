@@ -259,6 +259,7 @@
     "claimPending": "Waiting for the hider to confirm you caught them…",
     "voidedNotice": "Your last question couldn't be answered — ask again.",
     "vetoedNotice": "The hider vetoed your question — ask another.",
+    "answerArrived": "Answer arrived",
     "endgameClose": "Endgame — close in on the hider to catch them.",
     "questions": "Questions",
     "onMap": "on the map",

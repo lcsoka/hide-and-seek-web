@@ -259,6 +259,7 @@
     "claimPending": "Várakozás a bújó megerősítésére, hogy elkaptad…",
     "voidedNotice": "A legutóbbi kérdésedre nem lehetett válaszolni — kérdezz újra.",
     "vetoedNotice": "A bújó megvétózta a kérdésedet — kérdezz mást.",
+    "answerArrived": "Megjött a válasz",
     "endgameClose": "Hajrá — közelíts a bújóhoz, hogy elkapd!",
     "questions": "Kérdések",
     "onMap": "a térképen",

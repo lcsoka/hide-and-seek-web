@@ -69,6 +69,9 @@
       </div>
     }
 
+    <!-- Live flash when a seeker's question resolves (answered / vetoed / voided). -->
+    <app-question-result-toast [show]="role(s) === 'seeker'" />
+
     <!-- Subtle in-game reminder to enable notifications (for players who skipped the lobby). -->
     @if (activePlay(s) && !reconnecting() && !hidingCalculating()) {
       <div class="pointer-events-none absolute inset-x-0 top-16 z-[650] flex justify-center px-4">
