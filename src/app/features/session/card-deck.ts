@@ -28,18 +28,19 @@ interface TentaclePlace {
   templateUrl: './card-deck.html',
   styles: [
     `
+      /* New card springs up into the hand with a little overshoot + settle. */
       @keyframes cardDraw {
-        from {
-          transform: translateY(60px) scale(0.7) rotate(-8deg);
-          opacity: 0;
-        }
-        to {
-          transform: none;
-          opacity: 1;
-        }
+        0% { transform: translateY(64px) scale(0.72) rotate(-7deg); opacity: 0; }
+        55% { transform: translateY(-6px) scale(1.05) rotate(1deg); opacity: 1; }
+        100% { transform: none; opacity: 1; }
       }
       .card-draw {
-        animation: cardDraw 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        animation: cardDraw 0.55s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+        transform-origin: bottom center;
+        will-change: transform, opacity;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .card-draw { animation: none; }
       }
     `,
   ],

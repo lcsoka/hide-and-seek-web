@@ -12,18 +12,19 @@ import { Icon } from '../../shared/icon';
   templateUrl: './draw-modal.html',
   styles: [
     `
+      /* Drawn cards flip up from the deck, one after another, with a small settle overshoot. */
       @keyframes cardReveal {
-        from {
-          transform: translateY(40px) rotateY(90deg) scale(0.8);
-          opacity: 0;
-        }
-        to {
-          transform: none;
-          opacity: 1;
-        }
+        0% { transform: translateY(46px) rotateX(38deg) scale(0.82); opacity: 0; }
+        70% { transform: translateY(-5px) rotateX(0) scale(1.03); opacity: 1; }
+        100% { transform: none; opacity: 1; }
       }
       .card-reveal {
-        animation: cardReveal 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        animation: cardReveal 0.5s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+        transform-origin: bottom center;
+        will-change: transform, opacity;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .card-reveal { animation: none; }
       }
     `,
   ],
