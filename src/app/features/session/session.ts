@@ -249,6 +249,13 @@ export class SessionView {
     return this.role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame');
   }
 
+  /** The session's city centre (from config), so the map opens on the right city — including the
+   *  lobby, before anyone has a GPS position or a hiding zone. */
+  cityCenter(s: GameState): { lat: number; lng: number } | null {
+    const city = s.config?.['city'] as { lat?: number; lng?: number } | undefined;
+    return city?.lat != null && city?.lng != null ? { lat: city.lat, lng: city.lng } : null;
+  }
+
   /** i18n key for the "what to do now" objective line, by role + phase (or '' if none). */
   objective(s: GameState): string {
     const r = this.role(s);

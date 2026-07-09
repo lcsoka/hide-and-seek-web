@@ -64,6 +64,8 @@ export class DeductionMap {
   readonly regionPreview = input<Feature<Polygon | MultiPolygon> | null>(null);
   readonly players = input<PlayerView[]>([]); // visible players (seekers see themselves + teammates)
   readonly meId = input<string | null>(null);
+  // The session's city centre, so the map opens on the chosen city before any deduction frames it.
+  readonly center = input<{ lat: number; lng: number } | null>(null);
   // Dev question harness: an evaluated question's geometry to overlay. Null in normal play.
   readonly evalResult = input<QuestionEvalResult | null>(null);
   // The national border, drawn as a static frame in a different colour from the play area.
@@ -118,7 +120,8 @@ export class DeductionMap {
   }
 
   private init(): void {
-    this.map = L.map(this.el().nativeElement, { zoomAnimation: true, fadeAnimation: true }).setView(BUDAPEST, 11);
+    const c = this.center();
+    this.map = L.map(this.el().nativeElement, { zoomAnimation: true, fadeAnimation: true }).setView(c ? [c.lat, c.lng] : BUDAPEST, 11);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap, © CARTO',
       subdomains: 'abcd',

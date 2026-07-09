@@ -19,6 +19,9 @@ export class MapView {
   readonly el = viewChild.required<ElementRef<HTMLElement>>('el');
   readonly players = input<PlayerView[]>([]);
   readonly meId = input<string | null>(null);
+  // The session's city centre — so the map opens on the chosen city (esp. in the lobby, before
+  // anyone has a GPS position or a hiding zone). Falls back to Budapest when absent.
+  readonly center = input<{ lat: number; lng: number } | null>(null);
   readonly zone = input<HidingZone | null>(null);
   readonly stations = input<{ lat: number; lng: number; name?: string; modes?: string[] }[]>([]); // nearby stops to pick from
   readonly highlight = input<Position | null>(null); // the chosen/nearest station
@@ -43,6 +46,7 @@ export class MapView {
   private map?: L.Map;
   private overlay?: L.LayerGroup;
   private centred = false;
+  private cityCentered = false; // one-shot: opened on the session's city (until real content frames it)
   private wasPicking = false; // tracks picking sessions so a re-pick (e.g. Move) re-zooms
   private fittedRefKey = ''; // one-shot fit per question so far-away references come into view
   private readonly hiding = inject(HidingState);
@@ -68,6 +72,7 @@ export class MapView {
     // Re-render whenever any rendered input changes.
     effect(() => {
       this.players();
+      this.center();
       this.zone();
       this.stations();
       this.highlight();
@@ -159,7 +164,9 @@ export class MapView {
   }
 
   private init(): void {
-    this.map = L.map(this.el().nativeElement, { zoomAnimation: true, fadeAnimation: true }).setView(BUDAPEST, 12);
+    const c = this.center();
+    this.map = L.map(this.el().nativeElement, { zoomAnimation: true, fadeAnimation: true }).setView(c ? [c.lat, c.lng] : BUDAPEST, 12);
+    this.cityCentered = c != null;
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap, © CARTO',
       subdomains: 'abcd',
@@ -314,6 +321,16 @@ export class MapView {
         .bindTooltip(reveal.label ?? 'Hider was here', { permanent: true, direction: 'top', offset: [0, -22] })
         .addTo(this.overlay);
       this.map.setView([reveal.lat, reveal.lng], 15, { animate: true });
+    }
+
+    // Lobby / pre-hiding: nothing intentionally frames the map yet (no zone, pick, or reveal), so
+    // open it on the session's city rather than a stale default. One-shot, so it never fights a
+    // later recenter or the user panning around while they wait.
+    const city = this.center();
+    const framed = !!this.zone() || !!hl || !!reveal || !!this.previewZone();
+    if (city && !framed && !this.cityCentered) {
+      this.cityCentered = true;
+      this.map.setView([city.lat, city.lng], 12, { animate: false });
     }
   }
 }
