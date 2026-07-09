@@ -53,6 +53,9 @@ export class MapBackdrop {
     this.destroyRef.onDestroy(() => {
       clearInterval(drift);
       scheme.removeEventListener('change', onSchemeChange);
+      // Halt any in-flight flyTo first: otherwise its queued rAF frame fires on the just-removed
+      // map and computes an Invalid LatLng (NaN, NaN) — noisy on every navigate-away mid-drift.
+      map.stop();
       map.remove();
     });
   }
