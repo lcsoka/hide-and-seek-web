@@ -5,6 +5,7 @@ import { OverpassService } from '../maps/overpass';
 import { Position } from '../models';
 import { TransitService } from './transit.service';
 import { TransitStop } from './transit.model';
+import { collapseDirectionalStops } from './transit-stops';
 
 /**
  * Shared hiding selection: the nearby transit stops and the chosen one. Used by the
@@ -69,7 +70,7 @@ export class HidingState {
           };
         })
         .sort((a, b) => a.distM - b.distM);
-      const stops = this.collapseDirectionalStops(all);
+      const stops = collapseDirectionalStops(all);
       this.allStops.set(stops.map((s) => ({ lat: s.lat, lng: s.lng })));
       this.stations.set(stops.slice(0, 8));
       this.selected.set(stops[0] ?? null);
@@ -83,35 +84,4 @@ export class HidingState {
     }
   }
 
-  /**
-   * A real transit stop appears in OSM as one platform node per travel direction: same name, a
-   * few tens of metres apart, same modes. Those are ONE station for the game — so collapse
-   * same-named stops within SAME_STATION_M into the closest one (merging their modes). Otherwise
-   * the carve draws a perpendicular bisector toward the twin platform and eats half the zone.
-   * Input is sorted nearest-first, so the kept representative is the closest platform.
-   */
-  private collapseDirectionalStops(stops: TransitStop[]): TransitStop[] {
-    const SAME_STATION_M = 90;
-    const kept: TransitStop[] = [];
-    for (const s of stops) {
-      const twin =
-        s.name !== 'Unnamed stop'
-          ? kept.find((k) => k.name === s.name && this.metresBetween(k, s) <= SAME_STATION_M)
-          : undefined;
-      if (twin) {
-        twin.modes = [...new Set([...twin.modes, ...s.modes])];
-      } else {
-        kept.push({ ...s });
-      }
-    }
-
-    return kept;
-  }
-
-  private metresBetween(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
-    const dLat = (a.lat - b.lat) * 111000;
-    const dLng = (a.lng - b.lng) * 111000 * Math.cos((a.lat * Math.PI) / 180);
-
-    return Math.hypot(dLat, dLng);
-  }
 }
