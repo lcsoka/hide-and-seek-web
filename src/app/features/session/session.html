@@ -261,6 +261,10 @@
       </div>
     }
 
+    @if (role(s) === 'hider' && s.pending_discard) {
+      <app-discard-modal [sessionId]="s.session_id" [need]="s.pending_discard.need" [hand]="s.hand" />
+    }
+
     @if (role(s) === 'hider' && s.pending_draw) {
       <app-draw-modal [sessionId]="s.session_id" [draw]="s.pending_draw" />
     }

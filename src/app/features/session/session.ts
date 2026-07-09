@@ -27,6 +27,7 @@ import { CardDeck } from './card-deck';
 import { CurseAlert } from './curse-alert';
 import { DevTools } from './dev-tools';
 import { DrawModal } from './draw-modal';
+import { DiscardModal } from './discard-modal';
 import { FoundAlert } from './found-alert';
 import { GameHud } from './game-hud';
 import { HudNext } from './hud-next';
@@ -56,7 +57,7 @@ const OBJECTIVE_STATES = new Set(['hider_hiding', 'hider_seeking', 'hider_endgam
 @Component({
   selector: 'app-session',
   host: { class: 'block h-full w-full overflow-hidden' },
-  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, HudNext, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, QuestionResultToast, LocationGate, PushNudge, FoundAlert, Icon],
+  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, HudNext, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, DiscardModal, CurseAlert, RoundResults, QuestionResultToast, LocationGate, PushNudge, FoundAlert, Icon],
   templateUrl: './session.html',
 })
 export class SessionView {

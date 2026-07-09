@@ -76,6 +76,12 @@ export interface PendingDraw {
   cards: HandCard[];
 }
 
+/** A cycle powerup (discard N, draw N+1) awaiting the hider's choice of which cards to shed. */
+export interface PendingDiscard {
+  need: number; // how many hand cards to discard before the draw
+  draw: number; // how many will be drawn once the cost is paid
+}
+
 export interface CurseChoice {
   uid: string;
   curse_id: string | null;

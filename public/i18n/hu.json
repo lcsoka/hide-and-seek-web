@@ -179,6 +179,13 @@
     "kept": "marad",
     "keep": "Megtartás {{ chosen }}/{{ keep }}"
   },
+  "discard": {
+    "title": "Dobj el {{ need }} lapot",
+    "tap": "Koppints a kezedből eldobandó lapokra, majd erősítsd meg.",
+    "tapCard": "koppints",
+    "marked": "eldob",
+    "confirm": "Eldobás {{ chosen }}/{{ need }}"
+  },
   "landing": {
     "yourName": "A neved",
     "nameRequired": "Add meg a neved a kezdéshez",

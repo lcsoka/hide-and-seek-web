@@ -1,4 +1,4 @@
-import { ActiveCurse, CurseChoice, HandCard, PendingDraw } from './card.model';
+import { ActiveCurse, CurseChoice, HandCard, PendingDiscard, PendingDraw } from './card.model';
 import { FoundClaim, GameTimers, HidingZone, RoundReveal, Standing, TransitState } from './mechanics.model';
 import { PlayerView, TeamView } from './player.model';
 import { PendingQuestion, ResolvedQuestion, ThermometerRunning } from './question.model';
@@ -31,6 +31,7 @@ export interface GameState {
   hand: HandCard[];
   hand_limit: number | null; // hider-only: max cards they may hold (raised by 'draw_1_expand_1')
   pending_draw: PendingDraw | null;
+  pending_discard: PendingDiscard | null; // hider-only: a cycle powerup awaiting which cards to shed
   time_bonus_s: number | null;
   thermometer: ThermometerRunning | null;
   transit: TransitState | null; // seeker-only: board/alight status + the team's journey log

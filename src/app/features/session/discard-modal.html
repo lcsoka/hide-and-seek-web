@@ -1,0 +1,36 @@
+<div class="fixed inset-0 z-[820] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" *transloco="let t">
+  <div class="w-full max-w-md rounded-3xl bg-white p-4 shadow-2xl dark:bg-gray-900">
+    <h2 class="text-center text-lg font-bold">{{ t('discard.title', { need: target() }) }}</h2>
+    <p class="mb-3 text-center text-sm text-gray-500 dark:text-gray-400">{{ t('discard.tap') }}</p>
+
+    <div class="grid grid-cols-3 gap-2">
+      @for (c of hand(); track c.uid) {
+        <button (click)="toggle(c.uid)"
+                class="relative flex h-48 flex-col overflow-hidden rounded-xl border-2 bg-white text-left transition dark:bg-gray-900"
+                [style.borderColor]="isSelected(c.uid) ? 'var(--color-curse)' : cardColor(c)"
+                [class.scale-105]="isSelected(c.uid)"
+                [class.opacity-60]="!isSelected(c.uid) && selected().size >= target()">
+          <div class="px-1.5 py-1 text-[9px] font-bold leading-tight text-white" [style.background]="cardColor(c)">{{ c.name }}</div>
+          <div class="relative mx-1 mt-1 flex h-10 items-center justify-center rounded-md" [class]="cardTintClass(c)">
+            <span [style.color]="cardColor(c)"><app-icon [name]="cardEmblem(c)" [size]="24" /></span>
+            @if (c.type === 'time_bonus') { <span class="absolute right-1.5 text-xs font-extrabold" [style.color]="cardColor(c)">+{{ c.minutes }}′</span> }
+          </div>
+          <div class="min-h-0 flex-1 px-1.5 pt-1">
+            @if (c.description) { <p class="line-clamp-4 text-[8px] leading-snug text-gray-600 dark:text-gray-300">{{ c.description }}</p> }
+          </div>
+          <div class="p-1">
+            <span class="flex items-center justify-center gap-1 rounded-md py-1 text-center text-[9px] font-bold uppercase tracking-wide"
+                  [class]="isSelected(c.uid) ? 'bg-rose-600 text-white' : 'text-gray-400 ring-1 ring-inset ring-gray-200 dark:ring-gray-700'">
+              @if (isSelected(c.uid)) { <app-icon name="ban" [size]="12" /> {{ t('discard.marked') }} } @else { {{ t('discard.tapCard') }} }
+            </span>
+          </div>
+        </button>
+      }
+    </div>
+
+    <button (click)="confirm()" [disabled]="busy() || !canConfirm()"
+            class="mt-4 w-full rounded-xl bg-rose-600 p-3 font-semibold text-white transition hover:brightness-110 disabled:opacity-40">
+      {{ t('discard.confirm', { chosen: selected().size, need: target() }) }}
+    </button>
+  </div>
+</div>

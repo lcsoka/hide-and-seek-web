@@ -179,6 +179,13 @@
     "kept": "keep",
     "keep": "Keep {{ chosen }}/{{ keep }}"
   },
+  "discard": {
+    "title": "Discard {{ need }} card(s)",
+    "tap": "Tap the cards to discard from your hand, then confirm.",
+    "tapCard": "tap",
+    "marked": "discard",
+    "confirm": "Discard {{ chosen }}/{{ need }}"
+  },
   "landing": {
     "yourName": "Your name",
     "nameRequired": "Enter your name to start",
