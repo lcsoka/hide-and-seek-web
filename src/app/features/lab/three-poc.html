@@ -16,9 +16,14 @@
           Valódi WebGL: lágy árnyékok, esti fény. Vidd a kártya fölé az egeret (megemelkedik), kattints rá (megfordul).
         </p>
       </div>
-      <a routerLink="/" class="pointer-events-auto rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/10">
-        ← Vissza
-      </a>
+      <div class="pointer-events-auto flex items-center gap-2">
+        <a routerLink="/lab/diorama" class="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/10">
+          Dioráma POC →
+        </a>
+        <a routerLink="/" class="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/10">
+          Vissza
+        </a>
+      </div>
     </div>
 
     <!-- Bottom control dock (flat/cartoon buttons — no fake 3D) -->

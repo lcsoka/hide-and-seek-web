@@ -1,0 +1,47 @@
+<div class="fixed inset-0 overflow-hidden bg-[#171430]">
+  <!-- WebGL stage -->
+  <div #host class="absolute inset-0"></div>
+
+  <!-- Flat DOM HUD over the 3D stage -->
+  <div class="pointer-events-none absolute inset-0 flex flex-col justify-between p-4 sm:p-6">
+    <div class="flex items-start justify-between gap-3">
+      <div class="pointer-events-auto">
+        <div class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.28em] text-indigo-300">
+          <span class="h-1.5 w-1.5 rounded-full bg-rose-500 shadow-[0_0_10px] shadow-rose-500"></span>
+          three.js POC · ambient dioráma
+        </div>
+        <h1 class="mt-1 font-display text-2xl font-extrabold text-white sm:text-3xl">Papírváros — élő makett</h1>
+        <p class="mt-1 max-w-sm text-sm leading-snug text-indigo-200/70">
+          Forgó papírmakett-város világító ablakokkal, folyóval, híddal és metró-színű villamosokkal — a landing/lobby hangulati háttere.
+        </p>
+      </div>
+      <a routerLink="/lab" class="pointer-events-auto rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/10">
+        Kártya POC →
+      </a>
+    </div>
+
+    <div class="flex flex-col items-center gap-3">
+      <div class="pointer-events-auto flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 p-2 backdrop-blur-md">
+        <button (click)="toggleRotate()"
+                class="rounded-xl px-4 py-2.5 text-sm font-bold text-white transition active:scale-95"
+                [class]="rotating() ? 'bg-rose-600 shadow-lg shadow-rose-600/30 hover:brightness-110' : 'bg-white/10 hover:bg-white/20'">
+          {{ rotating() ? 'Forgás: be' : 'Forgás: ki' }}
+        </button>
+        <button (click)="toggleDusk()"
+                class="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/20 active:scale-95">
+          {{ dusk() ? 'Este' : 'Nappal' }}
+        </button>
+        <a routerLink="/" class="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white/90 transition hover:bg-white/20">Vissza</a>
+      </div>
+      <div class="pointer-events-none text-[11px] text-indigo-200/50">
+        Procedurális makett · a mostani appból semmit nem érint
+      </div>
+    </div>
+  </div>
+
+  @if (!ready()) {
+    <div class="absolute inset-0 grid place-items-center text-indigo-200/70">
+      <div class="animate-pulse text-sm font-semibold tracking-wide">Makett építése…</div>
+    </div>
+  }
+</div>
