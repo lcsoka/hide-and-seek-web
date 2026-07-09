@@ -22,7 +22,11 @@
     "cityTitle": "Melyik városban?",
     "cityHint": "A pálya mérete és az elérhető közlekedés a városhoz van kötve.",
     "transitShort": "közlekedés",
-    "size": { "small": "Kicsi", "medium": "Közepes", "large": "Nagy" },
+    "size": {
+      "small": "Kicsi",
+      "medium": "Közepes",
+      "large": "Nagy"
+    },
     "transitTitle": "Hol bújhatnak el?",
     "transitHint": "A(z) {{ city }} városban elérhető megállótípusok — koppints, amiket használtok.",
     "transitNeedOne": "Legalább egy közlekedési módot válassz.",
@@ -571,6 +575,15 @@
     "bodyNamed": "{{name}} bejelentette, hogy megtalált.",
     "confirm": "Elkaptak",
     "dispute": "Vitatom"
+  },
+  "geo": {
+    "eyebrow": "Helymegosztás",
+    "title": "Oszd meg a helyzeted",
+    "body": "A játékhoz mindenkinek meg kell osztania a helyzetét — így követi a rendszer a bújót és a keresőket is. Engedélyezd a helymeghatározást a folytatáshoz.",
+    "enable": "Helyzet engedélyezése",
+    "deniedBody": "A helymeghatározás le van tiltva ebben a böngészőben. A játékhoz engedélyezned kell.",
+    "deniedHint": "Nyisd meg a böngésző címsorában a lakat ikont (vagy a webhely beállításait), és állítsd a Helymeghatározást „Engedélyezés” értékre — a játék automatikusan folytatódik.",
+    "waiting": "Várakozás az engedélyre…"
   },
   "update": {
     "available": "Új verzió érhető el",

@@ -22,7 +22,11 @@
     "cityTitle": "Which city?",
     "cityHint": "The play size and available transit are tied to the city.",
     "transitShort": "transit",
-    "size": { "small": "Small", "medium": "Medium", "large": "Large" },
+    "size": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
+    },
     "transitTitle": "Where can they hide?",
     "transitHint": "The stop types available in {{ city }} — tap the ones you'll use.",
     "transitNeedOne": "Pick at least one transit mode.",
@@ -571,6 +575,15 @@
     "bodyNamed": "{{name}} claims they found you.",
     "confirm": "I'm caught",
     "dispute": "Dispute"
+  },
+  "geo": {
+    "eyebrow": "Location sharing",
+    "title": "Share your location",
+    "body": "Everyone needs to share their location to play — it's how the game tracks the hider and the seekers. Allow location access to continue.",
+    "enable": "Enable location",
+    "deniedBody": "Location is blocked in this browser. You need to allow it to play.",
+    "deniedHint": "Open the lock icon in the address bar (or the site settings) and set Location to “Allow” — the game will continue automatically.",
+    "waiting": "Waiting for permission…"
   },
   "update": {
     "available": "A new version is available",

@@ -273,5 +273,11 @@
     @if (role(s) === 'hider' && s.found_claim; as fc) {
       <app-found-alert [claim]="fc" [busy]="acting()" (confirm)="act('confirm_caught')" (dispute)="act('dispute_found')" />
     }
+
+    <!-- Once the game is live, everyone must share their location to play (both roles are tracked).
+         Not enforced in a dev build, where the debug tools drive the simulated position. -->
+    @if (!devMode) {
+      <app-location-gate [show]="activePlay(s)" />
+    }
   </div>
 }

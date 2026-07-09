@@ -13,6 +13,7 @@ import { DevMode } from '../../core/services/dev-mode';
 import { QuestionEvalResult } from '../../core/services/debug-api';
 import { HidingState } from '../../core/services/hiding-state';
 import { HudPreference } from '../../core/services/hud-preference';
+import { GeolocationPermission } from '../../core/services/geolocation-permission';
 import { LocationTracker } from '../../core/services/location';
 import { PlayerStore } from '../../core/services/player-store';
 import { Realtime } from '../../core/services/realtime';
@@ -38,6 +39,7 @@ import { TransitPicker } from './transit-picker';
 import { BoardChoice } from './transit-picker.model';
 import { RoundResults } from './round-results';
 import { QuestionResultToast } from './question-result-toast';
+import { LocationGate } from './location-gate';
 import { SeekerPanel } from './seeker-panel';
 import { PushNudge } from '../../shared/push-nudge';
 import { Icon } from '../../shared/icon';
@@ -54,7 +56,7 @@ const OBJECTIVE_STATES = new Set(['hider_hiding', 'hider_seeking', 'hider_endgam
 @Component({
   selector: 'app-session',
   host: { class: 'block h-full w-full overflow-hidden' },
-  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, HudNext, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, QuestionResultToast, PushNudge, FoundAlert, Icon],
+  imports: [RouterLink, TranslocoModule, MapView, DeductionMap, GameHud, HudNext, LobbyPanel, HostPanel, HiderPanel, SeekerPanel, CardDeck, DevTools, QuestionPicker, TransitPicker, DrawModal, CurseAlert, RoundResults, QuestionResultToast, LocationGate, PushNudge, FoundAlert, Icon],
   templateUrl: './session.html',
 })
 export class SessionView {
@@ -62,6 +64,7 @@ export class SessionView {
   private readonly api = inject(ApiClient);
   private readonly realtime = inject(Realtime);
   private readonly location = inject(LocationTracker);
+  readonly geoPermission = inject(GeolocationPermission);
   private readonly players = inject(PlayerStore);
   readonly store = inject(SessionStore);
   readonly hud = inject(HudPreference);
@@ -162,6 +165,13 @@ export class SessionView {
       // so don't let the browser GPS overwrite the simulated location.
       if (!this.devMode) {
         this.location.start(sessionId, this.myId());
+        // If the player was denied at first (tracking stopped) and later allows location — from the
+        // gate button or from browser settings — restart the live loop. start() is idempotent.
+        effect(() => {
+          if (this.geoPermission.state() === 'granted') {
+            this.location.start(sessionId, this.myId());
+          }
+        });
       }
 
       // Fallback poll: while the realtime socket is down, refresh /state periodically so
