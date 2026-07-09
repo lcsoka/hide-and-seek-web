@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ActiveSession } from '../../core/models';
-import { TRANSIT_MODES } from '../../core/maps/overpass';
 import { ApiClient } from '../../core/services/api-client';
 import { AuthStore } from '../../core/services/auth-store';
 import { PlayerStore } from '../../core/services/player-store';
@@ -13,10 +12,11 @@ import { InstallBanner } from '../../shared/install-banner';
 import { LangToggle } from '../../shared/lang-toggle';
 import { MapBackdrop } from '../../shared/map-backdrop';
 import { Icon } from '../../shared/icon';
+import { NewGameWizard } from './new-game-wizard';
 
 @Component({
   selector: 'app-landing',
-  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop, AppFooter, InstallBanner, Icon],
+  imports: [FormsModule, RouterLink, TranslocoModule, LangToggle, MapBackdrop, AppFooter, InstallBanner, Icon, NewGameWizard],
   host: { class: 'block h-full' },
   templateUrl: './landing.html',
 })
@@ -31,24 +31,15 @@ export class Landing {
 
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
-  readonly createOpen = signal(false);
+  readonly wizardOpen = signal(false); // the full-screen new-game wizard
   readonly joinOpen = signal(false);
   // Still-live games the user can rejoin, and the "start a new one anyway?" confirmation.
   readonly activeSessions = signal<ActiveSession[]>([]);
   readonly confirmNew = signal(false);
 
-  readonly cities = ['budapest', 'debrecen', 'szeged', 'miskolc', 'pecs', 'gyor', 'nyiregyhaza', 'kecskemet', 'szekesfehervar', 'szombathely'];
-  readonly sizes = ['small', 'medium', 'large'];
-  readonly allModes = TRANSIT_MODES;
-  readonly modes = signal<string[]>(['metro', 'tram']);
   readonly steps = [{ key: 'hide', icon: 'hide' }, { key: 'ask', icon: 'ask' }, { key: 'catch', icon: 'seek' }];
 
   name = '';
-  city = 'budapest';
-  size = 'medium';
-  units = 'metric';
-  zoneRule = 'nearest';
-  revealSeekers = false; // casual: show seeker positions to the hider (faithful = off)
   joinCode = '';
 
   constructor() {
@@ -89,42 +80,23 @@ export class Landing {
     void this.router.navigate(['/s', s.id]);
   }
 
-  /** Open the create sheet — but confirm first if the user already has a live game. */
+  /** Open the new-game wizard — but confirm first if the user already has a live game. */
   startGame(): void {
     if (this.activeSessions().length) {
       this.confirmNew.set(true);
     } else {
-      this.createOpen.set(true);
+      this.wizardOpen.set(true);
     }
   }
 
   proceedNewGame(): void {
     this.confirmNew.set(false);
-    this.createOpen.set(true);
-  }
-
-  /** Toggle a transit mode, but never let the last one be removed (need ≥1 to hide at). */
-  toggleMode(id: string): void {
-    this.modes.update((m) => (m.includes(id) ? (m.length > 1 ? m.filter((x) => x !== id) : m) : [...m, id]));
+    this.wizardOpen.set(true);
   }
 
   /** Join codes are 6 uppercase alphanumerics (SessionFactory Str::random(6)); be lenient on length. */
   joinCodeValid(): boolean {
     return /^[A-Za-z0-9]{4,8}$/.test(this.joinCode.trim());
-  }
-
-  async create(): Promise<void> {
-    if (!this.name.trim()) {
-      return;
-    }
-    await this.run(async () => {
-      await this.ensureToken();
-      const session = await this.api.createSession({ city: this.city, game_size: this.size, display_name: this.name.trim(), config: { units: this.units, transit_modes: this.modes(), hiding_zone_rule: this.zoneRule, reveal_seekers_to_hider: this.revealSeekers } });
-      if (session.host_player_id) {
-        this.players.set(session.id, session.host_player_id);
-      }
-      await this.router.navigate(['/s', session.id]);
-    }, this.transloco.translate('landing.createFailed'));
   }
 
   async join(): Promise<void> {

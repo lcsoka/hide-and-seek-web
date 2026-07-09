@@ -2,7 +2,7 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ActiveSession, CurseCatalogItem, CustomCurse, CustomQuestion, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models';
+import { ActiveSession, CityOption, CurseCatalogItem, CustomCurse, CustomQuestion, DeckCard, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models';
 
 /**
  * Typed wrapper over the REST contract. Reads use `httpResource` (signals);
@@ -87,12 +87,22 @@ export class ApiClient {
 
   createSession(body: {
     city: string;
-    game_size: string;
+    game_size?: string; // ignored by the server (size is tied to the city) — kept for back-compat
     game_mode?: string;
     display_name?: string;
     config?: Record<string, unknown>;
   }): Promise<SessionSummary> {
     return firstValueFrom(this.http.post<SessionSummary>(`${this.base}/sessions`, body));
+  }
+
+  /** Playable cities for the new-game wizard (image, size, transit modes). */
+  cities(): Promise<CityOption[]> {
+    return firstValueFrom(this.http.get<CityOption[]>(`${this.base}/cities`));
+  }
+
+  /** The full hider deck the host can curate (official + own custom); requires auth. */
+  deck(): Promise<DeckCard[]> {
+    return firstValueFrom(this.http.get<DeckCard[]>(`${this.base}/deck`));
   }
 
   join(code: string, displayName: string): Promise<{ player: PlayerView; session: SessionSummary }> {

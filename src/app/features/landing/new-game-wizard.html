@@ -1,0 +1,210 @@
+@if (open()) {
+  <div class="fixed inset-0 z-[900] flex justify-center bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white" *transloco="let t">
+   <div class="flex w-full max-w-lg flex-col">
+    <!-- Header + progress -->
+    <div class="flex shrink-0 items-center gap-3 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2">
+      <button (click)="back()" [attr.aria-label]="t('common.back')"
+              class="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-gray-200 bg-white text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
+        <app-icon [name]="step() === 1 ? 'x' : 'arrow'" [size]="18" />
+      </button>
+      <span class="font-display text-base font-bold">{{ t('wizard.title') }}</span>
+      <span class="ml-auto font-mono text-xs font-bold text-gray-400">{{ step() }} / 4</span>
+    </div>
+    <div class="mx-4 h-1 shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+      <div class="h-full rounded-full bg-brand transition-all duration-300" [style.width.%]="step() * 25"></div>
+    </div>
+
+    <!-- Body -->
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+      @switch (step()) {
+        <!-- STEP 1 — city -->
+        @case (1) {
+          <div class="wz-step">
+            <h2 class="text-xl font-bold tracking-tight">{{ t('wizard.cityTitle') }}</h2>
+            <p class="mb-4 mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ t('wizard.cityHint') }}</p>
+            @if (cities().length) {
+              <div class="grid grid-cols-2 gap-2.5">
+                @for (c of cities(); track c.key) {
+                  <button (click)="pickCity(c.key)"
+                          class="relative aspect-[1/1.05] overflow-hidden rounded-2xl border-2 text-left transition"
+                          [class]="cityKey() === c.key ? 'border-brand' : 'border-transparent'">
+                    @if (c.image) {
+                      <img [src]="c.image" alt="" class="absolute inset-0 h-full w-full object-cover" />
+                    } @else {
+                      <div class="absolute inset-0" [style.background]="coverBg(c.key)"></div>
+                    }
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
+                    @if (cityKey() === c.key) {
+                      <span class="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-brand text-white shadow"><app-icon name="check" [size]="13" /></span>
+                    }
+                    <div class="absolute inset-x-2.5 bottom-2 text-white">
+                      <div class="font-bold leading-tight">{{ c.name }}</div>
+                      <div class="text-[10px] opacity-85">{{ t('wizard.size.' + c.size) }} · {{ c.modes.length }} {{ t('wizard.transitShort') }}</div>
+                    </div>
+                  </button>
+                }
+              </div>
+            } @else {
+              <p class="py-10 text-center text-sm text-gray-400">{{ t('wizard.loading') }}</p>
+            }
+          </div>
+        }
+
+        <!-- STEP 2 — transit -->
+        @case (2) {
+          <div class="wz-step">
+            <h2 class="text-xl font-bold tracking-tight">{{ t('wizard.transitTitle') }}</h2>
+            <p class="mb-4 mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ t('wizard.transitHint', { city: city()?.name }) }}</p>
+            <div class="grid grid-cols-2 gap-2.5">
+              @for (m of cityModes(); track m) {
+                <button (click)="toggleMode(m)"
+                        class="relative flex flex-col gap-2 rounded-2xl border-2 p-3 text-left transition"
+                        [class]="modeState()[m] ? 'border-brand bg-brand/5' : 'border-gray-200 dark:border-gray-700'">
+                  <span class="absolute right-2.5 top-2.5 grid h-5 w-5 place-items-center rounded-full border-2 transition"
+                        [class]="modeState()[m] ? 'border-brand bg-brand text-white' : 'border-gray-300 dark:border-gray-600'">
+                    @if (modeState()[m]) { <app-icon name="check" [size]="11" /> }
+                  </span>
+                  <span class="grid h-10 w-10 place-items-center rounded-xl transition"
+                        [class]="modeState()[m] ? 'bg-brand text-white' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'">
+                    <app-icon [name]="modeIcon(m)" [size]="20" />
+                  </span>
+                  <span class="text-sm font-semibold">{{ t('mode.' + m) }}</span>
+                </button>
+              }
+            </div>
+            @if (selectedModes().length === 0) {
+              <p class="mt-3 text-center text-xs font-medium text-amber-600 dark:text-amber-400">{{ t('wizard.transitNeedOne') }}</p>
+            }
+          </div>
+        }
+
+        <!-- STEP 3 — deck -->
+        @case (3) {
+          <div class="wz-step">
+            <h2 class="text-xl font-bold tracking-tight">{{ t('wizard.deckTitle') }}</h2>
+            <p class="mb-3 mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ t('wizard.deckHint') }}</p>
+            <div class="mb-3 flex gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
+              @for (tb of deckTabs; track tb.key) {
+                @if (tb.key !== 'mine' || hasMine()) {
+                  <button (click)="deckTab.set(tb.key)"
+                          class="flex-1 rounded-lg py-2 text-[11px] font-bold transition"
+                          [class]="deckTab() === tb.key ? 'bg-brand text-white' : 'text-gray-500 dark:text-gray-400'">{{ t(tb.label) }}</button>
+                }
+              }
+            </div>
+            <div class="mb-2 flex items-center justify-between text-[11px]">
+              <span class="text-gray-500 dark:text-gray-400"><b class="text-gray-900 dark:text-white">{{ deckCount() }}</b> {{ t('wizard.deckInPlay') }}</span>
+              <button (click)="toggleCategory()" class="font-bold text-brand">{{ t('wizard.deckToggleCat') }}</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              @for (c of deckByTab(); track c.id) {
+                <button (click)="toggleCard(c.id)" class="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-2.5 text-left dark:border-gray-700 dark:bg-gray-900">
+                  <span class="absolute inset-y-0 left-0 w-[3px]" [style.background]="deckAccent(c)"></span>
+                  @if (c.is_custom) {
+                    <span class="absolute right-1.5 top-1.5 rounded bg-sky-500 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-white">{{ t('wizard.deckOwn') }}</span>
+                  }
+                  <span class="mb-2 grid h-7 w-7 place-items-center rounded-lg bg-gray-100 dark:bg-gray-800" [style.color]="deckAccent(c)"><app-icon [name]="deckEmblem(c)" [size]="16" /></span>
+                  <div class="text-xs font-bold leading-tight">{{ c.name }}</div>
+                  @if (c.cost) { <div class="mt-0.5 text-[9px] text-gray-400">{{ c.cost }}</div> }
+                  @if (isExcluded(c.id)) {
+                    <div class="absolute inset-0 grid place-items-center bg-white/85 dark:bg-gray-950/85">
+                      <span class="rounded-lg border border-dashed border-gray-300 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-gray-400 dark:border-gray-600">{{ t('wizard.deckSkipped') }}</span>
+                    </div>
+                  }
+                </button>
+              } @empty {
+                <p class="col-span-2 py-8 text-center text-sm text-gray-400">{{ t('wizard.deckEmptyCat') }}</p>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- STEP 4 — summary -->
+        @case (4) {
+          <div class="wz-step">
+            <h2 class="text-xl font-bold tracking-tight">{{ t('wizard.readyTitle') }}</h2>
+            <p class="mb-3 mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ t('wizard.readyHint') }}</p>
+            <div class="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700">
+              <div class="relative h-24">
+                @if (city()?.image) {
+                  <img [src]="city()!.image" alt="" class="absolute inset-0 h-full w-full object-cover" />
+                } @else {
+                  <div class="absolute inset-0" [style.background]="coverBg(cityKey() || '')"></div>
+                }
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div class="absolute bottom-2.5 left-3.5 text-lg font-bold text-white">{{ city()?.name }}</div>
+              </div>
+              <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                <div class="flex items-center justify-between px-3.5 py-2.5 text-xs"><span class="text-gray-500 dark:text-gray-400">{{ t('wizard.sumSize') }}</span><span class="font-medium text-gray-400">{{ t('wizard.size.' + (city()?.size || 'medium')) }} · {{ t('wizard.sumSizeCity') }}</span></div>
+                <div class="flex items-center justify-between gap-3 px-3.5 py-2.5 text-xs"><span class="shrink-0 text-gray-500 dark:text-gray-400">{{ t('wizard.sumTransit') }}</span><span class="truncate text-right font-semibold">{{ selectedModeLabels(t) }}</span></div>
+                <div class="flex items-center justify-between px-3.5 py-2.5 text-xs"><span class="text-gray-500 dark:text-gray-400">{{ t('wizard.sumDeck') }}</span><span class="font-semibold">{{ deckCount() }} {{ t('wizard.deckInPlay') }}</span></div>
+                <div class="flex items-center justify-between px-3.5 py-2.5 text-xs"><span class="text-gray-500 dark:text-gray-400">{{ t('wizard.sumUnits') }}</span><span class="font-medium text-gray-400">{{ t('wizard.sumMetric') }}</span></div>
+              </div>
+            </div>
+
+            <label class="mt-3 flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+              <span class="min-w-0">
+                <span class="block text-xs font-semibold">{{ t('wizard.revealTitle') }}</span>
+                <span class="block text-[10px] text-gray-400">{{ t('wizard.revealHint') }}</span>
+              </span>
+              <button type="button" (click)="reveal.set(!reveal())" role="switch" [attr.aria-checked]="reveal()"
+                      class="relative h-6 w-11 shrink-0 rounded-full transition-colors" [class]="reveal() ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-600'">
+                <span class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all" [class]="reveal() ? 'left-[22px]' : 'left-0.5'"></span>
+              </button>
+            </label>
+
+            @if (playerName()) {
+              <p class="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">{{ t('wizard.playingAs', { name: playerName() }) }}</p>
+            }
+            @if (error(); as e) {
+              <p class="mt-3 rounded-xl bg-red-500/90 p-2.5 text-center text-sm text-white">{{ e }}</p>
+            }
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="flex shrink-0 gap-2 border-t border-gray-100 bg-gray-50 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] dark:border-gray-800 dark:bg-gray-950">
+      @if (step() > 1) {
+        <button (click)="back()" class="rounded-xl border border-gray-300 bg-white px-5 font-semibold text-gray-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ t('common.back') }}</button>
+      }
+      <button (click)="next()" [disabled]="!canNext() || busy()"
+              class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand p-3.5 font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40">
+        @if (step() === 4) { <app-icon name="play" [size]="17" /> {{ t('wizard.create') }} } @else { {{ t('common.next') }} }
+      </button>
+    </div>
+   </div>
+
+    <!-- Exit confirmation -->
+    @if (exitConfirm()) {
+      <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
+        <div class="w-full max-w-xs rounded-2xl bg-white p-5 text-center shadow-2xl dark:bg-gray-900">
+          <h3 class="font-display text-base font-bold">{{ t('wizard.exitTitle') }}</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ t('wizard.exitBody') }}</p>
+          <div class="mt-4 flex gap-2">
+            <button (click)="exitConfirm.set(false)" class="flex-1 rounded-xl border border-gray-300 py-2.5 text-sm font-semibold dark:border-gray-600">{{ t('wizard.exitStay') }}</button>
+            <button (click)="confirmExit()" class="flex-1 rounded-xl bg-brand py-2.5 text-sm font-semibold text-white">{{ t('wizard.exitLeave') }}</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Create → lobby transition -->
+    @if (shuffling()) {
+      <div class="absolute inset-0 z-40 flex flex-col items-center justify-center gap-7"
+           style="background: radial-gradient(60% 50% at 50% 42%, #2a1020 0%, #080b14 72%)">
+        <div class="relative h-36 w-28">
+          <div class="fc absolute left-1/2 top-1/2 -ml-7 -mt-10 h-20 w-14 rounded-lg border border-white/15 bg-gradient-to-br from-slate-700 to-slate-900 shadow-xl"></div>
+          <div class="fc absolute left-1/2 top-1/2 -ml-7 -mt-10 h-20 w-14 rounded-lg border border-white/15 bg-gradient-to-br from-slate-700 to-slate-900 shadow-xl"></div>
+          <div class="fc absolute left-1/2 top-1/2 -ml-7 -mt-10 h-20 w-14 rounded-lg border border-white/15 bg-gradient-to-br from-slate-700 to-slate-900 shadow-xl"></div>
+          <div class="fc absolute left-1/2 top-1/2 -ml-7 -mt-10 h-20 w-14 rounded-lg border border-white/15 bg-gradient-to-br from-slate-700 to-slate-900 shadow-xl"></div>
+        </div>
+        <div class="text-center">
+          <div class="font-display text-base font-bold text-white">{{ t('wizard.shuffling') }}</div>
+          <div class="mt-1 text-xs text-gray-400">{{ city()?.name }} · {{ t('wizard.preparing') }}</div>
+        </div>
+      </div>
+    }
+  </div>
+}

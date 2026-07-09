@@ -115,67 +115,8 @@
     </div>
   }
 
-  <!-- Create-game sheet -->
-  @if (createOpen()) {
-    <div class="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center" (click)="createOpen.set(false)">
-      <div class="max-h-[88vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-t-3xl bg-white p-5 text-gray-900 shadow-2xl ring-1 ring-gray-200 sm:m-3 sm:rounded-3xl dark:bg-gray-900 dark:text-white dark:ring-white/10" (click)="$event.stopPropagation()">
-        <div class="flex items-center justify-between">
-          <h2 class="font-display text-xl font-bold">{{ t('landing.startGame') }}</h2>
-          <button (click)="createOpen.set(false)" class="text-gray-400 hover:text-gray-700 dark:text-white/50 dark:hover:text-white"><app-icon name="x" [size]="22" /></button>
-        </div>
-
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label class="space-y-1 text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.cityLabel') }}
-            <select [(ngModel)]="city" class="w-full rounded-lg border border-gray-300 bg-white p-3 capitalize text-gray-900 dark:border-white/15 dark:bg-white/10 dark:text-white">
-              @for (c of cities; track c) { <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" [value]="c">{{ c }}</option> }
-            </select>
-          </label>
-          <label class="space-y-1 text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.sizeLabel') }}
-            <select [(ngModel)]="size" class="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 dark:border-white/15 dark:bg-white/10 dark:text-white">
-              @for (s of sizes; track s) { <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" [value]="s">{{ t('landing.size.' + s) }}</option> }
-            </select>
-          </label>
-          <label class="space-y-1 text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.unitsLabel') }}
-            <select [(ngModel)]="units" class="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 dark:border-white/15 dark:bg-white/10 dark:text-white">
-              <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" value="metric">{{ t('landing.units.metric') }}</option>
-              <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" value="imperial">{{ t('landing.units.imperial') }}</option>
-            </select>
-          </label>
-          <label class="space-y-1 text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.zoneLabel') }}
-            <select [(ngModel)]="zoneRule" class="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 dark:border-white/15 dark:bg-white/10 dark:text-white">
-              <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" value="nearest">{{ t('landing.zoneCarved') }}</option>
-              <option class="bg-white text-gray-900 dark:bg-gray-800 dark:text-white" value="circle">{{ t('landing.zoneCircle') }}</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="space-y-1.5">
-          <div class="text-xs font-medium text-gray-500 dark:text-white/60">{{ t('landing.transport') }}</div>
-          <div class="flex flex-wrap gap-2">
-            @for (m of allModes; track m.id) {
-              <button type="button" (click)="toggleMode(m.id)"
-                      class="rounded-full border px-3 py-1.5 text-sm font-medium transition"
-                      [class]="modes().includes(m.id) ? 'border-rose-500 bg-rose-500/10 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300' : 'border-gray-300 text-gray-500 hover:border-gray-400 dark:border-white/15 dark:text-white/50 dark:hover:border-white/30'">
-                {{ t('mode.' + m.id) }}
-              </button>
-            }
-          </div>
-          <p class="text-xs text-gray-500 dark:text-white/40">{{ t('landing.transportHint') }}</p>
-        </div>
-
-        <label class="flex items-start gap-2 text-sm">
-          <input type="checkbox" [(ngModel)]="revealSeekers" class="mt-0.5 h-4 w-4 rounded border-gray-300 text-rose-600 dark:border-white/30 dark:bg-white/10" />
-          <span>{{ t('landing.revealSeekers') }}<span class="block text-xs text-gray-500 dark:text-white/40">{{ t('landing.revealSeekersHint') }}</span></span>
-        </label>
-
-        @if (error(); as e) { <p class="rounded-lg bg-red-500/90 p-2.5 text-sm text-white">{{ e }}</p> }
-        <button (click)="create()" [disabled]="busy()"
-                class="w-full rounded-xl bg-rose-600 p-3.5 font-semibold text-white shadow-lg shadow-rose-600/30 transition hover:bg-rose-500 disabled:opacity-50 dark:shadow-rose-950/50">
-          {{ t('landing.createGame') }}
-        </button>
-      </div>
-    </div>
-  }
+  <!-- Full-screen new-game wizard (city → transit → deck → start). -->
+  <app-new-game-wizard [open]="wizardOpen()" [playerName]="name" (closeChange)="wizardOpen.set($event)" />
 
   <!-- Join sheet -->
   @if (joinOpen()) {
