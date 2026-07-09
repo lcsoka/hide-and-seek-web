@@ -232,7 +232,8 @@
     "host": "házigazda",
     "needPlayers": "Legalább 2 játékos kell",
     "start": "Játék indítása",
-    "waiting": "Várakozás a házigazdára…"
+    "waiting": "Várakozás a házigazdára…",
+    "leave": "Kilépés a váróteremből"
   },
   "host": {
     "choose": "Válaszd ki a bújót",

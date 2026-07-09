@@ -1,4 +1,5 @@
 import { Component, inject, input, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
 import { GameState } from '../../core/models';
 import { ApiClient } from '../../core/services/api-client';
@@ -16,6 +17,7 @@ import { Icon } from '../../shared/icon';
 export class LobbyPanel {
   private readonly api = inject(ApiClient);
   private readonly store = inject(SessionStore);
+  private readonly router = inject(Router);
 
   readonly state = input.required<GameState>();
   readonly sessionId = input.required<string>();
@@ -46,5 +48,10 @@ export class LobbyPanel {
       this.busy.set(false);
       this.store.refresh();
     }
+  }
+
+  /** Go back to the landing; the session view removes this player from the lobby on teardown. */
+  leave(): void {
+    void this.router.navigate(['/']);
   }
 }

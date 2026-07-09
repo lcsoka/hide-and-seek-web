@@ -232,7 +232,8 @@
     "host": "host",
     "needPlayers": "Need at least 2 players",
     "start": "Start game",
-    "waiting": "Waiting for the host to start…"
+    "waiting": "Waiting for the host to start…",
+    "leave": "Leave lobby"
   },
   "host": {
     "choose": "Choose the hider",

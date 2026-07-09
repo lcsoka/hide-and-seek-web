@@ -193,6 +193,15 @@ export class SessionView {
         document.removeEventListener('visibilitychange', onVisible);
         window.removeEventListener('online', onOnline);
       });
+
+      // Leaving the session view WHILE STILL IN THE LOBBY frees the slot (the server keeps in-game
+      // players). onDestroy only fires on in-app navigation away — NOT on a hard refresh (Angular
+      // doesn't run destroy hooks when the document unloads) — so a refresh never removes you.
+      destroyRef.onDestroy(() => {
+        if (this.store.state()?.state === 'lobby') {
+          this.api.leaveSession(sessionId);
+        }
+      });
     }
 
     // 1s local tick for countdowns (no server hit). State updates come from realtime

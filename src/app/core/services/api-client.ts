@@ -3,6 +3,7 @@ import { inject, Injectable, Signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ActiveSession, CityOption, CurseCatalogItem, CustomCurse, CustomQuestion, DeckCard, GameState, GuestAuth, PlayerView, Profile, ProfileStats, QuestionCatalogItem, SessionSummary } from '../models';
+import { TokenStore } from './token-store';
 
 /**
  * Typed wrapper over the REST contract. Reads use `httpResource` (signals);
@@ -11,6 +12,7 @@ import { ActiveSession, CityOption, CurseCatalogItem, CustomCurse, CustomQuestio
 @Injectable({ providedIn: 'root' })
 export class ApiClient {
   private readonly http = inject(HttpClient);
+  private readonly tokens = inject(TokenStore);
   private readonly base = environment.apiBase;
 
   guest(displayName?: string): Promise<GuestAuth> {
@@ -109,6 +111,24 @@ export class ApiClient {
     return firstValueFrom(
       this.http.post<{ player: PlayerView; session: SessionSummary }>(`${this.base}/sessions/${code}/join`, { display_name: displayName }),
     );
+  }
+
+  /**
+   * Leave a game (the server only removes lobby players; in-game is kept). Best-effort and fired
+   * from teardown, so it uses `fetch` with `keepalive` — it must both carry the auth header AND
+   * outlive the page, which neither HttpClient (no keepalive) nor sendBeacon (no headers) can do.
+   */
+  leaveSession(id: string): void {
+    const token = this.tokens.token();
+    try {
+      void fetch(`${this.base}/sessions/${id}/leave`, {
+        method: 'POST',
+        keepalive: true,
+        headers: { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+    } catch {
+      // Unload-time best effort — the prune sweep is the backstop.
+    }
   }
 
   start(id: string): Promise<GameState> {
