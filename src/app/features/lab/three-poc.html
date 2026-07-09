@@ -1,0 +1,55 @@
+<div class="fixed inset-0 overflow-hidden bg-[#171430]">
+  <!-- WebGL stage: three.js appends its canvas here. -->
+  <div #host class="absolute inset-0"></div>
+
+  <!-- Flat DOM HUD, layered on top of the 3D stage (exactly the concept's split). -->
+  <div class="pointer-events-none absolute inset-0 flex flex-col justify-between p-4 sm:p-6">
+    <!-- Top bar -->
+    <div class="flex items-start justify-between gap-3">
+      <div class="pointer-events-auto">
+        <div class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.28em] text-indigo-300">
+          <span class="h-1.5 w-1.5 rounded-full bg-rose-500 shadow-[0_0_10px] shadow-rose-500"></span>
+          three.js POC · elkülönített
+        </div>
+        <h1 class="mt-1 font-display text-2xl font-extrabold text-white sm:text-3xl">Papírváros — kártyaasztal</h1>
+        <p class="mt-1 max-w-sm text-sm leading-snug text-indigo-200/70">
+          Valódi WebGL: lágy árnyékok, esti fény. Vidd a kártya fölé az egeret (megemelkedik), kattints rá (megfordul).
+        </p>
+      </div>
+      <a routerLink="/" class="pointer-events-auto rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/10">
+        ← Vissza
+      </a>
+    </div>
+
+    <!-- Bottom control dock (flat/cartoon buttons — no fake 3D) -->
+    <div class="flex flex-col items-center gap-3">
+      <div class="pointer-events-none h-6 text-sm font-semibold text-amber-300">
+        @if (hovered(); as h) { <span class="rounded-full bg-black/40 px-3 py-1 backdrop-blur">{{ h }}</span> }
+      </div>
+      <div class="pointer-events-auto flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 p-2 backdrop-blur-md">
+        <button (click)="deal()"
+                class="rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-rose-600/30 transition hover:brightness-110 active:scale-95">
+          Osztás
+        </button>
+        <button (click)="shuffle()"
+                class="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/20 active:scale-95">
+          Keverés
+        </button>
+        <button (click)="flipAll()"
+                class="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/20 active:scale-95">
+          Fordítás
+        </button>
+      </div>
+      <div class="pointer-events-none text-[11px] text-indigo-200/50">
+        A gombok lapos DOM-réteg a WebGL-színpad fölött · a mostani appból semmit nem érint
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading veil until the WebGL scene is ready. -->
+  @if (!ready()) {
+    <div class="absolute inset-0 grid place-items-center text-indigo-200/70">
+      <div class="animate-pulse text-sm font-semibold tracking-wide">Színpad építése…</div>
+    </div>
+  }
+</div>
