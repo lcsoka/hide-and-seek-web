@@ -103,7 +103,12 @@
                   @if (c.is_custom) {
                     <span class="absolute right-1.5 top-1.5 rounded bg-sky-500 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-white">{{ t('wizard.deckOwn') }}</span>
                   }
-                  <span class="mb-2 grid h-7 w-7 place-items-center rounded-lg bg-gray-100 dark:bg-gray-800" [style.color]="deckAccent(c)"><app-icon [name]="deckEmblem(c)" [size]="16" /></span>
+                  <div class="mb-2 flex items-center gap-1.5">
+                    <span class="grid h-7 w-7 place-items-center rounded-lg bg-gray-100 dark:bg-gray-800" [style.color]="deckAccent(c)"><app-icon [name]="deckEmblem(c)" [size]="16" /></span>
+                    @if (c.count > 1) {
+                      <span class="rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-500 dark:bg-gray-800 dark:text-gray-300">×{{ c.count }}</span>
+                    }
+                  </div>
                   <div class="text-xs font-bold leading-tight">{{ c.name }}</div>
                   @if (c.cost) { <div class="mt-0.5 text-[9px] text-gray-400">{{ c.cost }}</div> }
                   @if (isExcluded(c.id)) {

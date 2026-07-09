@@ -82,7 +82,11 @@ export class NewGameWizard {
     return this.deckCards().filter((c) => (tab === 'mine' ? c.is_custom : c.type === tab && !c.is_custom));
   });
   readonly hasMine = computed(() => this.deckCards().some((c) => c.is_custom));
-  readonly deckCount = computed(() => this.deckCards().filter((c) => !this.excluded().has(c.id)).length);
+  // Physical cards in the deck: the sum of copies of every kept card (so multi-copy powerups /
+  // time-bonuses count once per copy, matching the real shuffled deck).
+  readonly deckCount = computed(() =>
+    this.deckCards().filter((c) => !this.excluded().has(c.id)).reduce((n, c) => n + Math.max(1, c.count), 0),
+  );
   readonly canNext = computed(() => !(this.step() === 2 && this.selectedModes().length === 0));
 
   /** A deterministic hue per city, so the placeholder cover reads as a distinct "photo" until a

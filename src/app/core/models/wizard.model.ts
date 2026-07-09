@@ -17,5 +17,6 @@ export interface DeckCard {
   name: string;
   cost: string | null;
   description: string | null;
+  count: number; // copies of this card in the shuffled deck
   is_custom: boolean; // the host's own custom curse
 }
