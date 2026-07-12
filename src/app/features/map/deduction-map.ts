@@ -79,6 +79,11 @@ export class DeductionMap {
   private readonly transitService = inject(TransitService);
   private map?: L.Map;
   private overlay?: L.LayerGroup;
+  // Player avatars live in their OWN persistent layer, updated in place (never recreated with the
+  // overlay) — so they don't flicker on every refresh and glide instead of teleporting.
+  private playersLayer?: L.LayerGroup;
+  private readonly playerMarkers = new Map<string, L.Marker>();
+  private readonly markerSigs = new Map<string, string>();
   private fog?: L.SVG; // dedicated SVG renderer holding the "excluded fog" hatch pattern
   private resize?: ResizeObserver;
   // View preservation: only auto-fit when the deduction changes, and never once the
@@ -127,6 +132,7 @@ export class DeductionMap {
       subdomains: 'abcd',
       maxZoom: 20,
     }).addTo(this.map);
+    this.playersLayer = L.layerGroup().addTo(this.map);
 
     // A dedicated SVG renderer whose <defs> holds the "excluded fog" hatch pattern; the mask below
     // fills with url(#jl-fog), so ruled-out land reads as textured fog rather than a flat wash.
@@ -159,6 +165,46 @@ export class DeductionMap {
     });
     this.resize.observe(this.el().nativeElement);
     this.render();
+  }
+
+  /**
+   * Reconcile the player avatars in their persistent layer: move existing markers with setLatLng,
+   * re-icon only when name/colour/self/avatar changed (avatarIcon builds a fresh DOM node, so
+   * re-setting it every frame is what made the marker flicker), and drop players who left.
+   */
+  private renderPlayers(): void {
+    if (!this.playersLayer) {
+      return;
+    }
+    const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
+    const seen = new Set<string>();
+    for (const p of disperse(located)) {
+      seen.add(p.id);
+      const isMe = p.id === this.meId();
+      const color = isMe ? MAP.seeker : colorFor(p.id);
+      const sig = `${p.display_name}|${color}|${isMe}|${p.avatar ?? ''}`;
+      const marker = this.playerMarkers.get(p.id);
+      if (marker) {
+        marker.setLatLng([p.lat, p.lng]);
+        if (this.markerSigs.get(p.id) !== sig) {
+          marker.setIcon(avatarIcon(p.display_name, color, isMe, p.avatar));
+          this.markerSigs.set(p.id, sig);
+        }
+      } else {
+        const created = L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, color, isMe, p.avatar) })
+          .bindTooltip(isMe ? 'You' : p.display_name, isMe ? { permanent: true, direction: 'top', offset: [0, -20] } : {})
+          .addTo(this.playersLayer);
+        this.playerMarkers.set(p.id, created);
+        this.markerSigs.set(p.id, sig);
+      }
+    }
+    for (const [id, marker] of this.playerMarkers) {
+      if (!seen.has(id)) {
+        marker.remove();
+        this.playerMarkers.delete(id);
+        this.markerSigs.delete(id);
+      }
+    }
   }
 
   private render(): void {
@@ -417,15 +463,9 @@ export class DeductionMap {
       marker.addTo(this.overlay);
     }
 
-    // Visible players (the seeker themselves + teammates; the hider is concealed by
-    // the server). The seeker's own position gets a prominent ringed marker.
-    const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
-    for (const p of disperse(located)) {
-      const isMe = p.id === this.meId();
-      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, isMe ? MAP.seeker : colorFor(p.id), isMe, p.avatar) })
-        .bindTooltip(isMe ? 'You' : p.display_name, isMe ? { permanent: true, direction: 'top', offset: [0, -20] } : {})
-        .addTo(this.overlay);
-    }
+    // Visible players (the seeker themselves + teammates; the hider is concealed by the server).
+    // The seeker's own position gets a prominent ringed marker. Reconciled in place (see below).
+    this.renderPlayers();
 
     // When a transit route is (re)shown, frame it so the path is legible — the whole point
     // of drawing it. This deliberately overrides the candidate fit / user view.

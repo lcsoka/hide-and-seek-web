@@ -45,6 +45,11 @@ export class MapView {
 
   private map?: L.Map;
   private overlay?: L.LayerGroup;
+  // Player avatars live in their OWN persistent layer, updated in place (never recreated with the
+  // overlay) — so they don't flicker on every refresh and glide instead of teleporting.
+  private playersLayer?: L.LayerGroup;
+  private readonly playerMarkers = new Map<string, L.Marker>();
+  private readonly markerSigs = new Map<string, string>();
   private centred = false;
   private cityCentered = false; // one-shot: opened on the session's city (until real content frames it)
   private wasPicking = false; // tracks picking sessions so a re-pick (e.g. Move) re-zooms
@@ -172,9 +177,49 @@ export class MapView {
       subdomains: 'abcd',
       maxZoom: 20,
     }).addTo(this.map);
+    this.playersLayer = L.layerGroup().addTo(this.map);
     this.map.on('click', (e: L.LeafletMouseEvent) => this.mapClick.emit({ lat: e.latlng.lat, lng: e.latlng.lng }));
     setTimeout(() => this.map?.invalidateSize(), 100);
     this.render();
+  }
+
+  /**
+   * Reconcile the player avatars in their persistent layer: move existing markers with setLatLng,
+   * re-icon only when the name/colour/role/avatar actually changed (avatarIcon builds a fresh DOM
+   * node, so re-setting it every frame is what caused the flicker), and drop players who left.
+   */
+  private renderPlayers(): void {
+    if (!this.playersLayer) {
+      return;
+    }
+    const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
+    const seen = new Set<string>();
+    for (const p of disperse(located)) {
+      seen.add(p.id);
+      const color = p.role === 'hider' ? '#e11d48' : colorFor(p.id);
+      const sig = `${p.display_name}|${color}|${p.role}|${p.avatar ?? ''}`;
+      const marker = this.playerMarkers.get(p.id);
+      if (marker) {
+        marker.setLatLng([p.lat, p.lng]);
+        if (this.markerSigs.get(p.id) !== sig) {
+          marker.setIcon(avatarIcon(p.display_name, color, p.role === 'hider', p.avatar));
+          this.markerSigs.set(p.id, sig);
+        }
+      } else {
+        const created = L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, color, p.role === 'hider', p.avatar) })
+          .bindTooltip(p.display_name)
+          .addTo(this.playersLayer);
+        this.playerMarkers.set(p.id, created);
+        this.markerSigs.set(p.id, sig);
+      }
+    }
+    for (const [id, marker] of this.playerMarkers) {
+      if (!seen.has(id)) {
+        marker.remove();
+        this.playerMarkers.delete(id);
+        this.markerSigs.delete(id);
+      }
+    }
   }
 
   private render(): void {
@@ -199,13 +244,7 @@ export class MapView {
       }
     }
 
-    const located = this.players().filter((p) => p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number })[];
-    for (const p of disperse(located)) {
-      const color = p.role === 'hider' ? '#e11d48' : colorFor(p.id);
-      L.marker([p.lat, p.lng], { icon: avatarIcon(p.display_name, color, p.role === 'hider', p.avatar) })
-        .bindTooltip(p.display_name)
-        .addTo(this.overlay);
-    }
+    this.renderPlayers();
 
     // 'circle' rule = a plain radius (official, other stations don't matter); otherwise carve.
     const carve = this.zoneRule() !== 'circle';
@@ -254,7 +293,7 @@ export class MapView {
     // (rose). For point-feature measuring (no separate hider nearest) the line runs to the shared
     // reference. One-shot fit brings a far reference (e.g. a border point) into view.
     const qref = this.questionRef();
-    const hider = located.find((p) => p.role === 'hider');
+    const hider = this.players().find((p) => p.role === 'hider' && p.lat != null && p.lng != null) as (PlayerView & { lat: number; lng: number }) | undefined;
     if (qref && (qref.seekerClosest || qref.yourClosest)) {
       const fitPts: L.LatLngExpression[] = [];
       // The seeker's reference (cyan, "Kereső: …") — what the seeker is comparing against.

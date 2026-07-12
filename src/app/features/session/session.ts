@@ -290,11 +290,16 @@ export class SessionView {
   }
 
   /** The session's city centre (from config), so the map opens on the right city — including the
-   *  lobby, before anyone has a GPS position or a hiding zone. */
-  cityCenter(s: GameState): { lat: number; lng: number } | null {
-    const city = s.config?.['city'] as { lat?: number; lng?: number } | undefined;
-    return city?.lat != null && city?.lng != null ? { lat: city.lat, lng: city.lng } : null;
-  }
+   *  lobby, before anyone has a GPS position or a hiding zone. A computed with value-equality so it
+   *  returns a STABLE reference: bound as a map input, a fresh object every change-detection (every
+   *  1s tick) would otherwise re-run the map's render effect and flicker the markers. */
+  readonly cityCenter = computed<{ lat: number; lng: number } | null>(
+    () => {
+      const city = this.store.state()?.config?.['city'] as { lat?: number; lng?: number } | undefined;
+      return city?.lat != null && city?.lng != null ? { lat: city.lat, lng: city.lng } : null;
+    },
+    { equal: (a, b) => a?.lat === b?.lat && a?.lng === b?.lng },
+  );
 
   /** i18n key for the "what to do now" objective line, by role + phase (or '' if none). */
   objective(s: GameState): string {
