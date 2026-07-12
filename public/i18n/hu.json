@@ -58,7 +58,9 @@
     "exitStay": "Folytatom",
     "exitLeave": "Kilépés",
     "shuffling": "Pakli keverése…",
-    "preparing": "játék előkészítése"
+    "preparing": "játék előkészítése",
+    "endgameQTitle": "Kérdezés a hajrában",
+    "endgameQHint": "A keresők a végjátékban (endgame) is feltehetnek kérdéseket."
   },
   "connection": {
     "reconnecting": "Újracsatlakozás…"

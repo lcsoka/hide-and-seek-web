@@ -88,6 +88,15 @@ export class HudNext {
   readonly questionsAsked = computed(() => (this.state().questions ?? []).length);
   readonly activeCurses = computed(() => this.state().curses.filter((c) => c.status === 'active').length);
 
+  // Gate the seeker dock on what the server would actually accept (available_actions) — so the Ask
+  // button doesn't show (and error) during the hiding phase, and it appears in the endgame exactly
+  // when endgame questions are enabled. Board/alight covers both directions of the transit button.
+  private readonly actions = computed(() => this.state().available_actions ?? []);
+  readonly canAsk = computed(() => this.actions().includes('ask_question'));
+  readonly canBoard = computed(() => this.actions().includes('board_transit') || this.actions().includes('alight_transit'));
+  // The seeker is "in play" (map/history are meaningful) during seeking + endgame, not while hiding.
+  readonly seekerActive = computed(() => this.isSeeker() && (this.state().state === 'seeking' || this.state().state === 'endgame'));
+
   catIcon(category: string | null | undefined): string {
     return (category && CAT_ICON[category]) || 'ask';
   }

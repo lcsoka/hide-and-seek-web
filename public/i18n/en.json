@@ -58,7 +58,9 @@
     "exitStay": "Keep going",
     "exitLeave": "Leave",
     "shuffling": "Shuffling the deck…",
-    "preparing": "preparing the game"
+    "preparing": "preparing the game",
+    "endgameQTitle": "Questions in the endgame",
+    "endgameQHint": "Seekers can keep asking questions during the endgame."
   },
   "connection": {
     "reconnecting": "Reconnecting…"

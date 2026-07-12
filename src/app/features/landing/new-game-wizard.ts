@@ -56,6 +56,7 @@ export class NewGameWizard {
   readonly excluded = signal<Set<string>>(new Set());
   readonly deckTab = signal<DeckTab>('curse');
   readonly reveal = signal(false);
+  readonly endgameQuestions = signal(true); // seekers can keep asking in the endgame (default on)
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
   readonly shuffling = signal(false);
@@ -136,6 +137,7 @@ export class NewGameWizard {
     this.excluded.set(new Set());
     this.deckTab.set('curse');
     this.reveal.set(false);
+    this.endgameQuestions.set(true);
   }
 
   private async load(): Promise<void> {
@@ -234,6 +236,7 @@ export class NewGameWizard {
     const config: Record<string, unknown> = {
       transit_modes: this.selectedModes(),
       reveal_seekers_to_hider: this.reveal(),
+      endgame_questions: this.endgameQuestions(),
     };
     if (enabled) {
       config['deck_cards'] = enabled;

@@ -123,6 +123,7 @@ export class SessionView {
 
   private readonly tick = signal(0);
   private offset = 0;
+  private offsetSet = false;
 
   /** Shown as a banner: true only after the socket has dropped following a live connection. */
   readonly reconnecting = computed(() => this.realtime.everConnected() && !this.realtime.connected());
@@ -212,8 +213,18 @@ export class SessionView {
 
     effect(() => {
       const now = this.store.state()?.timers?.now;
-      if (now) {
-        this.offset = now * 1000 - Date.now();
+      if (!now) {
+        return;
+      }
+      const candidate = now * 1000 - Date.now();
+      // Set the clock offset ONCE, then only re-sync on a real drift (>2s). Recomputing it on every
+      // /state refresh made the countdown visibly jump back and forth, because `timers.now` is whole
+      // seconds and network latency varies per refresh (very noticeable as an installed PWA). The 1s
+      // local tick drives a smooth countdown from the stable offset; a big gap (long background,
+      // clock change) still re-syncs.
+      if (!this.offsetSet || Math.abs(candidate - this.offset) > 2000) {
+        this.offset = candidate;
+        this.offsetSet = true;
       }
     });
 
@@ -267,6 +278,15 @@ export class SessionView {
 
   showDeductionMap(s: GameState): boolean {
     return this.role(s) === 'seeker' && (s.state === 'seeking' || s.state === 'endgame');
+  }
+
+  /** The seeker's ask/transit buttons follow the server's available_actions, so they never show
+   *  (and error) during the hiding phase, and asking appears in the endgame exactly when enabled. */
+  seekerCanAsk(s: GameState): boolean {
+    return s.available_actions.includes('ask_question');
+  }
+  seekerCanBoard(s: GameState): boolean {
+    return s.available_actions.includes('board_transit') || s.available_actions.includes('alight_transit');
   }
 
   /** The session's city centre (from config), so the map opens on the right city — including the

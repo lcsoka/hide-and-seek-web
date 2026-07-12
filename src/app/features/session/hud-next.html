@@ -70,11 +70,17 @@
           <button (click)="openDrawer.emit('hand')" class="seg"><app-icon name="cards" [size]="21" /><span>{{ t('hud.hand') }}</span></button>
         }
       } @else if (isSeeker()) {
-        <button (click)="openAsk.emit()" class="seg on"><app-icon name="ask" [size]="21" /><span>{{ t('hud.ask') }}</span></button>
-        <button (click)="onTransit() ? openDrawer.emit('seeker') : openBoard.emit()" class="seg" [class.riding]="onTransit()">
-          <app-icon name="train" [size]="21" /><span>{{ onTransit() ? t('hud.alight') : t('hud.transit') }}</span>
-        </button>
-        <button (click)="openDrawer.emit('seeker')" class="seg"><app-icon name="history" [size]="21" /><span>{{ t('hud.info') }}</span></button>
+        @if (canAsk()) {
+          <button (click)="openAsk.emit()" class="seg on"><app-icon name="ask" [size]="21" /><span>{{ t('hud.ask') }}</span></button>
+        }
+        @if (canBoard()) {
+          <button (click)="onTransit() ? openDrawer.emit('seeker') : openBoard.emit()" class="seg" [class.riding]="onTransit()">
+            <app-icon name="train" [size]="21" /><span>{{ onTransit() ? t('hud.alight') : t('hud.transit') }}</span>
+          </button>
+        }
+        @if (seekerActive()) {
+          <button (click)="openDrawer.emit('seeker')" class="seg"><app-icon name="history" [size]="21" /><span>{{ t('hud.info') }}</span></button>
+        }
       }
       <button (click)="recenter.emit()" class="seg"><app-icon name="locate" [size]="21" /><span>{{ t('hud.recenter') }}</span></button>
     </div>
