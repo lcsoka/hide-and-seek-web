@@ -5,8 +5,12 @@ import { applyQuestions, playArea } from '../../core/deduction/deduction';
 import { DeductionQuestion, RegionQuestion } from '../../core/deduction/deduction.model';
 import { resolvedQuestionsToDeduction } from '../../core/deduction/game-deduction';
 import { isOsmCategory, OsmDeductionService } from '../../core/deduction/osm-deduction.service';
+import { TranslocoService } from '@jsverse/transloco';
+import { AnnotationsService } from '../../core/maps/annotations.service';
+import { MapAnnotation } from '../../core/maps/map.model';
 import { ActiveCurse, GodView, ResolvedQuestion } from '../../core/models';
 import { DebugApi } from '../../core/services/debug-api';
+import { Language } from '../../core/services/language';
 import { LabelService } from '../../core/services/label.service';
 import { UnitsService } from '../../core/services/units.service';
 import { MediaViewerService } from '../../shared/media-viewer';
@@ -21,6 +25,7 @@ interface TimelineEntry {
   text: string;
   media?: string[]; // photo/video URLs (question photo answers, curse proofs) — tap to view
   card?: { name: string; color: string; emblem: string }; // a played card, shown as a chip
+  explain?: string; // plain-language reason (why the map was cut, what the curse did)
 }
 
 /** One player's ordered movement samples (unix seconds). */
@@ -78,6 +83,9 @@ export class Replay {
   private readonly osmDeduction = inject(OsmDeductionService);
   private readonly label = inject(LabelService);
   private readonly unitsService = inject(UnitsService);
+  private readonly annotationsService = inject(AnnotationsService);
+  private readonly transloco = inject(TranslocoService);
+  private readonly language = inject(Language);
   readonly media = inject(MediaViewerService);
 
   private readonly deductionMap = viewChild(DeductionMap);
@@ -92,6 +100,7 @@ export class Replay {
   readonly playhead = signal(0);
   readonly playing = signal(false);
   readonly speed = signal(60); // game-seconds advanced per real second while playing
+  readonly showTrails = signal(true); // draw each player's movement path up to the playhead
   private fitted = false;
 
   readonly units = computed(() => this.unitsService.unitsOf(this.god()?.config));
@@ -212,11 +221,51 @@ export class Replay {
         return {
           type: 'Feature' as const,
           geometry: { type: 'Point' as const, coordinates: [pos.lng, pos.lat] },
-          properties: { name: `${p.display_name}${p.role ? ' (' + p.role + ')' : ''}` },
+          properties: { name: `${p.display_name}${p.role ? ' (' + p.role + ')' : ''}`, color: this.playerColor(p.id, p.role) },
         };
       })
       .filter((f): f is NonNullable<typeof f> => f != null);
     return { type: 'FeatureCollection', features };
+  });
+
+  /** All resolved questions as numbered, explained map annotations — radar circles, thermometer
+   *  bisectors, reference pins, and a plain-language reason the map was cut that way. */
+  private readonly allAnnotations = computed<MapAnnotation[]>(() => {
+    this.language.lang(); // re-localize the effect sentences when the language switches…
+    this.language.loaded(); // …and once the active language's file finishes loading (else raw keys)
+    const resolved = (this.god()?.questions ?? []).filter((q) => q.resolved_at != null);
+    return this.annotationsService.build(resolved, this.units(), (k, p) => this.transloco.translate(k, p));
+  });
+
+  /** Annotations for the questions answered by the playhead — shown on the map. */
+  readonly activeAnnotations = computed(() => {
+    const applied = this.appliedSeqs();
+    return this.allAnnotations().filter((a) => applied.has(a.seq));
+  });
+
+  private readonly effectBySeq = computed(() => {
+    const m = new Map<number, string>();
+    for (const a of this.allAnnotations()) {
+      m.set(a.seq, a.effect);
+    }
+    return m;
+  });
+
+  /** Each player's path up to the playhead, coloured per player — the toggleable trails layer. */
+  readonly trails = computed<{ color: string; latlngs: [number, number][] }[]>(() => {
+    if (!this.showTrails()) {
+      return [];
+    }
+    const t = this.playhead();
+    const out: { color: string; latlngs: [number, number][] }[] = [];
+    for (const [id, track] of this.tracks()) {
+      const pts = track.filter((s) => s.at <= t).map((s) => [s.lat, s.lng] as [number, number]);
+      if (pts.length > 1) {
+        const role = this.god()?.players.find((p) => p.id === id)?.role ?? null;
+        out.push({ color: this.playerColor(id, role), latlngs: pts });
+      }
+    }
+    return out;
   });
 
   readonly timeline = computed<TimelineEntry[]>(() => this.buildTimeline());
@@ -301,6 +350,22 @@ export class Replay {
     this.speed.set(s);
   }
 
+  toggleTrails(): void {
+    this.showTrails.update((v) => !v);
+  }
+
+  /** A stable per-player colour: the hider in rose, everyone else a hashed hue (matches trails). */
+  private playerColor(id: string, role: string | null): string {
+    if (role === 'hider') {
+      return '#e11d48';
+    }
+    let h = 0;
+    for (let i = 0; i < id.length; i++) {
+      h = (h * 31 + id.charCodeAt(i)) & 0xffffffff;
+    }
+    return `hsl(${Math.abs(h) % 360} 62% 45%)`;
+  }
+
   dot(kind: TimelineEntry['kind']): string {
     return { step: 'bg-gray-400', ask: 'bg-blue-500', answer: 'bg-green-500', curse: 'bg-purple-500' }[kind];
   }
@@ -359,7 +424,8 @@ export class Replay {
       if (q.resolved_at) {
         // A photo-question answer is the hider's photo/video — surface it inline.
         const media = q.answer?.photo_url ? [q.answer.photo_url] : undefined;
-        entries.push({ at: q.resolved_at, kind: 'answer', who: 'Hider', text: `${q.category}: ${this.answerText(q)}`, media });
+        // The annotation's effect explains WHY the map was cut this way (kept vs ruled out).
+        entries.push({ at: q.resolved_at, kind: 'answer', who: 'Hider', text: `${q.category}: ${this.answerText(q)}`, media, explain: this.effectBySeq().get(q.seq) });
       }
     }
     for (const c of g.curses) {

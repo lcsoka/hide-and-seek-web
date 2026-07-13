@@ -51,6 +51,10 @@ export class DeductionMap {
   readonly annotations = input<MapAnnotation[]>([]); // numbered, explained question markers
   readonly stations = input<FeatureCollection<Point> | null>(null);
   readonly points = input<FeatureCollection<Point> | null>(null); // highlighted POIs (e.g. tentacle candidates)
+  // Replay: show a permanent name label on each point (and colour it from properties.color).
+  readonly pointLabels = input(false);
+  // Replay: per-player movement trails, drawn as haloed polylines beneath the markers.
+  readonly trails = input<{ color: string; latlngs: [number, number][] }[]>([]);
   readonly overlays = input<Feature[]>([]); // e.g. admin borders, drawn as outlines
   readonly autoZoom = input(true);
   readonly loading = input(false); // hold rendering until the deduction is fully computed
@@ -105,6 +109,8 @@ export class DeductionMap {
       this.annotations();
       this.stations();
       this.points();
+      this.pointLabels();
+      this.trails();
       this.overlays();
       this.loading();
       this.thermoMarker();
@@ -266,6 +272,14 @@ export class DeductionMap {
       runner.eachLayer((l) => (l as unknown as { _path?: SVGPathElement })._path?.setAttribute('pathLength', '1000'));
     }
 
+    // Replay movement trails: each player's path so far, a white halo under the player colour.
+    for (const tr of this.trails()) {
+      if (tr.latlngs.length > 1) {
+        L.polyline(tr.latlngs, { color: '#ffffff', weight: 5, opacity: 0.55, interactive: false }).addTo(this.overlay);
+        L.polyline(tr.latlngs, { color: tr.color, weight: 2.5, opacity: 0.95, interactive: false }).addTo(this.overlay);
+      }
+    }
+
     for (const overlay of this.overlays()) {
       L.geoJSON(overlay as GeoJsonObject, { style: { color: MAP.region, weight: 2, dashArray: '6', fill: false }, interactive: false }).addTo(this.overlay);
     }
@@ -279,8 +293,12 @@ export class DeductionMap {
 
     for (const p of this.points()?.features ?? []) {
       const [lng, lat] = p.geometry.coordinates;
-      L.circleMarker([lat, lng], { radius: 6, color: MAP.region, fillColor: MAP.region, fillOpacity: 0.9, weight: 2 })
-        .bindTooltip(String(p.properties?.['name'] ?? 'place'), { permanent: false })
+      const color = (p.properties?.['color'] as string) || MAP.region;
+      L.circleMarker([lat, lng], { radius: 6, color, fillColor: color, fillOpacity: 0.9, weight: 2 })
+        .bindTooltip(
+          String(p.properties?.['name'] ?? 'place'),
+          this.pointLabels() ? { permanent: true, direction: 'top', offset: [0, -8], opacity: 0.95 } : { permanent: false },
+        )
         .addTo(this.overlay);
     }
 
