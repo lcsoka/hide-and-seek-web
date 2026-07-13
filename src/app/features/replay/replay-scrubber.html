@@ -1,0 +1,29 @@
+<div class="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+  <div class="flex items-center gap-3">
+    <button type="button" (click)="toggle.emit()"
+            class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-rose-600 text-white transition hover:bg-rose-500">
+      <app-icon [name]="playing() ? 'pause' : 'play'" [size]="18" />
+    </button>
+
+    <input type="range" [min]="t0()" [max]="t1()" step="1" [value]="playhead()"
+           (input)="onSeek($event)"
+           class="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-gray-200 accent-rose-600 dark:bg-gray-700" />
+
+    <span class="shrink-0 font-mono text-xs tabular-nums text-gray-500 dark:text-gray-400">
+      {{ clock(playhead()) }} <span class="text-gray-300 dark:text-gray-600">/</span> {{ clock(t1()) }}
+    </span>
+  </div>
+
+  <div class="flex items-center justify-between gap-2">
+    <span class="font-mono text-[11px] tabular-nums text-gray-400">+{{ elapsed() }}</span>
+    <div class="flex items-center gap-1">
+      @for (s of speeds; track s) {
+        <button type="button" (click)="speedChange.emit(s)"
+                class="rounded-md px-2 py-0.5 text-xs font-semibold tabular-nums transition"
+                [class]="s === speed() ? 'bg-rose-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'">
+          {{ s }}×
+        </button>
+      }
+    </div>
+  </div>
+</div>

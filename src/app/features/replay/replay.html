@@ -15,9 +15,16 @@
 
   <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
     <div class="space-y-2">
-      <app-deduction-map class="block h-[60vh] min-h-80" [candidate]="candidate()" [questions]="markerQuestions()" [points]="playerPoints()" [autoZoom]="true" />
+      <app-deduction-map class="block h-[60vh] min-h-80" [candidate]="candidate()" [questions]="activeMarkerQuestions()" [points]="playerPoints()" [autoZoom]="false" />
+
+      @if (hasTimeline()) {
+        <app-replay-scrubber
+          [t0]="domain().t0" [t1]="domain().t1" [playhead]="playhead()" [playing]="playing()" [speed]="speed()"
+          (seek)="seek($event)" (toggle)="togglePlay()" (speedChange)="setSpeed($event)" />
+      }
+
       <p class="text-xs text-gray-500 dark:text-gray-400">
-        Shaded = ruled out by the questions. Markers show every player's last position (god view).
+        Shaded = ruled out by the questions answered so far. Markers show every player's position at the playhead.
       </p>
     </div>
 
@@ -25,12 +32,12 @@
       <h2 class="mb-2 font-semibold">Timeline ({{ timeline().length }})</h2>
       <ol class="space-y-2">
         @for (e of timeline(); track $index) {
-          <li class="flex items-start gap-2 text-sm">
+          <li class="flex items-start gap-2 text-sm transition-opacity" [class.opacity-40]="!isPast(e.at)">
             <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full" [class]="dot(e.kind)"></span>
             <div class="min-w-0 flex-1">
               <div class="flex justify-between gap-2">
                 <span class="font-medium">{{ e.text }}</span>
-                <span class="shrink-0 font-mono text-xs tabular-nums text-gray-400">{{ time(e.at) }}</span>
+                <button type="button" (click)="seek(e.at)" class="shrink-0 font-mono text-xs tabular-nums text-gray-400 hover:text-rose-500" title="Jump here">{{ time(e.at) }}</button>
               </div>
               <div class="text-xs text-gray-500 dark:text-gray-400">{{ e.who }}</div>
 

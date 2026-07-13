@@ -19,6 +19,14 @@ export interface ActionLogEntry {
   at: number | null;
 }
 
+/** One throttled position sample from the replay movement history. `at` is a unix timestamp (s). */
+export interface PositionSample {
+  player_id: string;
+  lat: number;
+  lng: number;
+  at: number | null;
+}
+
 /** Unfiltered developer/debug view of a session (sees the hider, pending truths, etc.). */
 export interface GodView {
   session_id: string;
@@ -32,4 +40,5 @@ export interface GodView {
   questions: ResolvedQuestion[];
   curses: ActiveCurse[];
   action_logs: ActionLogEntry[];
+  positions?: PositionSample[];
 }
