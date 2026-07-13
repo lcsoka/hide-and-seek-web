@@ -55,6 +55,12 @@ export class DeductionMap {
   readonly pointLabels = input(false);
   // Replay: per-player movement trails, drawn as haloed polylines beneath the markers.
   readonly trails = input<{ color: string; latlngs: [number, number][] }[]>([]);
+  // Region cuts (matching/measuring): the admin area or nearest-cell that a question kept (blue)
+  // or ruled out (red), outlined + tinted so the cut reads visually — not just as a shaded blob.
+  readonly regions = input<{ region: Feature<Polygon | MultiPolygon>; within: boolean | null; label?: string }[]>([]);
+  // Whether to keep the numbered annotation's explanation label always on (true) or only on hover
+  // (false) — the replay uses hover so many nearby pins don't stack overlapping label boxes.
+  readonly annotationLabels = input(true);
   readonly overlays = input<Feature[]>([]); // e.g. admin borders, drawn as outlines
   readonly autoZoom = input(true);
   readonly loading = input(false); // hold rendering until the deduction is fully computed
@@ -111,6 +117,8 @@ export class DeductionMap {
       this.points();
       this.pointLabels();
       this.trails();
+      this.regions();
+      this.annotationLabels();
       this.overlays();
       this.loading();
       this.thermoMarker();
@@ -272,6 +280,15 @@ export class DeductionMap {
       runner.eachLayer((l) => (l as unknown as { _path?: SVGPathElement })._path?.setAttribute('pathLength', '1000'));
     }
 
+    // Region cuts (matching / measuring): outline + tint the admin area or nearest-cell a question
+    // kept (blue) or ruled out (red, dashed), so the "same district?" style cut reads at a glance.
+    for (const r of this.regions()) {
+      const color = r.within === false ? MAP.hider : MAP.seeker;
+      L.geoJSON(r.region as GeoJsonObject, {
+        style: { color, weight: 2, fillColor: color, fillOpacity: 0.08, dashArray: r.within === false ? '5' : undefined, interactive: false },
+      }).addTo(this.overlay);
+    }
+
     // Replay movement trails: each player's path so far, a white halo under the player colour.
     for (const tr of this.trails()) {
       if (tr.latlngs.length > 1) {
@@ -342,7 +359,7 @@ export class DeductionMap {
       }
       if (a.point) {
         L.marker([a.point.lat, a.point.lng], { icon: markerIcon(String(a.n), { color: '#0f172a', size: 24 }) })
-          .bindTooltip(`#${a.n} ${a.effect}`, { permanent: true, direction: 'top', offset: [0, -12], opacity: 0.95 })
+          .bindTooltip(`#${a.n} ${a.effect}`, { permanent: this.annotationLabels(), direction: 'top', offset: [0, -12], opacity: 0.95 })
           .addTo(this.overlay);
       }
     }

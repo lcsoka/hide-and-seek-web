@@ -26,6 +26,7 @@ interface TimelineEntry {
   media?: string[]; // photo/video URLs (question photo answers, curse proofs) — tap to view
   card?: { name: string; color: string; emblem: string }; // a played card, shown as a chip
   explain?: string; // plain-language reason (why the map was cut, what the curse did)
+  num?: number; // the map pin number this event corresponds to (answers only)
 }
 
 /** One player's ordered movement samples (unix seconds). */
@@ -243,10 +244,21 @@ export class Replay {
     return this.allAnnotations().filter((a) => applied.has(a.seq));
   });
 
+  /** Region cuts (matching/measuring) applied by the playhead — outlined kept/removed on the map. */
+  readonly activeRegions = computed(() => this.activeOsmRegions().map((r) => ({ region: r.region, within: r.within, label: r.label })));
+
   private readonly effectBySeq = computed(() => {
     const m = new Map<number, string>();
     for (const a of this.allAnnotations()) {
       m.set(a.seq, a.effect);
+    }
+    return m;
+  });
+
+  private readonly numBySeq = computed(() => {
+    const m = new Map<number, number>();
+    for (const a of this.allAnnotations()) {
+      m.set(a.seq, a.n);
     }
     return m;
   });
@@ -309,7 +321,9 @@ export class Replay {
         return;
       }
       for (const q of g.questions) {
-        if (isOsmCategory(q.category) && q.ask.lat != null && q.ask.feature && !this.osmSeen.has(q.seq)) {
+        // OSM regions come from a point feature (measuring/tentacles/place-matching) OR an admin
+        // level (zone-matching / border-measuring) — the latter has no feature, so gate on both.
+        if (isOsmCategory(q.category) && q.ask.lat != null && (q.ask.feature || q.ask.admin_level != null || q.ask.boundary_level != null) && !this.osmSeen.has(q.seq)) {
           this.osmSeen.add(q.seq);
           void this.osmDeduction.region(q).then((r) => {
             if (r) {
@@ -425,7 +439,7 @@ export class Replay {
         // A photo-question answer is the hider's photo/video — surface it inline.
         const media = q.answer?.photo_url ? [q.answer.photo_url] : undefined;
         // The annotation's effect explains WHY the map was cut this way (kept vs ruled out).
-        entries.push({ at: q.resolved_at, kind: 'answer', who: 'Hider', text: `${q.category}: ${this.answerText(q)}`, media, explain: this.effectBySeq().get(q.seq) });
+        entries.push({ at: q.resolved_at, kind: 'answer', who: 'Hider', text: `${q.category}: ${this.answerText(q)}`, media, explain: this.effectBySeq().get(q.seq), num: this.numBySeq().get(q.seq) });
       }
     }
     for (const c of g.curses) {

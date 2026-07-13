@@ -16,8 +16,8 @@
   <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
     <div class="space-y-2">
       <app-deduction-map class="block h-[60vh] min-h-80"
-        [candidate]="candidate()" [annotations]="activeAnnotations()" [points]="playerPoints()"
-        [pointLabels]="true" [trails]="trails()" [autoZoom]="false" />
+        [candidate]="candidate()" [annotations]="activeAnnotations()" [regions]="activeRegions()" [points]="playerPoints()"
+        [pointLabels]="true" [annotationLabels]="false" [trails]="trails()" [autoZoom]="false" />
 
       @if (hasTimeline()) {
         <app-replay-scrubber
@@ -45,7 +45,11 @@
             <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full" [class]="dot(e.kind)"></span>
             <div class="min-w-0 flex-1">
               <div class="flex justify-between gap-2">
-                <span class="font-medium">{{ e.text }}</span>
+                <span class="font-medium">
+                  @if (e.num) {
+                    <span class="mr-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-slate-800 px-1 align-[1px] text-[10px] font-bold text-white dark:bg-slate-200 dark:text-slate-900">{{ e.num }}</span>
+                  }{{ e.text }}
+                </span>
                 <button type="button" (click)="seek(e.at)" class="shrink-0 font-mono text-xs tabular-nums text-gray-400 hover:text-rose-500" title="Jump here">{{ time(e.at) }}</button>
               </div>
               <div class="text-xs text-gray-500 dark:text-gray-400">{{ e.who }}</div>
