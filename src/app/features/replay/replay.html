@@ -28,9 +28,9 @@
       </p>
     </div>
 
-    <section class="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
-      <h2 class="mb-2 font-semibold">Timeline ({{ timeline().length }})</h2>
-      <ol class="space-y-2">
+    <section class="flex max-h-[70vh] flex-col rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+      <h2 class="mb-2 shrink-0 font-semibold">Timeline ({{ timeline().length }})</h2>
+      <ol class="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
         @for (e of timeline(); track $index) {
           <li class="flex items-start gap-2 text-sm transition-opacity" [class.opacity-40]="!isPast(e.at)">
             <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full" [class]="dot(e.kind)"></span>
