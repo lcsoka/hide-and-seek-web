@@ -301,7 +301,8 @@ export class DeductionMap {
     // cell reads as "bounded by the halfway lines to these". Hover names each; drawn beneath pins.
     for (const s of this.sites()?.features ?? []) {
       const [lng, lat] = s.geometry.coordinates;
-      L.circleMarker([lat, lng], { radius: 3.5, color: MAP.region, weight: 1.5, fillColor: '#ffffff', fillOpacity: 0.6, opacity: 0.75 })
+      const color = (s.properties?.['color'] as string) || MAP.region;
+      L.circleMarker([lat, lng], { radius: 3.5, color, weight: 1.5, fillColor: '#ffffff', fillOpacity: 0.7, opacity: 0.9 })
         .bindTooltip(String(s.properties?.['name'] ?? 'place'))
         .addTo(this.overlay);
     }
@@ -371,8 +372,9 @@ export class DeductionMap {
       if (a.feature) {
         // The reference place (closest airport, matched place, nearest tentacle target). A dashed
         // connector from the ask point makes the cut legible — "from here, the nearest X is that
-        // one" — colour-coded blue (kept) / red (ruled out) to match the region tint.
-        const fc = a.within === false ? MAP.hider : MAP.seeker;
+        // one". Uses the question's identity colour when set (so overlapping Voronoi questions read
+        // as distinct sets), else blue (kept) / red (ruled out).
+        const fc = a.color ?? (a.within === false ? MAP.hider : MAP.seeker);
         if (a.point) {
           L.polyline([[a.point.lat, a.point.lng], [a.feature.lat, a.feature.lng]], { color: fc, weight: 1.5, dashArray: '5 5', opacity: 0.85, interactive: false }).addTo(this.overlay);
         }

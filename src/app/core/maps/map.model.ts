@@ -32,4 +32,7 @@ export interface MapAnnotation {
   photoUrl?: string;
   /** The reference OSM feature (matching/measuring/tentacles) — shown as a labelled pin. */
   feature?: { lat: number; lng: number; name: string | null };
+  /** An identity colour for this question's markers (feature pin + connector + competing POIs),
+   *  so overlapping Voronoi questions read as distinct sets. Falls back to kept/ruled-out colours. */
+  color?: string;
 }

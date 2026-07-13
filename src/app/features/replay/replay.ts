@@ -240,10 +240,13 @@ export class Replay {
     return this.annotationsService.build(resolved, this.units(), (k, p) => this.transloco.translate(k, p));
   });
 
-  /** Annotations for the questions answered by the playhead — shown on the map. */
+  /** Annotations for the questions answered by the playhead — shown on the map, each tagged with
+   *  its identity colour so a question's feature pin + connector + competing POIs read as one set. */
   readonly activeAnnotations = computed(() => {
     const applied = this.appliedSeqs();
-    return this.allAnnotations().filter((a) => applied.has(a.seq));
+    return this.allAnnotations()
+      .filter((a) => applied.has(a.seq))
+      .map((a) => ({ ...a, color: this.questionColor(a.n) }));
   });
 
   /** Region cuts (matching/measuring/tentacles) applied by the playhead — outlined kept/removed on
@@ -278,12 +281,13 @@ export class Replay {
         const my = (b[3] - b[1]) * 0.6 || 0.02;
         box = [b[0] - mx, b[1] - my, b[2] + mx, b[3] + my];
       }
+      const color = this.questionColor(this.numBySeq().get(seq) ?? seq);
       for (const f of sites.features) {
         const [lng, lat] = f.geometry.coordinates;
         if (box && (lng < box[0] || lng > box[2] || lat < box[1] || lat > box[3])) {
           continue; // keep only the places near the kept cell — the ones that actually bound it
         }
-        features.push(f);
+        features.push({ ...f, properties: { ...(f.properties ?? {}), color } });
       }
     }
     return { type: 'FeatureCollection', features };
@@ -411,6 +415,14 @@ export class Replay {
 
   toggleTrails(): void {
     this.showTrails.update((v) => !v);
+  }
+
+  // Distinct identity colours for each question's markers, so overlapping Voronoi sets (a park
+  // matching + a cinema tentacle) don't blur into one another.
+  private readonly questionPalette = ['#7c3aed', '#0891b2', '#ea580c', '#16a34a', '#db2777', '#ca8a04', '#4f46e5', '#0d9488'];
+
+  private questionColor(n: number): string {
+    return this.questionPalette[(Math.max(1, n) - 1) % this.questionPalette.length];
   }
 
   /** A stable per-player colour: the hider in rose, everyone else a hashed hue (matches trails). */
