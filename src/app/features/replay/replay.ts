@@ -7,7 +7,7 @@ import { resolvedQuestionsToDeduction } from '../../core/deduction/game-deductio
 import { isOsmCategory, OsmDeductionService } from '../../core/deduction/osm-deduction.service';
 import { TranslocoService } from '@jsverse/transloco';
 import { AnnotationsService } from '../../core/maps/annotations.service';
-import { MapAnnotation } from '../../core/maps/map.model';
+import { MapAnnotation, Poly } from '../../core/maps/map.model';
 import { ActiveCurse, GodView, ResolvedQuestion } from '../../core/models';
 import { DebugApi } from '../../core/services/debug-api';
 import { Language } from '../../core/services/language';
@@ -244,8 +244,19 @@ export class Replay {
     return this.allAnnotations().filter((a) => applied.has(a.seq));
   });
 
-  /** Region cuts (matching/measuring) applied by the playhead — outlined kept/removed on the map. */
-  readonly activeRegions = computed(() => this.activeOsmRegions().map((r) => ({ region: r.region, within: r.within, label: r.label })));
+  /** Region cuts (matching/measuring/tentacles) applied by the playhead — outlined kept/removed on
+   *  the map, with the question's explanation sentence as the hover label. */
+  readonly activeRegions = computed<{ region: Poly; within: boolean | null; label?: string }[]>(() => {
+    const applied = this.appliedSeqs();
+    const eff = this.effectBySeq();
+    const out: { region: Poly; within: boolean | null; label?: string }[] = [];
+    for (const [seq, r] of this.osmRegions()) {
+      if (applied.has(seq)) {
+        out.push({ region: r.region, within: r.within, label: eff.get(seq) ?? r.label });
+      }
+    }
+    return out;
+  });
 
   private readonly effectBySeq = computed(() => {
     const m = new Map<number, string>();
@@ -424,7 +435,9 @@ export class Replay {
     }
 
     const entries: TimelineEntry[] = [];
-    const skip = new Set(['ask_question', 'answer_question', 'play_curse']); // covered by questions/curses below
+    // ask/answer/curse are shown via the question + curse rows below; location:observed is a
+    // high-volume position ping that would flood the timeline.
+    const skip = new Set(['ask_question', 'answer_question', 'amend_answer', 'play_curse', 'location:observed']);
 
     for (const l of g.action_logs) {
       if (!skip.has(l.type) && l.at != null) {

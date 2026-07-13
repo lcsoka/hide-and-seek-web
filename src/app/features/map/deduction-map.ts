@@ -280,13 +280,17 @@ export class DeductionMap {
       runner.eachLayer((l) => (l as unknown as { _path?: SVGPathElement })._path?.setAttribute('pathLength', '1000'));
     }
 
-    // Region cuts (matching / measuring): outline + tint the admin area or nearest-cell a question
-    // kept (blue) or ruled out (red, dashed), so the "same district?" style cut reads at a glance.
+    // Region cuts (matching / measuring / tentacles): outline + tint the admin area or nearest-cell
+    // a question kept (blue) or ruled out (red, dashed), so the "same district?" style cut reads at
+    // a glance. Hover explains WHY (the annotation's effect sentence, passed as the label).
     for (const r of this.regions()) {
       const color = r.within === false ? MAP.hider : MAP.seeker;
-      L.geoJSON(r.region as GeoJsonObject, {
-        style: { color, weight: 2, fillColor: color, fillOpacity: 0.08, dashArray: r.within === false ? '5' : undefined, interactive: false },
+      const layer = L.geoJSON(r.region as GeoJsonObject, {
+        style: { color, weight: 2, fillColor: color, fillOpacity: 0.08, dashArray: r.within === false ? '5' : undefined },
       }).addTo(this.overlay);
+      if (r.label) {
+        layer.bindTooltip(r.label, { sticky: true, opacity: 0.95 });
+      }
     }
 
     // Replay movement trails: each player's path so far, a white halo under the player colour.
@@ -352,9 +356,15 @@ export class DeductionMap {
         L.circleMarker([a.thermo.b.lat, a.thermo.b.lng], { radius: 4, color: MAP.warm, fillColor: MAP.warm, fillOpacity: 1 }).addTo(this.overlay);
       }
       if (a.feature) {
-        // The reference place (closest airport, matched place, nearest tentacle target).
-        L.marker([a.feature.lat, a.feature.lng], { icon: glyphIcon('pin', { color: MAP.clue, size: 26 }) })
-          .bindTooltip(a.feature.name ? a.feature.name : 'reference place', { permanent: true, direction: 'right', offset: [6, 0], opacity: 0.95 })
+        // The reference place (closest airport, matched place, nearest tentacle target). A dashed
+        // connector from the ask point makes the cut legible — "from here, the nearest X is that
+        // one" — colour-coded blue (kept) / red (ruled out) to match the region tint.
+        const fc = a.within === false ? MAP.hider : MAP.seeker;
+        if (a.point) {
+          L.polyline([[a.point.lat, a.point.lng], [a.feature.lat, a.feature.lng]], { color: fc, weight: 1.5, dashArray: '5 5', opacity: 0.85, interactive: false }).addTo(this.overlay);
+        }
+        L.marker([a.feature.lat, a.feature.lng], { icon: glyphIcon('pin', { color: fc, size: 26 }) })
+          .bindTooltip(a.feature.name ? a.feature.name : 'reference place', { permanent: this.annotationLabels(), direction: 'right', offset: [6, 0], opacity: 0.95 })
           .addTo(this.overlay);
       }
       if (a.point) {
