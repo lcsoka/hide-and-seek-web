@@ -434,7 +434,8 @@
     "dispute_found": "Nem kaptak el",
     "surrender": "Feladás",
     "advance_round": "Következő kör",
-    "end_game": "Játék befejezése"
+    "end_game": "Játék befejezése",
+    "cancel_question": "Kérdés visszavonása"
   },
   "map": {
     "calculating": "Következtetés számítása…",

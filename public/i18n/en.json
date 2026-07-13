@@ -434,7 +434,8 @@
     "dispute_found": "Not caught",
     "surrender": "Surrender",
     "advance_round": "Next round",
-    "end_game": "End game"
+    "end_game": "End game",
+    "cancel_question": "Cancel question"
   },
   "map": {
     "calculating": "Calculating deduction…",
