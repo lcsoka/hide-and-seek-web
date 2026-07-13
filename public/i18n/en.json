@@ -389,7 +389,9 @@
     "promptMatching": "Is the seeker's closest place also your nearest?",
     "promptMeasuring": "Compared to the seeker, are you closer to or further from it?",
     "promptTentacles": "Are you within the question's range of one of the seeker's nearby places?",
-    "duplicatePick": "Which card should it copy?"
+    "duplicatePick": "Which card should it copy?",
+    "filmBird": "Film a bird and send it to the seekers — they must match its length.",
+    "sendVideo": "Send video & play"
   },
   "picker": {
     "ask": "Ask a question",

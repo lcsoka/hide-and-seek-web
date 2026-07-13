@@ -133,11 +133,17 @@
             </div>
           }
           @if (c.status === 'completed' && c.proof_url) {
-            <button type="button" (click)="media.open(c.proof_url)" class="block w-full">
-              <img [src]="c.proof_url" alt="Proof" class="h-24 w-full rounded-lg object-cover ring-1 ring-black/10" />
+            <button type="button" (click)="media.open(c.proof_url)" class="relative block w-full">
+              @if (isVideoUrl(c.proof_url)) {
+                <video [src]="c.proof_url" class="h-24 w-full rounded-lg object-cover ring-1 ring-black/10" muted playsinline preload="metadata"></video>
+                <span class="pointer-events-none absolute inset-0 grid place-items-center"><span class="grid h-8 w-8 place-items-center rounded-full bg-black/55 text-white"><app-icon name="play" [size]="16" /></span></span>
+              } @else {
+                <img [src]="c.proof_url" alt="Proof" class="h-24 w-full rounded-lg object-cover ring-1 ring-black/10" />
+              }
             </button>
           } @else if (c.requires_proof && c.status === 'active') {
-            <app-image-upload [sessionId]="sessionId()" [label]="tr('seeker.submitProof')" (uploaded)="submitProof(c, $event)" />
+            <app-image-upload [sessionId]="sessionId()" [label]="tr('seeker.submitProof')"
+                              [accept]="c.video_proof ? 'video/*' : 'image/*'" (uploaded)="submitProof(c, $event)" />
           }
           @if (c.dice && c.status === 'active') {
             <app-dice-roller [sessionId]="sessionId()" [curse]="c" />

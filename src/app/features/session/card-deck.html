@@ -57,6 +57,14 @@
                             (uploaded)="confirmPlayWithPhoto($event)" />
           <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">{{ t('common.cancel') }}</button>
         </div>
+      } @else if (c.needs_video) {
+        <p class="text-xs font-medium text-purple-700 dark:text-purple-300">{{ t('deck.filmBird') }}</p>
+        <div class="flex gap-2">
+          <app-image-upload class="flex-1" [sessionId]="sessionId()" [label]="t('deck.sendVideo')" accept="video/*"
+                            cssClass="block w-full cursor-pointer rounded-lg bg-purple-600 p-2 text-center text-sm font-semibold text-white hover:bg-purple-700"
+                            (uploaded)="confirmPlayWithPhoto($event)" />
+          <button (click)="cancelPlay()" class="rounded-lg border border-gray-300 px-3 text-sm font-medium dark:border-gray-600">{{ t('common.cancel') }}</button>
+        </div>
       } @else if (c.needs_word) {
         <p class="text-xs font-medium text-purple-700 dark:text-purple-300">{{ t('deck.hangmanWord') }}</p>
         <input [value]="castWord()" (input)="castWord.set($any($event.target).value)"

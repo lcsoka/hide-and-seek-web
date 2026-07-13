@@ -34,6 +34,7 @@ export interface ActiveCurse {
   cost: string | null;
   description: string | null;
   requires_proof: boolean;
+  video_proof?: boolean; // the seeker clears this curse with a video (film a bird), not a photo
   dice?: DiceSpec | null;
   last_roll?: DiceRoll | null;
   /** Present on the Hidden Gallows curse — the seekers solve it to lift the asking block. */
@@ -66,6 +67,7 @@ export interface HandCard {
   description: string | null;
   /** This curse requires the hider to attach a photo (e.g. a Street View screenshot) to cast it. */
   needs_photo?: boolean;
+  needs_video?: boolean; // the hider attaches a video when casting (the Bird Guide's bird footage)
   /** This curse (the Hidden Hangman) requires the hider to type a word for the seekers to guess. */
   needs_word?: boolean;
 }

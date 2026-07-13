@@ -389,7 +389,9 @@
     "promptMatching": "A kereső legközelebbi helye egyben a te legközelebbid is?",
     "promptMeasuring": "A keresőhöz képest közelebb vagy vagy távolabb tőle?",
     "promptTentacles": "A kérdés hatótávján belül vagy a kereső valamelyik közeli helyétől?",
-    "duplicatePick": "Melyik lapot másolod le?"
+    "duplicatePick": "Melyik lapot másolod le?",
+    "filmBird": "Filmezz le egy madarat, és küldd a keresőknek — legalább ennyi ideig kell nekik is.",
+    "sendVideo": "Videó küldése és kijátszás"
   },
   "picker": {
     "ask": "Tegyél fel kérdést",

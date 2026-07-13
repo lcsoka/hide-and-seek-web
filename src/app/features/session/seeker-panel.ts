@@ -37,6 +37,11 @@ export class SeekerPanel {
   readonly openBoard = output<void>();
   readonly mode = (id: string) => this.transitService.transitMeta(id);
 
+  /** A proof URL that points at a video (so the preview shows a player, not a broken <img>). */
+  isVideoUrl(url: string | null | undefined): boolean {
+    return !!url && /\.(mp4|mov|m4v|webm|3gp)(\?|$)/i.test(url);
+  }
+
   readonly questionNotice = this.store.questionNotice;
   readonly canAsk = computed(() => this.state().available_actions.includes('ask_question'));
   readonly canCatch = computed(() => this.state().available_actions.includes('claim_found'));

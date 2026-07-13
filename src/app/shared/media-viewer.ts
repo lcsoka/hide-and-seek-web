@@ -25,7 +25,7 @@ export class MediaViewerService {
   }
 
   private kindOf(url: string): 'image' | 'video' {
-    return /\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(url) ? 'video' : 'image';
+    return /\.(mp4|webm|mov|m4v|3gp|ogv)(\?|#|$)/i.test(url) ? 'video' : 'image';
   }
 }
 
