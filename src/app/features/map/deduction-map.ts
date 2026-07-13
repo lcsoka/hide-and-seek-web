@@ -475,15 +475,9 @@ export class DeductionMap {
       this.lastRouteSig = routeSig;
       const pts = shownRoute!.lines.flat();
       if (pts.length) {
-        try {
-          const lats = pts.map((p) => p.lat);
-          const lngs = pts.map((p) => p.lng);
-          this.programmaticMove = true;
-          this.map.fitBounds([[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]], { padding: [40, 40], maxZoom: 15, animate: true, duration: 0.5 });
-          setTimeout(() => (this.programmaticMove = false), 600);
-        } catch {
-          // degenerate geometry — leave the view
-        }
+        const lats = pts.map((p) => p.lat);
+        const lngs = pts.map((p) => p.lng);
+        this.fitBox(Math.min(...lats), Math.min(...lngs), Math.max(...lats), Math.max(...lngs), { padding: [40, 40], maxZoom: 15, animate: true, duration: 0.5 });
       }
       return; // don't also run the candidate fit this pass
     }
@@ -496,15 +490,27 @@ export class DeductionMap {
     const sig = `${this.questions().length}:${this.annotations().length}:${cand ? 1 : 0}`;
     if (this.autoZoom() && cand && sig !== this.lastFitSig && !this.userMoved) {
       this.lastFitSig = sig;
-      try {
-        const [minX, minY, maxX, maxY] = bbox(cand);
-        this.programmaticMove = true;
-        this.map.fitBounds([[minY, minX], [maxY, maxX]], { padding: [24, 24], maxZoom: 15, animate: true, duration: 0.6 });
-        setTimeout(() => (this.programmaticMove = false), 700);
-      } catch {
-        // empty / degenerate candidate — leave the view as-is
-      }
+      const [minX, minY, maxX, maxY] = bbox(cand);
+      this.fitBox(minY, minX, maxY, maxX, { padding: [24, 24], maxZoom: 15, animate: true, duration: 0.6 });
     }
+  }
+
+  /**
+   * Fit to a numeric lat/lng box, but only if it's finite. An empty or fully ruled-out
+   * candidate makes `bbox()` return `Infinity`; Leaflet's `fitBounds` doesn't throw on that —
+   * it silently projects to `NaN` and spams "Invalid LatLng (NaN, NaN)" (seen in the replay).
+   * Guarding here keeps a degenerate deduction from resetting or breaking the view.
+   */
+  private fitBox(minLat: number, minLng: number, maxLat: number, maxLng: number, opts: L.FitBoundsOptions): void {
+    if (!this.map || ![minLat, minLng, maxLat, maxLng].every(Number.isFinite)) {
+      return;
+    }
+    if (minLat < -90 || maxLat > 90 || minLng < -180 || maxLng > 180) {
+      return;
+    }
+    this.programmaticMove = true;
+    this.map.fitBounds([[minLat, minLng], [maxLat, maxLng]], opts);
+    setTimeout(() => (this.programmaticMove = false), (Number(opts.duration ?? 0.6) * 1000) + 100);
   }
 
   /** Centre on the player's own position (a "find me" button). Falls back to re-framing the
@@ -529,13 +535,7 @@ export class DeductionMap {
       return;
     }
     this.userMoved = false;
-    try {
-      const [minX, minY, maxX, maxY] = bbox(cand);
-      this.programmaticMove = true;
-      this.map.fitBounds([[minY, minX], [maxY, maxX]], { padding: [24, 24], maxZoom: 15, animate: true, duration: 0.6 });
-      setTimeout(() => (this.programmaticMove = false), 700);
-    } catch {
-      // degenerate candidate — ignore
-    }
+    const [minX, minY, maxX, maxY] = bbox(cand);
+    this.fitBox(minY, minX, maxY, maxX, { padding: [24, 24], maxZoom: 15, animate: true, duration: 0.6 });
   }
 }

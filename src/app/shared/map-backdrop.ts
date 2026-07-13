@@ -46,15 +46,26 @@ export class MapBackdrop {
     setTimeout(() => map.invalidateSize(), 200);
 
     let i = 0;
+    let dead = false;
     const drift = setInterval(() => {
+      if (dead) {
+        return;
+      }
       i = (i + 1) % spots.length;
+      // Cancel any still-pending flyTo frame before starting the next one. Each flyTo tracks its
+      // rAF id in a single `_flyToFrame` slot, so starting a new drift while a prior frame is still
+      // queued (e.g. a backgrounded tab throttles rAF so the 7s fly outlives the 9s interval)
+      // ORPHANS the old id — neither stop() nor remove() can cancel it, and it fires on the removed
+      // map afterwards as "Invalid LatLng (NaN, NaN)". Stopping first keeps at most one frame live.
+      map.stop();
       map.flyTo(spots[i], 13, { duration: 7, easeLinearity: 0.25 });
     }, 9000);
     this.destroyRef.onDestroy(() => {
+      dead = true;
       clearInterval(drift);
       scheme.removeEventListener('change', onSchemeChange);
-      // Halt any in-flight flyTo first: otherwise its queued rAF frame fires on the just-removed
-      // map and computes an Invalid LatLng (NaN, NaN) — noisy on every navigate-away mid-drift.
+      // Halt the in-flight flyTo, then remove(): both call _stop() to cancel the tracked frame, so
+      // no queued rAF frame runs on the torn-down map (which would compute NaN and spam the console).
       map.stop();
       map.remove();
     });
