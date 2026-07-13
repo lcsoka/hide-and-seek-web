@@ -15,6 +15,7 @@ import { HidingState } from '../../core/services/hiding-state';
 import { HudPreference } from '../../core/services/hud-preference';
 import { GeolocationPermission } from '../../core/services/geolocation-permission';
 import { LocationTracker } from '../../core/services/location';
+import { ScreenWakeLock } from '../../core/services/screen-wake-lock';
 import { PlayerStore } from '../../core/services/player-store';
 import { Realtime } from '../../core/services/realtime';
 import { SessionStore } from '../../core/services/session-store';
@@ -65,7 +66,14 @@ export class SessionView {
   private readonly api = inject(ApiClient);
   private readonly realtime = inject(Realtime);
   private readonly location = inject(LocationTracker);
+  private readonly wakeLock = inject(ScreenWakeLock);
   readonly geoPermission = inject(GeolocationPermission);
+
+  // Signal form of activePlay(s) for the wake-lock effect (hiding/seeking/endgame = live play).
+  private readonly activePlayNow = computed(() => {
+    const st = this.store.state()?.state;
+    return st === 'hiding' || st === 'seeking' || st === 'endgame';
+  });
   private readonly players = inject(PlayerStore);
   readonly store = inject(SessionStore);
   readonly hud = inject(HudPreference);
@@ -185,9 +193,20 @@ export class SessionView {
       }, 15000);
       destroyRef.onDestroy(() => clearInterval(poll));
 
-      // Browsers suspend backgrounded tabs (locked phones) and can silently drop the socket.
-      // On return to the foreground / regaining connectivity, catch up on missed events.
-      const onVisible = () => document.visibilityState === 'visible' && this.store.catchUp();
+      // Browsers suspend backgrounded tabs (locked phones): the socket drops AND geolocation stops.
+      // On return to the foreground / regaining connectivity, catch up on missed events, restart the
+      // location loop (watchPosition may have died while suspended), and re-take the wake lock (the
+      // OS releases it on background). A stale position previously broke the endgame catch.
+      const onVisible = () => {
+        if (document.visibilityState !== 'visible') {
+          return;
+        }
+        this.store.catchUp();
+        if (!this.devMode) {
+          this.location.start(sessionId, this.myId());
+        }
+        void this.wakeLock.reacquire();
+      };
       const onOnline = () => this.store.catchUp();
       document.addEventListener('visibilitychange', onVisible);
       window.addEventListener('online', onOnline);
@@ -195,6 +214,17 @@ export class SessionView {
         document.removeEventListener('visibilitychange', onVisible);
         window.removeEventListener('online', onOnline);
       });
+
+      // Keep the screen awake during active play so the app isn't suspended mid-walk (which stops
+      // GPS + the socket). Released in the lobby / round breaks and on teardown.
+      effect(() => {
+        if (this.activePlayNow()) {
+          void this.wakeLock.enable();
+        } else {
+          this.wakeLock.disable();
+        }
+      });
+      destroyRef.onDestroy(() => this.wakeLock.disable());
 
       // Leaving the session view WHILE STILL IN THE LOBBY frees the slot (the server keeps in-game
       // players). onDestroy only fires on in-app navigation away — NOT on a hard refresh (Angular
