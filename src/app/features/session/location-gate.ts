@@ -58,7 +58,8 @@ export class LocationGate {
   /** True while the game is live (past the lobby) — the gate only enforces during play. */
   readonly show = input(false);
 
-  /** Block only when we can actually get a grant. 'unsupported' can never be resolved, so let
-   *  those (rare) players through rather than trapping them behind an unclearable modal. */
-  readonly visible = computed(() => this.show() && (this.perm.state() === 'prompt' || this.perm.state() === 'denied'));
+  /** Only block on a CONFIRMED denial. The transient 'prompt' default (which iOS never clears,
+   *  since it can't query geolocation permission) would otherwise flash the gate on every
+   *  foreground; the native browser prompt does the initial asking, and a real fix marks 'granted'. */
+  readonly visible = computed(() => this.show() && this.perm.state() === 'denied');
 }

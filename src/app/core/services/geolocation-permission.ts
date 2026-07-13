@@ -41,6 +41,20 @@ export class GeolocationPermission {
     }
   }
 
+  /**
+   * The live location loop received a fix — hard proof the grant is real. This is the reliable
+   * signal on iOS, where `navigator.permissions.query({name:'geolocation'})` isn't supported, so the
+   * state would otherwise sit at 'prompt' forever and flash the gate on every foreground.
+   */
+  markGranted(): void {
+    this.state.set('granted');
+  }
+
+  /** The location loop failed with a hard permission denial. */
+  markDenied(): void {
+    this.state.set('denied');
+  }
+
   /** Trigger the native prompt (or confirm an existing grant). Resolves the state either way. */
   request(): void {
     if (this.state() === 'unsupported') {

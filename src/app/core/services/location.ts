@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { distanceMeters } from '../geo/geo';
 import { Position } from '../models';
 import { ApiClient } from './api-client';
+import { GeolocationPermission } from './geolocation-permission';
 import { LOCATION_SOURCE } from './location-source';
 import { SessionStore } from './session-store';
 
@@ -39,6 +40,7 @@ export class LocationTracker {
   private readonly api = inject(ApiClient);
   private readonly source = inject(LOCATION_SOURCE);
   private readonly store = inject(SessionStore);
+  private readonly perm = inject(GeolocationPermission);
   private subscription: Subscription | null = null;
 
   private lastSent: Position | null = null;
@@ -53,6 +55,7 @@ export class LocationTracker {
 
     this.subscription = this.source.positions().subscribe({
       next: (pos) => {
+        this.perm.markGranted(); // a real fix arrived → permission is granted (reliable on iOS too)
         // Move the player's OWN marker instantly (no server round-trip / broadcast echo wait).
         if (playerId) {
           this.store.setLivePosition(playerId, pos.lat, pos.lng);
@@ -63,8 +66,14 @@ export class LocationTracker {
           void this.api.reportLocation(sessionId, pos.lat, pos.lng);
         }
       },
-      // Permission denied / unavailable — stop quietly; the game still works without GPS.
-      error: () => this.stop(),
+      // Denied / unavailable — stop quietly; the game still works without GPS. A hard denial
+      // (code 1) surfaces the gate so the player can re-enable it from settings.
+      error: (e: GeolocationPositionError) => {
+        if (e?.code === 1) {
+          this.perm.markDenied();
+        }
+        this.stop();
+      },
     });
   }
 
