@@ -388,7 +388,8 @@
     "matchDiff": "No — different",
     "promptMatching": "Is the seeker's closest place also your nearest?",
     "promptMeasuring": "Compared to the seeker, are you closer to or further from it?",
-    "promptTentacles": "Are you within the question's range of one of the seeker's nearby places?"
+    "promptTentacles": "Are you within the question's range of one of the seeker's nearby places?",
+    "duplicatePick": "Which card should it copy?"
   },
   "picker": {
     "ask": "Ask a question",

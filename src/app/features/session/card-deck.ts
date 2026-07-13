@@ -75,6 +75,12 @@ export class CardDeck {
   readonly qIcon = (subject: string | null | undefined, c: string | null | undefined) =>
     this.category.questionIconName(subject ?? '', c ?? '');
   readonly confirmCard = signal<HandCard | null>(null);
+  // The 'duplicate' powerup being played — while set, the hider picks which OTHER card to copy.
+  readonly duplicateChoosing = signal<HandCard | null>(null);
+  readonly duplicateTargets = computed(() => {
+    const dup = this.duplicateChoosing();
+    return dup ? this.hand().filter((c) => c.uid !== dup.uid) : [];
+  });
   // The word the hider types when casting the Hidden Hangman (min 4 letters).
   readonly castWord = signal('');
 
@@ -369,13 +375,31 @@ export class CardDeck {
     }
   }
 
-  /** Curses ask for confirmation (they're played on the seekers); powerups play directly. */
+  /** Curses ask for confirmation (they're played on the seekers); powerups play directly — except
+   *  'duplicate', which first asks WHICH card to copy (without a target it silently did nothing). */
   async playCard(card: HandCard): Promise<void> {
     if (card.type === 'curse') {
       this.confirmCard.set(card);
+    } else if (card.type === 'powerup' && card.power === 'duplicate') {
+      if (this.hand().some((c) => c.uid !== card.uid)) {
+        this.duplicateChoosing.set(card); // open the copy-target picker
+      }
     } else if (card.type === 'powerup') {
       await this.act('play_powerup', { card_uid: card.uid });
     }
+  }
+
+  /** Play the 'duplicate' powerup against the chosen target card (makes a copy of it). */
+  async chooseDuplicateTarget(target: HandCard): Promise<void> {
+    const dup = this.duplicateChoosing();
+    this.duplicateChoosing.set(null);
+    if (dup) {
+      await this.act('play_powerup', { card_uid: dup.uid, target_uid: target.uid });
+    }
+  }
+
+  cancelDuplicate(): void {
+    this.duplicateChoosing.set(null);
   }
 
   async confirmPlay(): Promise<void> {

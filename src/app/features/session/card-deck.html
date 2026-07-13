@@ -78,6 +78,24 @@
     </div>
   }
 
+  <!-- Duplicate powerup: pick WHICH card to copy (a missing target used to make it do nothing). -->
+  @if (duplicateChoosing()) {
+    <div class="space-y-2 rounded-xl border-2 border-sky-400 bg-sky-50 p-3 dark:bg-sky-950">
+      <div class="text-sm font-semibold">{{ t('deck.duplicatePick') }}</div>
+      <div class="grid grid-cols-2 gap-2">
+        @for (c of duplicateTargets(); track c.uid) {
+          <button (click)="chooseDuplicateTarget(c)" [disabled]="busy()"
+                  class="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white p-2 text-left text-xs font-semibold dark:border-gray-700 dark:bg-gray-900"
+                  [style.borderColor]="cardColor(c)">
+            <span [style.color]="cardColor(c)"><app-icon [name]="cardEmblem(c)" [size]="16" /></span>
+            <span class="truncate">{{ c.name }}</span>
+          </button>
+        }
+      </div>
+      <button (click)="cancelDuplicate()" class="w-full rounded-lg border border-gray-300 p-2 text-sm font-medium dark:border-gray-600">{{ t('common.cancel') }}</button>
+    </div>
+  }
+
   @if (show('question') && pending(); as q) {
     <div class="space-y-2 rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-950">
       <div class="flex items-center gap-2">

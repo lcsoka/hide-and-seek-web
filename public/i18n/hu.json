@@ -388,7 +388,8 @@
     "matchDiff": "Nem — más",
     "promptMatching": "A kereső legközelebbi helye egyben a te legközelebbid is?",
     "promptMeasuring": "A keresőhöz képest közelebb vagy vagy távolabb tőle?",
-    "promptTentacles": "A kérdés hatótávján belül vagy a kereső valamelyik közeli helyétől?"
+    "promptTentacles": "A kérdés hatótávján belül vagy a kereső valamelyik közeli helyétől?",
+    "duplicatePick": "Melyik lapot másolod le?"
   },
   "picker": {
     "ask": "Tegyél fel kérdést",
