@@ -1,0 +1,67 @@
+<main class="mx-auto w-full max-w-6xl space-y-4 p-4">
+  <header class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-3">
+      <a routerLink="/" class="text-sm text-rose-600">← Home</a>
+      <h1 class="text-lg font-bold">Session replay</h1>
+    </div>
+    @if (god(); as g) {
+      <span class="rounded bg-gray-200 px-2 py-1 text-xs dark:bg-gray-800">{{ g.state }} · {{ g.status }} · round {{ g.round }}</span>
+    }
+  </header>
+
+  @if (error(); as e) {
+    <p class="rounded-lg bg-red-100 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">{{ e }}</p>
+  }
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div class="space-y-2">
+      <app-deduction-map class="block h-[60vh] min-h-80" [candidate]="candidate()" [questions]="markerQuestions()" [points]="playerPoints()" [autoZoom]="true" />
+      <p class="text-xs text-gray-500 dark:text-gray-400">
+        Shaded = ruled out by the questions. Markers show every player's last position (god view).
+      </p>
+    </div>
+
+    <section class="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+      <h2 class="mb-2 font-semibold">Timeline ({{ timeline().length }})</h2>
+      <ol class="space-y-2">
+        @for (e of timeline(); track $index) {
+          <li class="flex items-start gap-2 text-sm">
+            <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full" [class]="dot(e.kind)"></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex justify-between gap-2">
+                <span class="font-medium">{{ e.text }}</span>
+                <span class="shrink-0 font-mono text-xs tabular-nums text-gray-400">{{ time(e.at) }}</span>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">{{ e.who }}</div>
+
+              @if (e.card; as card) {
+                <div class="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-lg border px-2 py-1 text-xs"
+                     [style.borderColor]="card.color" [style.color]="card.color">
+                  <app-icon [name]="card.emblem" [size]="14" />
+                  <span class="truncate font-semibold">{{ card.name }}</span>
+                </div>
+              }
+
+              @if (e.media?.length) {
+                <div class="mt-1.5 flex flex-wrap gap-1.5">
+                  @for (m of e.media; track m) {
+                    <button type="button" (click)="media.open(m)" class="relative h-14 w-14 overflow-hidden rounded-lg ring-1 ring-black/10 dark:ring-white/10">
+                      @if (isVideo(m)) {
+                        <video [src]="m" class="h-full w-full object-cover" muted playsinline preload="metadata"></video>
+                        <span class="pointer-events-none absolute inset-0 grid place-items-center"><span class="grid h-6 w-6 place-items-center rounded-full bg-black/55 text-white"><app-icon name="play" [size]="12" /></span></span>
+                      } @else {
+                        <img [src]="m" class="h-full w-full object-cover" alt="media" />
+                      }
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </li>
+        } @empty {
+          <li class="text-sm text-gray-400">No activity recorded.</li>
+        }
+      </ol>
+    </section>
+  </div>
+</main>

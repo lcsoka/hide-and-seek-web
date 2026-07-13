@@ -5,10 +5,12 @@ import { applyQuestions, playArea } from '../../core/deduction/deduction';
 import { DeductionQuestion, RegionQuestion } from '../../core/deduction/deduction.model';
 import { resolvedQuestionsToDeduction } from '../../core/deduction/game-deduction';
 import { isOsmCategory, OsmDeductionService } from '../../core/deduction/osm-deduction.service';
-import { GodView, ResolvedQuestion } from '../../core/models';
+import { ActiveCurse, GodView, ResolvedQuestion } from '../../core/models';
 import { DebugApi } from '../../core/services/debug-api';
 import { LabelService } from '../../core/services/label.service';
 import { UnitsService } from '../../core/services/units.service';
+import { MediaViewerService } from '../../shared/media-viewer';
+import { Icon } from '../../shared/icon';
 import { DeductionMap } from '../map/deduction-map';
 
 interface TimelineEntry {
@@ -16,57 +18,14 @@ interface TimelineEntry {
   kind: 'step' | 'ask' | 'answer' | 'curse';
   who: string;
   text: string;
+  media?: string[]; // photo/video URLs (question photo answers, curse proofs) — tap to view
+  card?: { name: string; color: string; emblem: string }; // a played card, shown as a chip
 }
 
 @Component({
   selector: 'app-replay',
-  imports: [RouterLink, DeductionMap],
-  template: `
-    <main class="mx-auto w-full max-w-6xl space-y-4 p-4">
-      <header class="flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-3">
-          <a routerLink="/" class="text-sm text-rose-600">← Home</a>
-          <h1 class="text-lg font-bold">Session replay</h1>
-        </div>
-        @if (god(); as g) {
-          <span class="rounded bg-gray-200 px-2 py-1 text-xs dark:bg-gray-800">{{ g.state }} · {{ g.status }} · round {{ g.round }}</span>
-        }
-      </header>
-
-      @if (error(); as e) {
-        <p class="rounded-lg bg-red-100 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">{{ e }}</p>
-      }
-
-      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div class="space-y-2">
-          <app-deduction-map class="block h-[60vh] min-h-80" [candidate]="candidate()" [questions]="markerQuestions()" [points]="playerPoints()" [autoZoom]="true" />
-          <p class="text-xs text-gray-500 dark:text-gray-400">
-            Shaded = ruled out by the questions. Markers show every player's last position (god view).
-          </p>
-        </div>
-
-        <section class="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
-          <h2 class="mb-2 font-semibold">Timeline ({{ timeline().length }})</h2>
-          <ol class="space-y-2">
-            @for (e of timeline(); track $index) {
-              <li class="flex items-start gap-2 text-sm">
-                <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full" [class]="dot(e.kind)"></span>
-                <div class="flex-1">
-                  <div class="flex justify-between gap-2">
-                    <span class="font-medium">{{ e.text }}</span>
-                    <span class="shrink-0 text-xs text-gray-400">{{ time(e.at) }}</span>
-                  </div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400">{{ e.who }}</div>
-                </div>
-              </li>
-            } @empty {
-              <li class="text-sm text-gray-400">No activity recorded.</li>
-            }
-          </ol>
-        </section>
-      </div>
-    </main>
-  `,
+  imports: [RouterLink, DeductionMap, Icon],
+  templateUrl: './replay.html',
 })
 export class Replay {
   private readonly route = inject(ActivatedRoute);
@@ -74,6 +33,7 @@ export class Replay {
   private readonly osmDeduction = inject(OsmDeductionService);
   private readonly label = inject(LabelService);
   private readonly unitsService = inject(UnitsService);
+  readonly media = inject(MediaViewerService);
 
   readonly id = this.route.snapshot.paramMap.get('id') ?? '';
   readonly god = signal<GodView | null>(null);
@@ -148,8 +108,18 @@ export class Replay {
     return { step: 'bg-gray-400', ask: 'bg-blue-500', answer: 'bg-green-500', curse: 'bg-purple-500' }[kind];
   }
 
+  /** A stable hh:mm:ss clock (not the locale's am/pm formatting). */
   time(at: number): string {
-    return at ? new Date(at * 1000).toLocaleTimeString() : '';
+    if (!at) {
+      return '';
+    }
+    const d = new Date(at * 1000);
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  }
+
+  isVideo(url: string): boolean {
+    return /\.(mp4|mov|m4v|webm|3gp|ogv)(\?|#|$)/i.test(url);
   }
 
   private playerName(id: string | null): string {
@@ -185,15 +155,30 @@ export class Replay {
         entries.push({ at: q.asked_at, kind: 'ask', who: this.playerName(q.asked_by), text: `Asked ${q.category}` });
       }
       if (q.resolved_at) {
-        entries.push({ at: q.resolved_at, kind: 'answer', who: 'Hider', text: `${q.category}: ${this.answerText(q)}` });
+        // A photo-question answer is the hider's photo/video — surface it inline.
+        const media = q.answer?.photo_url ? [q.answer.photo_url] : undefined;
+        entries.push({ at: q.resolved_at, kind: 'answer', who: 'Hider', text: `${q.category}: ${this.answerText(q)}`, media });
       }
     }
     for (const c of g.curses) {
       if (c.at) {
-        entries.push({ at: c.at, kind: 'curse', who: this.playerName(c.by), text: `Curse: ${c.name ?? ''}` });
+        // The hider's cast media + the seeker's proof (photo or video), whichever exist.
+        const media = [c.hint_photo_url, c.proof_url].filter((u): u is string => !!u);
+        entries.push({
+          at: c.at,
+          kind: 'curse',
+          who: this.playerName(c.by),
+          text: this.curseStatus(c),
+          card: { name: c.name ?? 'Curse', color: 'var(--color-curse)', emblem: 'curse' },
+          media: media.length ? media : undefined,
+        });
       }
     }
 
     return entries.sort((a, b) => a.at - b.at);
+  }
+
+  private curseStatus(c: ActiveCurse): string {
+    return c.status === 'completed' ? 'Curse cleared' : c.status === 'expired' ? 'Curse expired' : 'Curse played';
   }
 }
