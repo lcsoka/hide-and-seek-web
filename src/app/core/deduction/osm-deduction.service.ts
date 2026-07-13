@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { bbox, booleanPointInPolygon, circle, distance, nearestPoint, point, voronoi } from '@turf/turf';
+import { FeatureCollection, Point } from 'geojson';
 import { ResolvedQuestion } from '../models';
 import { measuringRegionToBorder, tentacleRegion } from './deduction';
 import { Poly } from '../maps/map.model';
@@ -42,7 +43,7 @@ export class OsmDeductionService {
    * tentacles) by fetching the relevant features and applying the same geometry the
    * server reasoned over. Returns the region to keep plus whether to keep inside it.
    */
-  async region(q: ResolvedQuestion): Promise<{ region: Poly; within: boolean } | null> {
+  async region(q: ResolvedQuestion): Promise<{ region: Poly; within: boolean; sites?: FeatureCollection<Point> } | null> {
     const { lat, lng, feature, radius_m, admin_level, boundary_level } = q.ask;
     const tag = feature ? FEATURE_TAGS[feature] : undefined;
     const answer = q.answer?.answer;
@@ -81,7 +82,9 @@ export class OsmDeductionService {
       const places = await this.overpass.pois(lat, lng, radiusKm, tag);
       const region = q.answer?.feature_name ? tentacleRegion(lat, lng, radiusKm, places, q.answer.feature_name) : null;
 
-      return region ? { region, within: true } : null;
+      // sites = the candidate POIs inside the radius; their Voronoi split IS the cut, so exposing
+      // them lets the replay draw the competing places (the cell edges are the bisectors to them).
+      return region ? { region, within: true, sites: places } : null;
     }
 
     if (q.category === 'measuring') {
@@ -108,7 +111,8 @@ export class OsmDeductionService {
       const ref = serverReference(q) ?? askPoint;
       const cell = cells.features.find((c) => c && booleanPointInPolygon(ref, c));
 
-      return cell ? { region: cell as Poly, within: answer === 'yes' } : null;
+      // sites = every candidate place; the chosen cell's edges are the bisectors to its neighbours.
+      return cell ? { region: cell as Poly, within: answer === 'yes', sites: features } : null;
     }
 
     return null;

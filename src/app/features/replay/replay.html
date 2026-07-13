@@ -16,7 +16,7 @@
   <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
     <div class="space-y-2">
       <app-deduction-map class="block h-[60vh] min-h-80"
-        [candidate]="candidate()" [annotations]="activeAnnotations()" [regions]="activeRegions()" [points]="playerPoints()"
+        [candidate]="candidate()" [annotations]="activeAnnotations()" [regions]="activeRegions()" [sites]="activeSites()" [points]="playerPoints()"
         [pointLabels]="true" [annotationLabels]="false" [trails]="trails()" [autoZoom]="false" />
 
       @if (hasTimeline()) {

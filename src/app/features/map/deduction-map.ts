@@ -61,6 +61,9 @@ export class DeductionMap {
   // Whether to keep the numbered annotation's explanation label always on (true) or only on hover
   // (false) — the replay uses hover so many nearby pins don't stack overlapping label boxes.
   readonly annotationLabels = input(true);
+  // The competing POIs behind a Voronoi cut (other parks/cinemas), drawn as faint dots so the cell
+  // reads as "bounded by the halfway lines to these places". Hover shows each name.
+  readonly sites = input<FeatureCollection<Point> | null>(null);
   readonly overlays = input<Feature[]>([]); // e.g. admin borders, drawn as outlines
   readonly autoZoom = input(true);
   readonly loading = input(false); // hold rendering until the deduction is fully computed
@@ -119,6 +122,7 @@ export class DeductionMap {
       this.trails();
       this.regions();
       this.annotationLabels();
+      this.sites();
       this.overlays();
       this.loading();
       this.thermoMarker();
@@ -291,6 +295,15 @@ export class DeductionMap {
       if (r.label) {
         layer.bindTooltip(r.label, { sticky: true, opacity: 0.95 });
       }
+    }
+
+    // Competing POIs behind a Voronoi cut (other parks/cinemas): faint hollow rings, so the kept
+    // cell reads as "bounded by the halfway lines to these". Hover names each; drawn beneath pins.
+    for (const s of this.sites()?.features ?? []) {
+      const [lng, lat] = s.geometry.coordinates;
+      L.circleMarker([lat, lng], { radius: 3.5, color: MAP.region, weight: 1.5, fillColor: '#ffffff', fillOpacity: 0.6, opacity: 0.75 })
+        .bindTooltip(String(s.properties?.['name'] ?? 'place'))
+        .addTo(this.overlay);
     }
 
     // Replay movement trails: each player's path so far, a white halo under the player colour.

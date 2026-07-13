@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { FeatureCollection, Point } from 'geojson';
+import { bbox } from '@turf/turf';
+import { Feature, FeatureCollection, Point } from 'geojson';
 import { applyQuestions, playArea } from '../../core/deduction/deduction';
 import { DeductionQuestion, RegionQuestion } from '../../core/deduction/deduction.model';
 import { resolvedQuestionsToDeduction } from '../../core/deduction/game-deduction';
@@ -95,6 +96,7 @@ export class Replay {
   readonly god = signal<GodView | null>(null);
   readonly error = signal<string | null>(null);
   readonly osmRegions = signal<Map<number, RegionQuestion>>(new Map());
+  readonly osmSites = signal<Map<number, FeatureCollection<Point>>>(new Map());
   private readonly osmSeen = new Set<number>();
 
   // Playback state: a movable playhead over the game's [t0, t1] window, plus transport.
@@ -258,6 +260,35 @@ export class Replay {
     return out;
   });
 
+  /** The competing POIs (parks/cinemas) behind each applied Voronoi cut, near the kept cell — so the
+   *  "random" cell shape reads as "bounded by the halfway lines to these places". */
+  readonly activeSites = computed<FeatureCollection<Point>>(() => {
+    const applied = this.appliedSeqs();
+    const regions = this.osmRegions();
+    const features: Feature<Point>[] = [];
+    for (const [seq, sites] of this.osmSites()) {
+      if (!applied.has(seq)) {
+        continue;
+      }
+      const region = regions.get(seq)?.region;
+      let box: [number, number, number, number] | null = null;
+      if (region) {
+        const b = bbox(region);
+        const mx = (b[2] - b[0]) * 0.6 || 0.02;
+        const my = (b[3] - b[1]) * 0.6 || 0.02;
+        box = [b[0] - mx, b[1] - my, b[2] + mx, b[3] + my];
+      }
+      for (const f of sites.features) {
+        const [lng, lat] = f.geometry.coordinates;
+        if (box && (lng < box[0] || lng > box[2] || lat < box[1] || lat > box[3])) {
+          continue; // keep only the places near the kept cell — the ones that actually bound it
+        }
+        features.push(f);
+      }
+    }
+    return { type: 'FeatureCollection', features };
+  });
+
   private readonly effectBySeq = computed(() => {
     const m = new Map<number, string>();
     for (const a of this.allAnnotations()) {
@@ -339,6 +370,9 @@ export class Replay {
           void this.osmDeduction.region(q).then((r) => {
             if (r) {
               this.osmRegions.update((m) => new Map(m).set(q.seq, { id: `q${q.seq}`, type: 'region', label: q.category, region: r.region, within: r.within }));
+              if (r.sites) {
+                this.osmSites.update((m) => new Map(m).set(q.seq, r.sites!));
+              }
             }
           });
         }
