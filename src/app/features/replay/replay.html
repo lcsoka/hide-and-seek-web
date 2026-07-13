@@ -17,7 +17,7 @@
     <div class="space-y-2">
       <app-deduction-map class="block h-[60vh] min-h-80"
         [candidate]="candidate()" [annotations]="activeAnnotations()" [regions]="activeRegions()" [sites]="activeSites()" [points]="playerPoints()"
-        [pointLabels]="true" [annotationLabels]="false" [trails]="trails()" [autoZoom]="false" />
+        [pointLabels]="true" [annotationLabels]="false" [featureLinks]="true" [trails]="trails()" [autoZoom]="false" />
 
       @if (hasTimeline()) {
         <app-replay-scrubber

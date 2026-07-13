@@ -61,6 +61,9 @@ export class DeductionMap {
   // Whether to keep the numbered annotation's explanation label always on (true) or only on hover
   // (false) — the replay uses hover so many nearby pins don't stack overlapping label boxes.
   readonly annotationLabels = input(true);
+  // Draw a dashed connector from each ask point to its reference/matched feature. Replay-only: the
+  // live seeker map stays as it was (just the feature pin), no extra lines.
+  readonly featureLinks = input(false);
   // The competing POIs behind a Voronoi cut (other parks/cinemas), drawn as faint dots so the cell
   // reads as "bounded by the halfway lines to these places". Hover shows each name.
   readonly sites = input<FeatureCollection<Point> | null>(null);
@@ -122,6 +125,7 @@ export class DeductionMap {
       this.trails();
       this.regions();
       this.annotationLabels();
+      this.featureLinks();
       this.sites();
       this.overlays();
       this.loading();
@@ -375,7 +379,7 @@ export class DeductionMap {
         // one". Uses the question's identity colour when set (so overlapping Voronoi questions read
         // as distinct sets), else blue (kept) / red (ruled out).
         const fc = a.color ?? (a.within === false ? MAP.hider : MAP.seeker);
-        if (a.point) {
+        if (a.point && this.featureLinks()) {
           L.polyline([[a.point.lat, a.point.lng], [a.feature.lat, a.feature.lng]], { color: fc, weight: 1.5, dashArray: '5 5', opacity: 0.85, interactive: false }).addTo(this.overlay);
         }
         L.marker([a.feature.lat, a.feature.lng], { icon: glyphIcon('pin', { color: fc, size: 26 }) })
