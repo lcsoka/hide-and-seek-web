@@ -63,9 +63,8 @@
     "endgameQHint": "Seekers can keep asking questions during the endgame.",
     "hidingTimeTitle": "Hiding time",
     "hidingTimeHint": "How long the hider has to hide before seeking begins.",
-    "hidingDefault": "Default",
     "minShort": "min",
-    "custom": "custom"
+    "hourShort": "h"
   },
   "connection": {
     "reconnecting": "Reconnecting…"

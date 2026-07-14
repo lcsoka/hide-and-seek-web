@@ -63,9 +63,8 @@
     "endgameQHint": "A keresők a végjátékban (endgame) is feltehetnek kérdéseket.",
     "hidingTimeTitle": "Bújási idő",
     "hidingTimeHint": "Mennyi ideje van a bújónak elrejtőzni, mielőtt kezdődik a keresés.",
-    "hidingDefault": "Alap",
     "minShort": "perc",
-    "custom": "egyéni"
+    "hourShort": "ó"
   },
   "connection": {
     "reconnecting": "Újracsatlakozás…"

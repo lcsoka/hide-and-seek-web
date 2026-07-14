@@ -57,10 +57,14 @@ export class NewGameWizard {
   readonly deckTab = signal<DeckTab>('curse');
   readonly reveal = signal(false);
   readonly endgameQuestions = signal(true); // seekers can keep asking in the endgame (default on)
-  // How long the hider gets to hide, in minutes. Defaults to 45; the host can pick a preset or a
-  // custom value. (Clearing the custom field → null → falls back to the city-size default server-side.)
-  readonly hidingMinutes = signal<number | null>(45);
+  // How long the hider gets to hide, in minutes. Defaults to 45; presets for the common values and a
+  // slider (5 min – 4 h, 5-min steps) for anything else — the slider can't produce an invalid value.
+  readonly hidingMinutes = signal(45);
   readonly hidingPresets = [15, 30, 45, 60];
+  readonly hidingMin = 5;
+  readonly hidingMax = 240; // 4 hours
+  readonly hidingHours = computed(() => Math.floor(this.hidingMinutes() / 60));
+  readonly hidingMins = computed(() => this.hidingMinutes() % 60);
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
   readonly shuffling = signal(false);
@@ -224,10 +228,11 @@ export class NewGameWizard {
     }
   }
 
-  /** Custom hiding-time input: a positive number sets it, an empty/invalid value falls back to the default. */
-  onHidingCustom(e: Event): void {
+  /** Slider → hiding minutes, clamped + snapped to 5-min steps so no invalid value can be set. */
+  onHidingSlider(e: Event): void {
     const v = Number((e.target as HTMLInputElement).value);
-    this.hidingMinutes.set(Number.isFinite(v) && v > 0 ? v : null);
+    const snapped = Math.round((Number.isFinite(v) ? v : 45) / 5) * 5;
+    this.hidingMinutes.set(Math.min(this.hidingMax, Math.max(this.hidingMin, snapped)));
   }
 
   async create(): Promise<void> {
