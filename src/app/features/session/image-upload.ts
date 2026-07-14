@@ -52,12 +52,37 @@ export class ImageUpload {
       const upload = isVideo ? file : await this.downscale(file);
       const { url } = await this.api.uploadMedia(this.sessionId(), upload);
       this.uploaded.emit(url);
-    } catch {
-      this.err.set('A feltöltés nem sikerült — próbáld újra.');
+    } catch (e: unknown) {
+      this.err.set(this.uploadError(e, isVideo));
     } finally {
       this.busy.set(false);
       input.value = '';
     }
+  }
+
+  /** Turn an upload failure into a specific, actionable message instead of a blanket "try again". */
+  private uploadError(e: unknown, isVideo: boolean): string {
+    const err = e as { status?: number; error?: { message?: string; errors?: Record<string, string[]> } };
+    const status = err?.status ?? 0;
+    const kind = isVideo ? 'videó' : 'kép';
+    // PHP rejected the body before Laravel (over post_max_size), or Laravel's own size/type rule tripped.
+    if (status === 413) {
+      return `A ${kind} túl nagy a szerver számára${isVideo ? ` (max ${MAX_VIDEO_MB} MB)` : ''}.`;
+    }
+    if (status === 422) {
+      // mimes/max validation — surface the server's reason if we have it, else a clear generic.
+      const msg = err?.error?.message ?? err?.error?.errors?.['image']?.[0] ?? '';
+      return /large|kilobytes|max/i.test(msg)
+        ? `A ${kind} túl nagy — válassz kisebbet${isVideo ? ` (max ${MAX_VIDEO_MB} MB)` : ''}.`
+        : `Nem támogatott ${kind}formátum — próbálj másikat.`;
+    }
+    if (status === 0) {
+      return 'Nincs internetkapcsolat, vagy megszakadt a feltöltés.';
+    }
+    if (status >= 500) {
+      return 'Szerverhiba a feltöltésnél — próbáld újra kicsit később.';
+    }
+    return 'A feltöltés nem sikerült — próbáld újra.';
   }
 
   /**
