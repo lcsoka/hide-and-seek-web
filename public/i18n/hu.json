@@ -344,7 +344,9 @@
     "findPlace": "Keresd meg ezt a helyet:",
     "submitProof": "Bizonyíték küldése",
     "restore": "Vissza a következtetésbe",
-    "ignore": "Kihagyás a következtetésből"
+    "ignore": "Kihagyás a következtetésből",
+    "watchVideo": "Nézd meg a bújó videóját, és válaszolj egy hosszabbal",
+    "submitVideoProof": "Válaszvideó küldése (hosszabb legyen)"
   },
   "hangman": {
     "solveToAsk": "Fejtsd meg a szót, hogy újra kérdezhess!",

@@ -126,9 +126,14 @@
 
           @if (c.hint_photo_url) {
             <div class="space-y-1">
-              <div class="text-xs font-medium text-purple-700 dark:text-purple-300">{{ tr('seeker.findPlace') }}</div>
-              <button type="button" (click)="media.open(c.hint_photo_url)" class="block w-full">
-                <img [src]="c.hint_photo_url" alt="Find this Street View location" class="h-40 w-full rounded-lg object-cover ring-1 ring-black/10" />
+              <div class="text-xs font-medium text-purple-700 dark:text-purple-300">{{ c.video_proof ? tr('seeker.watchVideo') : tr('seeker.findPlace') }}</div>
+              <button type="button" (click)="media.open(c.hint_photo_url)" class="relative block w-full">
+                @if (isVideoUrl(c.hint_photo_url)) {
+                  <video [src]="c.hint_photo_url" class="h-40 w-full rounded-lg object-cover ring-1 ring-black/10" muted playsinline preload="metadata"></video>
+                  <span class="pointer-events-none absolute inset-0 grid place-items-center"><span class="grid h-8 w-8 place-items-center rounded-full bg-black/55 text-white"><app-icon name="play" [size]="18" /></span></span>
+                } @else {
+                  <img [src]="c.hint_photo_url" alt="hint" class="h-40 w-full rounded-lg object-cover ring-1 ring-black/10" />
+                }
               </button>
             </div>
           }
@@ -142,7 +147,7 @@
               }
             </button>
           } @else if (c.requires_proof && c.status === 'active') {
-            <app-image-upload [sessionId]="sessionId()" [label]="tr('seeker.submitProof')"
+            <app-image-upload [sessionId]="sessionId()" [label]="c.video_proof ? tr('seeker.submitVideoProof') : tr('seeker.submitProof')"
                               [accept]="c.video_proof ? 'video/*' : 'image/*'" (uploaded)="submitProof(c, $event)" />
           }
           @if (c.dice && c.status === 'active') {

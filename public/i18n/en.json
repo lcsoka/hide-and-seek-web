@@ -344,7 +344,9 @@
     "findPlace": "Find this place:",
     "submitProof": "Submit proof",
     "restore": "Restore to deduction",
-    "ignore": "Ignore in deduction"
+    "ignore": "Ignore in deduction",
+    "watchVideo": "Watch the hider's video, then reply with a longer one",
+    "submitVideoProof": "Send a reply video (make it longer)"
   },
   "hangman": {
     "solveToAsk": "Solve the word to ask again!",
