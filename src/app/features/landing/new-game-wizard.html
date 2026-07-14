@@ -153,10 +153,6 @@
                 <span class="block text-[10px] text-gray-400">{{ t('wizard.hidingTimeHint') }}</span>
               </div>
               <div class="flex flex-wrap items-center gap-1.5">
-                <button type="button" (click)="hidingMinutes.set(null)"
-                        class="rounded-lg px-2.5 py-1 text-xs font-semibold transition" [class]="hidingMinutes() === null ? 'bg-brand text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'">
-                  {{ t('wizard.hidingDefault') }}
-                </button>
                 @for (m of hidingPresets; track m) {
                   <button type="button" (click)="hidingMinutes.set(m)"
                           class="rounded-lg px-2.5 py-1 text-xs font-semibold tabular-nums transition" [class]="hidingMinutes() === m ? 'bg-brand text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'">

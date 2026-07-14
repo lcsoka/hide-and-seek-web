@@ -57,8 +57,9 @@ export class NewGameWizard {
   readonly deckTab = signal<DeckTab>('curse');
   readonly reveal = signal(false);
   readonly endgameQuestions = signal(true); // seekers can keep asking in the endgame (default on)
-  // How long the hider gets to hide, in minutes. null = the city-size default (small 15 / medium 30 / large 60).
-  readonly hidingMinutes = signal<number | null>(null);
+  // How long the hider gets to hide, in minutes. Defaults to 45; the host can pick a preset or a
+  // custom value. (Clearing the custom field → null → falls back to the city-size default server-side.)
+  readonly hidingMinutes = signal<number | null>(45);
   readonly hidingPresets = [15, 30, 45, 60];
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
