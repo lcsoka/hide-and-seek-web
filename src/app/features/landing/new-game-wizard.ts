@@ -57,12 +57,12 @@ export class NewGameWizard {
   readonly deckTab = signal<DeckTab>('curse');
   readonly reveal = signal(false);
   readonly endgameQuestions = signal(true); // seekers can keep asking in the endgame (default on)
-  // How long the hider gets to hide, in minutes. Defaults to 45; presets for the common values and a
-  // slider (5 min – 4 h, 5-min steps) for anything else — the slider can't produce an invalid value.
+  // How long the hider gets to hide, in minutes. Defaults to 45; presets for the common values, plus
+  // hour + minute dropdowns so only valid combinations (5 min – 4 h, 5-min steps) are selectable.
   readonly hidingMinutes = signal(45);
   readonly hidingPresets = [15, 30, 45, 60];
-  readonly hidingMin = 5;
-  readonly hidingMax = 240; // 4 hours
+  readonly hidingHourOptions = [0, 1, 2, 3, 4];
+  readonly hidingMinuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
   readonly hidingHours = computed(() => Math.floor(this.hidingMinutes() / 60));
   readonly hidingMins = computed(() => this.hidingMinutes() % 60);
   readonly busy = signal(false);
@@ -228,11 +228,18 @@ export class NewGameWizard {
     }
   }
 
-  /** Slider → hiding minutes, clamped + snapped to 5-min steps so no invalid value can be set. */
-  onHidingSlider(e: Event): void {
-    const v = Number((e.target as HTMLInputElement).value);
-    const snapped = Math.round((Number.isFinite(v) ? v : 45) / 5) * 5;
-    this.hidingMinutes.set(Math.min(this.hidingMax, Math.max(this.hidingMin, snapped)));
+  /** Total hiding time is bounded to 5 min – 4 h; the dropdowns only offer valid parts, and this
+   *  guards the edges (e.g. 4 h + 30 min snaps back to 4 h, 0 h + 0 min to 5 min). */
+  private clampHiding(total: number): number {
+    return Math.min(240, Math.max(5, total));
+  }
+
+  setHidingHours(h: number): void {
+    this.hidingMinutes.set(this.clampHiding(h * 60 + this.hidingMins()));
+  }
+
+  setHidingMins(m: number): void {
+    this.hidingMinutes.set(this.clampHiding(this.hidingHours() * 60 + m));
   }
 
   async create(): Promise<void> {
