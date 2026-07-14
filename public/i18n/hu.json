@@ -60,7 +60,12 @@
     "shuffling": "Pakli keverése…",
     "preparing": "játék előkészítése",
     "endgameQTitle": "Kérdezés a hajrában",
-    "endgameQHint": "A keresők a végjátékban (endgame) is feltehetnek kérdéseket."
+    "endgameQHint": "A keresők a végjátékban (endgame) is feltehetnek kérdéseket.",
+    "hidingTimeTitle": "Bújási idő",
+    "hidingTimeHint": "Mennyi ideje van a bújónak elrejtőzni, mielőtt kezdődik a keresés.",
+    "hidingDefault": "Alap",
+    "minShort": "perc",
+    "custom": "egyéni"
   },
   "connection": {
     "reconnecting": "Újracsatlakozás…"
@@ -171,7 +176,10 @@
     "roam": "Szabadon mozoghatsz a zónádban",
     "roamHint": "Mozogj szabadon a rejtekzónádon belül — a helyed csak akkor rögzül, ha egy kereső elér.",
     "locked": "A keresők a zónádban vannak!",
-    "lockedHint": "Elkezdődött a végjáték — maradj pontosan ott, ahol vagy, amíg meg nem találnak."
+    "lockedHint": "Elkezdődött a végjáték — maradj pontosan ott, ahol vagy, amíg meg nem találnak.",
+    "arriveHint": "Amíg mozogsz, nem keresünk megállókat — így nem terheljük feleslegesen a térképszervert. Amikor a rejtekhelyeden vagy, koppints alább.",
+    "arrived": "Megérkeztem a zónámba",
+    "stillMoving": "Még mozgok"
   },
   "draw": {
     "title": "Húztál {{ drew }} lapot — tarts meg {{ keep }}-t",

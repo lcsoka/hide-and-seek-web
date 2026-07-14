@@ -10,9 +10,22 @@
 
   @if (!hasLocation()) {
     <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('hider.waitingGps') }}</p>
-  } @else if (stations() === null) {
-    <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('hider.finding') }}</p>
-  } @else if (selected(); as sel) {
+  } @else if (!arrived()) {
+    <!-- Gate the Overpass search: only look for stops once the hider says they're in place. -->
+    <div class="rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50">
+      <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('hider.arriveHint') }}</p>
+    </div>
+    <button (click)="arrive()"
+            class="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 p-3 font-semibold text-white hover:bg-rose-700">
+      <app-icon name="pin" [size]="18" /> {{ t('hider.arrived') }}
+    </button>
+  } @else {
+    <button (click)="goBack()" class="inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+      <app-icon name="arrow" [size]="14" /> {{ t('hider.stillMoving') }}
+    </button>
+    @if (stations() === null || calculating()) {
+      <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('hider.finding') }}</p>
+    } @else if (selected(); as sel) {
     <div class="rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950">
       <p class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">{{ t('hider.hideNear') }}</p>
       <p class="text-lg font-bold">{{ sel.name }}</p>
@@ -50,7 +63,8 @@
         </ul>
       </details>
     }
-  } @else {
-    <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('hider.none') }}</p>
+    } @else {
+      <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('hider.none') }}</p>
+    }
   }
 </div>

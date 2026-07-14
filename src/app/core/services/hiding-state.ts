@@ -32,6 +32,15 @@ export class HidingState {
     return s ? { lat: s.lat, lng: s.lng } : null;
   });
 
+  /** Clear the selection + cached fetch (e.g. the hider tapped "back", or a new round begins), so
+   *  the next "I arrived" re-fetches instead of reusing a stale position. */
+  reset(): void {
+    this.stations.set(null);
+    this.allStops.set(null);
+    this.selected.set(null);
+    this.loadedKey = null;
+  }
+
   beginWork(): void {
     this.inflight.update((n) => n + 1);
   }

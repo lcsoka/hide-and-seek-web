@@ -57,6 +57,9 @@ export class NewGameWizard {
   readonly deckTab = signal<DeckTab>('curse');
   readonly reveal = signal(false);
   readonly endgameQuestions = signal(true); // seekers can keep asking in the endgame (default on)
+  // How long the hider gets to hide, in minutes. null = the city-size default (small 15 / medium 30 / large 60).
+  readonly hidingMinutes = signal<number | null>(null);
+  readonly hidingPresets = [15, 30, 45, 60];
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
   readonly shuffling = signal(false);
@@ -220,6 +223,12 @@ export class NewGameWizard {
     }
   }
 
+  /** Custom hiding-time input: a positive number sets it, an empty/invalid value falls back to the default. */
+  onHidingCustom(e: Event): void {
+    const v = Number((e.target as HTMLInputElement).value);
+    this.hidingMinutes.set(Number.isFinite(v) && v > 0 ? v : null);
+  }
+
   async create(): Promise<void> {
     const cityKey = this.cityKey();
     if (!cityKey || this.busy()) {
@@ -240,6 +249,11 @@ export class NewGameWizard {
     };
     if (enabled) {
       config['deck_cards'] = enabled;
+    }
+    // Only override the city-size default when the host picked a hiding time.
+    const mins = this.hidingMinutes();
+    if (mins && mins > 0) {
+      config['hiding_time_limit_s'] = Math.round(mins * 60);
     }
 
     try {

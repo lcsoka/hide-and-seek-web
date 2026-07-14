@@ -25,23 +25,48 @@ export class HiderPanel {
 
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
+  // The hider taps "I arrived" once they're at their hiding spot — only THEN do we search for
+  // nearby stops. Without this, every step during the walk re-queried Overpass needlessly.
+  readonly arrived = signal(false);
   readonly mode = (id: string) => this.transitService.transitMeta(id);
 
   readonly stations = this.hiding.stations;
   readonly selected = this.hiding.selected;
+  readonly calculating = this.hiding.calculating;
   readonly me = computed(() => this.state().players.find((p) => p.id === this.meId()));
   readonly hasLocation = computed(() => this.me()?.lat != null && this.me()?.lng != null);
   readonly others = computed(() => this.stations()?.filter((s) => s !== this.selected()) ?? []);
 
+  private lastRound = -1;
+
   constructor() {
+    // A fresh hiding phase (new round) resets the arrival — the hider must confirm again where they are.
     effect(() => {
-      const m = this.me();
-      const modes = this.state().config?.['transit_modes'] as string[] | undefined;
-      const radiusM = Number(this.state().config?.['hiding_zone_radius_m'] ?? 400) || 400;
-      if (m?.lat != null && m?.lng != null) {
-        void this.hiding.loadFor(m.lat, m.lng, modes, radiusM);
+      const round = Number(this.state().round ?? 0);
+      if (round !== this.lastRound) {
+        this.lastRound = round;
+        this.arrived.set(false);
+        this.hiding.reset();
       }
     });
+  }
+
+  /** The hider is at their hiding spot: search for nearby stops ONCE, from the current position. */
+  arrive(): void {
+    const m = this.me();
+    if (m?.lat == null || m?.lng == null) {
+      return;
+    }
+    this.arrived.set(true);
+    const modes = this.state().config?.['transit_modes'] as string[] | undefined;
+    const radiusM = Number(this.state().config?.['hiding_zone_radius_m'] ?? 400) || 400;
+    void this.hiding.loadFor(m.lat, m.lng, modes, radiusM);
+  }
+
+  /** Tapped "I arrived" too early — go back to moving (and drop the stops we found). */
+  goBack(): void {
+    this.arrived.set(false);
+    this.hiding.reset();
   }
 
   async hideHere(): Promise<void> {

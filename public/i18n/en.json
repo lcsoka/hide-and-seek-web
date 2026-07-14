@@ -60,7 +60,12 @@
     "shuffling": "Shuffling the deck…",
     "preparing": "preparing the game",
     "endgameQTitle": "Questions in the endgame",
-    "endgameQHint": "Seekers can keep asking questions during the endgame."
+    "endgameQHint": "Seekers can keep asking questions during the endgame.",
+    "hidingTimeTitle": "Hiding time",
+    "hidingTimeHint": "How long the hider has to hide before seeking begins.",
+    "hidingDefault": "Default",
+    "minShort": "min",
+    "custom": "custom"
   },
   "connection": {
     "reconnecting": "Reconnecting…"
@@ -171,7 +176,10 @@
     "roam": "You can roam your zone",
     "roamHint": "Move freely anywhere inside your hiding zone — your spot only locks when a seeker reaches you.",
     "locked": "Seekers are in your zone!",
-    "lockedHint": "The endgame has started — stay exactly where you are until you're found."
+    "lockedHint": "The endgame has started — stay exactly where you are until you're found.",
+    "arriveHint": "While you move we don't search for stops — to avoid hammering the map server. When you're at your hiding spot, tap below.",
+    "arrived": "I've arrived at my zone",
+    "stillMoving": "Still moving"
   },
   "draw": {
     "title": "You drew {{ drew }} — keep {{ keep }}",
