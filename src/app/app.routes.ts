@@ -9,6 +9,7 @@ export const routes: Routes = [
   { path: 'auth', loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage) },
   { path: 'reset-password', loadComponent: () => import('./features/auth/reset-password').then((m) => m.ResetPasswordPage) },
   { path: 'legal/:doc', loadComponent: () => import('./features/legal/legal-page').then((m) => m.LegalPage) },
+  { path: 'guide', loadComponent: () => import('./features/guide/guide').then((m) => m.Guide) },
   { path: 's/:id', loadComponent: () => import('./features/session/session').then((m) => m.SessionView) },
   { path: 'map', loadComponent: () => import('./features/map/map-page').then((m) => m.MapPage) },
   // Isolated three.js proofs-of-concept (see features/lab) — touch nothing else in the app.

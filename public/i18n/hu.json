@@ -553,6 +553,10 @@
     },
     "replay": {
       "title": "Visszajátszás — Hide & Seek"
+    },
+    "guide": {
+      "title": "Hogyan működik — Hide & Seek",
+      "desc": "Ismerd meg a Hide & Seek szabályait: hogyan szűkítik a kérdések (radar, hőmérő, egyezés, tapogatók, mérés) a térképet."
     }
   },
   "push": {
@@ -602,5 +606,97 @@
   "update": {
     "available": "Új verzió érhető el",
     "refresh": "Frissítés"
+  },
+  "guide": {
+    "navLink": "Hogyan működik?",
+    "back": "Vissza",
+    "title": "Hogyan működik a játék?",
+    "subtitle": "Rejtőzz el, vagy szűkítsd a térképet kérdésekkel — így számol a játék.",
+    "intro": {
+      "body": "A Hide & Seek egy valós idejű, helyalapú bújócska: egy játékos elbújik egy városban, a többiek pedig okos kérdésekkel próbálják kideríteni, hol van. Minden válasz egy darabkát vág le a térképből — a maradék terület az, ahol a bújó még lehet. Ez az oldal elmagyarázza, mi alapján számol a játék."
+    },
+    "roles": {
+      "title": "A két szerep",
+      "hiderTitle": "A bújó",
+      "hiderBody": "Elbújik egy megállóhoz közel, és őszintén válaszol a kérdésekre. Átkokkal (kártyákkal) lassíthatja és zavarhatja a keresőket, és időbónuszokat gyűjthet.",
+      "seekerTitle": "A kereső(k)",
+      "seekerBody": "Kérdéseket tesznek fel, hogy szűkítsék a bújó lehetséges helyét, mozognak a városban (akár tömegközlekedéssel), és a végén megpróbálják megtalálni."
+    },
+    "flow": {
+      "title": "A játék menete",
+      "hide": {
+        "title": "1. Elbújás",
+        "body": "A bújó kap egy kis időt, hogy elrejtőzzön egy választott megálló környékén (a bújási zónában). Amíg tart, a keresők nem kérdezhetnek."
+      },
+      "seek": {
+        "title": "2. Keresés",
+        "body": "A keresők kérdésekkel szűkítik a térképet, a bújó válaszol és átkokat játszik ki. A megmaradt (satírozatlan) terület mutatja, hol lehet még a bújó."
+      },
+      "endgame": {
+        "title": "3. Végjáték",
+        "body": "Amikor a keresők úgy érzik, elég közel vannak, elindítják a végjátékot, és a helyszínen megpróbálják megtalálni a bújót."
+      }
+    },
+    "map": {
+      "title": "A térkép: mi a „lehetséges terület”?",
+      "body": "A térképen a színes (viola) rész az, ahol a bújó még lehet. Minden megválaszolt kérdés kizár egy darabot — az kiszürkül. Ahogy jönnek a válaszok, a lehetséges terület egyre kisebb lesz, míg a végén körülhatárolható a bújó."
+    },
+    "cutsTitle": "Hogyan vág a térképből egy-egy kérdés?",
+    "cutsIntro": "Ötféle térkép-kérdés van. Mindegyik más geometria szerint szűkíti a lehetséges területet — nézzük egyenként.",
+    "cutsOutro": "A vágások összeadódnak: minél több kérdés, annál kisebb a maradék terület — a keresők így közelítik be a bújót.",
+    "cut": {
+      "radar": {
+        "title": "Radar",
+        "q": "„A megadott X km-en belül vagy?”",
+        "body": "Egy kört rajzol a kereső köré. Ha a válasz igen, csak a körön belüli rész marad; ha nem, a kör belseje kizárul. Klasszikus közelség-szűkítés."
+      },
+      "thermo": {
+        "title": "Hőmérő",
+        "q": "„Melegebb vagy hidegebb lettél?”",
+        "body": "A kereső elindul egy pontból, és megáll egy másikon. Ha közben melegebb lett (közelebb a bújóhoz), akkor a bújó a végpont felőli oldalon van — a játék a két pont közti felezővonal melegebbik felét tartja meg, a másikat kizárja."
+      },
+      "matching": {
+        "title": "Egyezés (matching)",
+        "q": "„Ugyanaz a legközelebbi park (vagy kerület), mint neked?”",
+        "body": "Nem magát a parkot vágja ki, hanem a park „vonzáskörzetét”: azt a területet, ahonnan ugyanez a park a legközelebbi (ez a Voronoi-cella). A cella határait a szomszédos parkokkal húzott felezővonalak adják — ezért lehet szabálytalan alakú. „Igen”-nél ez a cella marad meg."
+      },
+      "tentacles": {
+        "title": "Tapogatók (tentacles)",
+        "q": "„Egy adott sugáron belül ugyanaz a legközelebbi mozi?”",
+        "body": "Mint az egyezés, de csak a megadott sugáron belül számol, és a végén a körre is levágja. A megmaradt terület: a talált mozi vonzáskörzete metszve a sugár-körrel. Kevés mozi a sugárban → nagyobb megmaradt terület."
+      },
+      "measuring": {
+        "title": "Mérés (measuring)",
+        "q": "„Közelebb vagy egy ponthoz (pl. folyóhoz), mint én?”",
+        "body": "A játék a kereső saját távolságával rajzol egy kört a referenciapont köré. Ha a bújó közelebb van, a körön belüli rész marad; ha távolabb, a körön kívüli."
+      }
+    },
+    "more": {
+      "title": "További szabályok",
+      "curses": {
+        "title": "Átkok",
+        "body": "A bújó kártyákkal átkokat játszhat ki a keresőkre: pl. le kell fotózniuk valamit, kockát dobniuk, vagy egy feladatot megoldaniuk, mielőtt továbbmehetnek. Ez időt nyer a bújónak."
+      },
+      "cards": {
+        "title": "Kártyák és időbónuszok",
+        "body": "Minden megválaszolt kérdésért a bújó kártyát húz (átkok, időbónuszok, extra képességek). A kártyák teszik izgalmassá a bújó oldalát: lassíthatja, zavarhatja vagy félrevezetheti a keresőket."
+      },
+      "transit": {
+        "title": "Tömegközlekedés",
+        "body": "A keresők felszállhatnak buszra, villamosra, metróra, hogy gyorsabban mozogjanak. Fontos szabály: a hőmérő kérdésnél csak a gyalog megtett út számít — tömegközlekedéssel nem lehet „csalni”."
+      },
+      "zone": {
+        "title": "Bújási zóna",
+        "body": "A bújó egy választott megálló környékén rejtőzik. A zóna addig tart, ameddig az adott megálló a legközelebbi — a szomszédos megállók felezővonalai vágják körbe (ugyanaz a Voronoi-elv, mint a matchingnél)."
+      },
+      "endgame": {
+        "title": "A megtalálás",
+        "body": "A végjátékban a keresőnek fizikailag oda kell érnie a bújóhoz. A megtalálás akkor számít, amikor a kereső eléggé közel ér a bújó rögzített helyéhez."
+      }
+    },
+    "cta": {
+      "title": "Készen állsz egy játékra?",
+      "button": "Játék indítása"
+    }
   }
 }

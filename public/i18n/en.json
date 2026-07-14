@@ -553,6 +553,10 @@
     },
     "replay": {
       "title": "Replay — Hide & Seek"
+    },
+    "guide": {
+      "title": "How it works — Hide & Seek",
+      "desc": "Learn the rules of Hide & Seek: how questions (radar, thermometer, matching, tentacles, measuring) narrow the map."
     }
   },
   "push": {
@@ -602,5 +606,97 @@
   "update": {
     "available": "A new version is available",
     "refresh": "Refresh"
+  },
+  "guide": {
+    "navLink": "How it works",
+    "back": "Back",
+    "title": "How the game works",
+    "subtitle": "Hide, or narrow the map with questions — here's the maths behind it.",
+    "intro": {
+      "body": "Hide & Seek is a real-time, location-based game of hide and seek: one player hides in a city, and the others use clever questions to work out where. Every answer cuts a piece off the map — what is left is where the hider can still be. This page explains what the game bases its calculation on."
+    },
+    "roles": {
+      "title": "The two roles",
+      "hiderTitle": "The hider",
+      "hiderBody": "Hides near a transit stop and answers questions honestly. Can play curses (cards) to slow and disrupt the seekers, and collect time bonuses.",
+      "seekerTitle": "The seeker(s)",
+      "seekerBody": "Ask questions to narrow down the hider's possible location, move around the city (including by transit), and finally try to find them."
+    },
+    "flow": {
+      "title": "How a game flows",
+      "hide": {
+        "title": "1. Hiding",
+        "body": "The hider gets a short window to hide near a chosen stop (the hiding zone). While it runs, seekers can't ask questions."
+      },
+      "seek": {
+        "title": "2. Seeking",
+        "body": "Seekers narrow the map with questions; the hider answers and plays curses. The remaining (un-shaded) area shows where the hider could still be."
+      },
+      "endgame": {
+        "title": "3. Endgame",
+        "body": "When the seekers feel close enough, they trigger the endgame and try to physically find the hider."
+      }
+    },
+    "map": {
+      "title": "The map: what is the “possible area”?",
+      "body": "On the map, the coloured (violet) part is where the hider can still be. Every answered question rules out a piece — it greys out. As answers come in, the possible area shrinks until the hider is pinned down."
+    },
+    "cutsTitle": "How does each question cut the map?",
+    "cutsIntro": "There are five map questions. Each narrows the possible area by a different geometry — let's take them one by one.",
+    "cutsOutro": "The cuts stack up: the more questions, the smaller the remaining area — that's how the seekers close in.",
+    "cut": {
+      "radar": {
+        "title": "Radar",
+        "q": "“Are you within X km?”",
+        "body": "Draws a circle around the seeker. If yes, only the inside stays; if no, the inside is ruled out. A classic proximity cut."
+      },
+      "thermo": {
+        "title": "Thermometer",
+        "q": "“Did you get warmer or colder?”",
+        "body": "The seeker starts at one point and stops at another. If they got warmer (closer to the hider), the hider is on the end-point side — the game keeps the warmer half of the line halfway between the two points and rules out the other."
+      },
+      "matching": {
+        "title": "Matching",
+        "q": "“Is your nearest park (or district) the same as mine?”",
+        "body": "It does not cut out the park itself, but its “catchment area”: everywhere whose nearest park is that same one (a Voronoi cell). The cell edges are the halfway lines to the neighbouring parks — that is why it can be an odd shape. On “yes”, this cell is kept."
+      },
+      "tentacles": {
+        "title": "Tentacles",
+        "q": "“Within a given radius, is your nearest cinema the same?”",
+        "body": "Like matching, but it only considers places within the given radius, and clips the result to the circle. What remains: the matched cinema catchment area intersected with the radius. Fewer cinemas in the radius → a larger remaining area."
+      },
+      "measuring": {
+        "title": "Measuring",
+        "q": "“Are you closer to a point (e.g. a river) than me?”",
+        "body": "The game draws a circle around the reference point at the seeker's own distance. If the hider is closer, the inside stays; if further, the outside stays."
+      }
+    },
+    "more": {
+      "title": "More rules",
+      "curses": {
+        "title": "Curses",
+        "body": "The hider can play curse cards on the seekers: e.g. they must photograph something, roll dice, or complete a task before moving on. It buys the hider time."
+      },
+      "cards": {
+        "title": "Cards and time bonuses",
+        "body": "For every answered question the hider draws a card (curses, time bonuses, extra abilities). Cards make the hider's side fun: slow, disrupt or mislead the seekers."
+      },
+      "transit": {
+        "title": "Transit",
+        "body": "Seekers can board a bus, tram or metro to move faster. Key rule: for the thermometer question only distance walked on foot counts — you cannot “cheat” with transit."
+      },
+      "zone": {
+        "title": "Hiding zone",
+        "body": "The hider hides near a chosen stop. The zone extends as far as that stop stays the nearest — carved by the halfway lines to neighbouring stops (the same Voronoi idea as matching)."
+      },
+      "endgame": {
+        "title": "The catch",
+        "body": "In the endgame the seeker must physically reach the hider. The catch counts once the seeker gets close enough to the hider's locked-in spot."
+      }
+    },
+    "cta": {
+      "title": "Ready for a game?",
+      "button": "Start a game"
+    }
   }
 }

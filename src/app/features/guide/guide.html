@@ -1,0 +1,106 @@
+<main *transloco="let t" class="mx-auto w-full max-w-3xl px-4 pb-16 pt-6 text-slate-700 dark:text-slate-200">
+  <header class="mb-8">
+    <div class="mb-6 flex items-center justify-between gap-3">
+      <a routerLink="/" class="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 hover:text-rose-500">
+        <app-icon name="arrow" [size]="16" /> {{ t('guide.back') }}
+      </a>
+      <app-lang-toggle />
+    </div>
+    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">{{ t('guide.title') }}</h1>
+    <p class="mt-2 text-base text-slate-500 dark:text-slate-400">{{ t('guide.subtitle') }}</p>
+  </header>
+
+  <!-- Overview -->
+  <section class="mb-10">
+    <p class="text-[15px] leading-relaxed">{{ t('guide.intro.body') }}</p>
+  </section>
+
+  <!-- Roles -->
+  <section class="mb-10">
+    <h2 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">{{ t('guide.roles.title') }}</h2>
+    <div class="grid gap-3 sm:grid-cols-2">
+      <div class="rounded-xl border border-rose-200 bg-rose-50/60 p-4 dark:border-rose-500/20 dark:bg-rose-500/5">
+        <div class="mb-1.5 flex items-center gap-2 font-semibold text-rose-600 dark:text-rose-300"><app-icon name="hide" [size]="18" /> {{ t('guide.roles.hiderTitle') }}</div>
+        <p class="text-sm leading-relaxed">{{ t('guide.roles.hiderBody') }}</p>
+      </div>
+      <div class="rounded-xl border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-500/20 dark:bg-blue-500/5">
+        <div class="mb-1.5 flex items-center gap-2 font-semibold text-blue-600 dark:text-blue-300"><app-icon name="ask" [size]="18" /> {{ t('guide.roles.seekerTitle') }}</div>
+        <p class="text-sm leading-relaxed">{{ t('guide.roles.seekerBody') }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Game flow -->
+  <section class="mb-10">
+    <h2 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">{{ t('guide.flow.title') }}</h2>
+    <ol class="space-y-3">
+      @for (step of ['hide', 'seek', 'endgame']; track step; let i = $index) {
+        <li class="flex gap-3">
+          <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-slate-900 text-xs font-bold text-white dark:bg-white dark:text-slate-900">{{ i + 1 }}</span>
+          <div>
+            <div class="font-semibold text-slate-900 dark:text-white">{{ t('guide.flow.' + step + '.title') }}</div>
+            <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{{ t('guide.flow.' + step + '.body') }}</p>
+          </div>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <!-- The map / candidate concept -->
+  <section class="mb-10">
+    <h2 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">{{ t('guide.map.title') }}</h2>
+    <p class="mb-4 text-[15px] leading-relaxed">{{ t('guide.map.body') }}</p>
+    <div class="mx-auto max-w-sm rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+      <app-guide-diagram type="candidate" />
+    </div>
+  </section>
+
+  <!-- The cuts -->
+  <section class="mb-10">
+    <h2 class="mb-1.5 text-xl font-bold text-slate-900 dark:text-white">{{ t('guide.cutsTitle') }}</h2>
+    <p class="mb-5 text-[15px] leading-relaxed">{{ t('guide.cutsIntro') }}</p>
+
+    <div class="space-y-5">
+      @for (c of cuts; track c.key) {
+        <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+          <div class="flex items-center gap-2 border-b border-slate-100 px-4 py-2.5 dark:border-slate-800">
+            <span class="grid h-7 w-7 place-items-center rounded-lg" [style.color]="c.color" [style.backgroundColor]="c.color + '1f'"><app-icon [name]="c.icon" [size]="16" /></span>
+            <h3 class="font-bold text-slate-900 dark:text-white">{{ t('guide.cut.' + c.key + '.title') }}</h3>
+          </div>
+          <div class="grid gap-3 p-4 sm:grid-cols-[1fr_1.1fr] sm:items-center">
+            <div class="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50"><app-guide-diagram [type]="c.diagram" /></div>
+            <div class="space-y-2 text-sm leading-relaxed">
+              <p><span class="font-semibold text-slate-900 dark:text-white">{{ t('guide.cut.' + c.key + '.q') }}</span></p>
+              <p class="text-slate-600 dark:text-slate-300">{{ t('guide.cut.' + c.key + '.body') }}</p>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    <p class="mt-4 rounded-xl bg-violet-50 p-3 text-sm leading-relaxed text-violet-900 dark:bg-violet-500/10 dark:text-violet-200">{{ t('guide.cutsOutro') }}</p>
+  </section>
+
+  <!-- Other rules -->
+  <section class="mb-10">
+    <h2 class="mb-4 text-xl font-bold text-slate-900 dark:text-white">{{ t('guide.more.title') }}</h2>
+    <div class="space-y-4">
+      @for (r of rules; track r.key) {
+        <div class="flex gap-3">
+          <span class="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"><app-icon [name]="r.icon" [size]="18" /></span>
+          <div>
+            <div class="font-semibold text-slate-900 dark:text-white">{{ t('guide.more.' + r.key + '.title') }}</div>
+            <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{{ t('guide.more.' + r.key + '.body') }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="rounded-2xl bg-slate-900 p-6 text-center dark:bg-white/10">
+    <p class="mb-3 text-lg font-bold text-white">{{ t('guide.cta.title') }}</p>
+    <a routerLink="/" class="inline-flex items-center gap-2 rounded-full bg-rose-600 px-5 py-2.5 font-semibold text-white transition hover:bg-rose-500">
+      {{ t('guide.cta.button') }} <app-icon name="arrow" [size]="16" class="-scale-x-100" />
+    </a>
+  </div>
+</main>

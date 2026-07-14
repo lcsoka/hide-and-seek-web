@@ -1,0 +1,86 @@
+@switch (type()) {
+  @case ('candidate') {
+    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Lehetséges terület és kizárt terület">
+      <rect x="6" y="6" width="308" height="178" rx="12" fill="#94a3b8" fill-opacity="0.16" />
+      <path d="M72 46 Q150 24 236 54 Q276 96 244 138 Q160 172 84 142 Q46 96 72 46 Z" fill="#7c3aed" fill-opacity="0.20" stroke="#7c3aed" stroke-width="2.5" />
+      <text x="160" y="98" text-anchor="middle" fill="#7c3aed" font-size="13" font-weight="700">lehetséges terület</text>
+      <text x="160" y="170" text-anchor="middle" fill="currentColor" font-size="11" opacity="0.7">a satírozott rész már kizárva</text>
+    </svg>
+  }
+
+  @case ('radar') {
+    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Radar kör">
+      <rect x="6" y="6" width="308" height="178" rx="12" fill="#94a3b8" fill-opacity="0.14" />
+      <circle cx="160" cy="98" r="66" fill="#7c3aed" fill-opacity="0.18" stroke="#2563eb" stroke-width="2.5" />
+      <line x1="160" y1="98" x2="226" y2="98" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4 4" />
+      <text x="192" y="91" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">X&#8202;km</text>
+      <circle cx="160" cy="98" r="6" fill="#2563eb" />
+      <text x="160" y="122" text-anchor="middle" fill="currentColor" font-size="10.5" opacity="0.75">kereső</text>
+      <text x="160" y="56" text-anchor="middle" fill="#7c3aed" font-size="12" font-weight="700">IGEN → itt belül</text>
+      <text x="160" y="180" text-anchor="middle" fill="currentColor" font-size="11" opacity="0.65">NEM → a körön kívül</text>
+    </svg>
+  }
+
+  @case ('thermometer') {
+    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Hőmérő felezővonal">
+      <rect x="6" y="6" width="308" height="178" rx="12" fill="#94a3b8" fill-opacity="0.14" />
+      <!-- The warmer half (toward B) is kept -->
+      <path d="M112 12 200 178 314 178 314 12 Z" fill="#7c3aed" fill-opacity="0.18" />
+      <!-- Perpendicular bisector (halfway line) -->
+      <line x1="112" y1="12" x2="200" y2="178" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6 5" />
+      <!-- The seeker's walk A → B -->
+      <defs><marker id="gd-arrow" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#f59e0b" /></marker></defs>
+      <line x1="86" y1="150" x2="226" y2="52" stroke="#f59e0b" stroke-width="3" marker-end="url(#gd-arrow)" />
+      <circle cx="86" cy="150" r="6" fill="#ffffff" stroke="#f59e0b" stroke-width="2.5" />
+      <circle cx="226" cy="52" r="7" fill="#f59e0b" />
+      <text x="70" y="170" text-anchor="middle" fill="currentColor" font-size="10.5" opacity="0.75">start</text>
+      <text x="250" y="44" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="700">melegebb</text>
+      <text x="250" y="150" text-anchor="middle" fill="#7c3aed" font-size="11.5" font-weight="700">ez a fél marad</text>
+    </svg>
+  }
+
+  @case ('matching') {
+    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Voronoi cellák">
+      <rect x="6" y="6" width="308" height="178" rx="12" fill="#94a3b8" fill-opacity="0.14" />
+      <!-- The seeker's park's cell — kept -->
+      <path d="M92 40 150 74 150 128 96 150 54 96 Z" fill="#7c3aed" fill-opacity="0.22" stroke="#7c3aed" stroke-width="2.5" />
+      <!-- Cell boundaries to neighbouring parks (the halfway lines) -->
+      <path d="M150 74 236 44 M150 74 150 128 M150 128 232 150 M150 128 96 150 M150 74 92 40" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-opacity="0.7" />
+      <!-- Parks (green) -->
+      <circle cx="100" cy="94" r="7" fill="#16a34a" /><text x="100" y="112" text-anchor="middle" fill="currentColor" font-size="9.5" opacity="0.8">park</text>
+      <circle cx="196" cy="60" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <circle cx="200" cy="130" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <circle cx="88" cy="150" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <circle cx="250" cy="96" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <text x="102" y="70" text-anchor="middle" fill="#7c3aed" font-size="10.5" font-weight="700">ide eshet</text>
+    </svg>
+  }
+
+  @case ('tentacles') {
+    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Tapogatók a sugáron belül">
+      <rect x="6" y="6" width="308" height="178" rx="12" fill="#94a3b8" fill-opacity="0.14" />
+      <circle cx="160" cy="96" r="74" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="5 4" />
+      <!-- matched cinema's cell, clipped to the radius -->
+      <path d="M160 30 A66 66 0 0 1 214 128 L160 96 Z" fill="#7c3aed" fill-opacity="0.22" stroke="#7c3aed" stroke-width="2" />
+      <circle cx="160" cy="96" r="5.5" fill="#0891b2" /><text x="160" y="114" text-anchor="middle" fill="currentColor" font-size="9.5" opacity="0.8">mozi</text>
+      <circle cx="120" cy="60" r="5" fill="#db2777" fill-opacity="0.8" />
+      <circle cx="196" cy="150" r="5" fill="#db2777" fill-opacity="0.8" />
+      <circle cx="110" cy="140" r="5" fill="#db2777" fill-opacity="0.8" />
+      <text x="186" y="58" text-anchor="middle" fill="#2563eb" font-size="10.5" font-weight="700">sugár</text>
+      <text x="196" y="80" text-anchor="middle" fill="#7c3aed" font-size="10.5" font-weight="700">ide eshet</text>
+    </svg>
+  }
+
+  @case ('measuring') {
+    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Távolság kör a referenciahelyhez">
+      <rect x="6" y="6" width="308" height="178" rx="12" fill="#94a3b8" fill-opacity="0.14" />
+      <circle cx="150" cy="98" r="66" fill="#7c3aed" fill-opacity="0.18" stroke="#0891b2" stroke-width="2.5" />
+      <line x1="150" y1="98" x2="216" y2="98" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="4 4" />
+      <text x="184" y="91" text-anchor="middle" fill="#0891b2" font-size="10.5" font-weight="700">a te távolságod</text>
+      <path d="M150 90 l6 8 -6 8 -6 -8 Z" fill="#0891b2" />
+      <text x="150" y="122" text-anchor="middle" fill="currentColor" font-size="9.5" opacity="0.8">pl. folyó</text>
+      <text x="150" y="56" text-anchor="middle" fill="#7c3aed" font-size="11.5" font-weight="700">közelebb → itt belül</text>
+      <text x="150" y="180" text-anchor="middle" fill="currentColor" font-size="11" opacity="0.65">távolabb → a körön kívül</text>
+    </svg>
+  }
+}

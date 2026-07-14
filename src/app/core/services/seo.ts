@@ -15,6 +15,7 @@ const ROUTE_SEO: Record<string, { title: string; desc: string }> = {
   content: { title: 'seo.content.title', desc: 'seo.home.desc' },
   s: { title: 'seo.game.title', desc: 'seo.home.desc' },
   replay: { title: 'seo.replay.title', desc: 'seo.home.desc' },
+  guide: { title: 'seo.guide.title', desc: 'seo.guide.desc' },
 };
 
 /**
