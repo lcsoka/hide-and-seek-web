@@ -40,24 +40,36 @@
   }
 
   @case ('matching') {
-    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Voronoi cellák">
-      <rect x="6" y="6" width="308" height="178" rx="12" fill="#94a3b8" fill-opacity="0.14" />
-      <!-- The seeker's park's cell — kept -->
-      <path d="M92 40 150 74 150 128 96 150 54 96 Z" fill="#7c3aed" fill-opacity="0.22" stroke="#7c3aed" stroke-width="2.5" />
-      <!-- Cell boundaries to neighbouring parks (the halfway lines) -->
-      <path d="M150 74 236 44 M150 74 150 128 M150 128 232 150 M150 128 96 150 M150 74 92 40" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-opacity="0.7" />
-      <!-- Parks (green) -->
-      <circle cx="100" cy="94" r="7" fill="#16a34a" /><text x="100" y="112" text-anchor="middle" fill="currentColor" font-size="9.5" opacity="0.8">park</text>
-      <circle cx="196" cy="60" r="5" fill="#16a34a" fill-opacity="0.7" />
-      <circle cx="200" cy="130" r="5" fill="#16a34a" fill-opacity="0.7" />
-      <circle cx="88" cy="150" r="5" fill="#16a34a" fill-opacity="0.7" />
-      <circle cx="250" cy="96" r="5" fill="#16a34a" fill-opacity="0.7" />
-      <text x="102" y="70" text-anchor="middle" fill="#7c3aed" font-size="10.5" font-weight="700">ide eshet</text>
+    <!-- A real Voronoi partition (computed with turf) of 8 parks; every point belongs to its nearest
+         park. The shared cell edges ARE the halfway (perpendicular-bisector) lines between parks. -->
+    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Voronoi cellák — minden park a hozzá legközelebbi területet birtokolja">
+      <g fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-opacity="0.6">
+        <path d="M4 49 L95 91 L149 4 L4 4 Z" />
+        <path d="M161 4 L215 97 L316 44 L316 4 Z" />
+        <path d="M215 97 L254 147 L316 128 L316 44 Z" />
+        <path d="M252 186 L254 147 L215 97 L137 164 L135 186 Z" />
+        <path d="M135 186 L137 164 L95 101 L4 156 L4 186 Z" />
+        <path d="M4 156 L95 101 L95 91 L4 49 Z" />
+        <path d="M316 128 L254 147 L252 186 L316 186 Z" />
+      </g>
+      <!-- the seeker's park's cell — kept ("ide eshet a bújó") -->
+      <path d="M95 91 L95 101 L137 164 L215 97 L161 4 L149 4 Z" fill="#7c3aed" fill-opacity="0.22" stroke="#7c3aed" stroke-width="2.5" />
+      <!-- parks (green) — the seeker's is emphasised -->
+      <circle cx="150" cy="96" r="7" fill="#16a34a" stroke="#ffffff" stroke-width="2" />
+      <circle cx="66" cy="44" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <circle cx="246" cy="40" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <circle cx="280" cy="104" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <circle cx="206" cy="162" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <circle cx="70" cy="150" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <circle cx="40" cy="100" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <circle cx="300" cy="168" r="5" fill="#16a34a" fill-opacity="0.7" />
+      <text x="150" y="80" text-anchor="middle" fill="currentColor" font-size="9" opacity="0.75">a te parkod</text>
+      <text x="150" y="132" text-anchor="middle" fill="#7c3aed" font-size="11.5" font-weight="700">ide eshet</text>
     </svg>
   }
 
   @case ('tentacles') {
-    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Tapogatók a sugáron belül">
+    <svg viewBox="0 0 320 190" class="h-auto w-full" role="img" aria-label="Csápok a sugáron belül">
       <rect x="6" y="6" width="308" height="178" rx="12" fill="#94a3b8" fill-opacity="0.14" />
       <circle cx="160" cy="96" r="74" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="5 4" />
       <!-- matched cinema's cell, clipped to the radius -->

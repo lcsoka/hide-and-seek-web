@@ -556,7 +556,7 @@
     },
     "guide": {
       "title": "Hogyan működik — Hide & Seek",
-      "desc": "Ismerd meg a Hide & Seek szabályait: hogyan szűkítik a kérdések (radar, hőmérő, egyezés, tapogatók, mérés) a térképet."
+      "desc": "Ismerd meg a Hide & Seek szabályait: hogyan szűkítik a kérdések (radar, hőmérő, egyezés, csápok, mérés) a térképet."
     }
   },
   "push": {
@@ -661,7 +661,7 @@
         "body": "Nem magát a parkot vágja ki, hanem a park „vonzáskörzetét”: azt a területet, ahonnan ugyanez a park a legközelebbi (ez a Voronoi-cella). A cella határait a szomszédos parkokkal húzott felezővonalak adják — ezért lehet szabálytalan alakú. „Igen”-nél ez a cella marad meg."
       },
       "tentacles": {
-        "title": "Tapogatók (tentacles)",
+        "title": "Csápok",
         "q": "„Egy adott sugáron belül ugyanaz a legközelebbi mozi?”",
         "body": "Mint az egyezés, de csak a megadott sugáron belül számol, és a végén a körre is levágja. A megmaradt terület: a talált mozi vonzáskörzete metszve a sugár-körrel. Kevés mozi a sugárban → nagyobb megmaradt terület."
       },
