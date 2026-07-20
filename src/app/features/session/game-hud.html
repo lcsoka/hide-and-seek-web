@@ -33,12 +33,21 @@
   </div>
 </div>
 
-@if (calculating()) {
-  <div class="pointer-events-none absolute inset-x-0 top-16 z-[600] flex justify-center sm:top-20" *transloco="let tr">
-    <span class="pointer-events-auto flex items-center gap-2 rounded-full bg-amber-500/90 px-3 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur">
-      <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
-      {{ tr('hud.calculating') }}
-    </span>
+@if (calculating() || weakGps()) {
+  <div class="pointer-events-none absolute inset-x-0 top-16 z-[600] flex flex-col items-center gap-1.5 sm:top-20" *transloco="let tr">
+    @if (calculating()) {
+      <span class="pointer-events-auto flex items-center gap-2 rounded-full bg-amber-500/90 px-3 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur">
+        <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
+        {{ tr('hud.calculating') }}
+      </span>
+    }
+    @if (weakGps()) {
+      <span class="pointer-events-auto flex items-center gap-2 rounded-full bg-orange-600/90 px-3 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur"
+            [title]="tr('hud.weakGpsHint')">
+        <app-icon name="locate" [size]="14" />
+        {{ tr('hud.weakGps') }}
+      </span>
+    }
   </div>
 }
 

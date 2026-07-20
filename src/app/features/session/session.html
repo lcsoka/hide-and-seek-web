@@ -32,7 +32,7 @@
                     (openAsk)="openAsk()" (openBoard)="boardOpen.set(true)" (openDrawer)="mobileDrawer.set($event)" (recenter)="recenter()" (endGame)="confirmEnd.set(true)" />
     } @else {
       <app-game-hud [joinCode]="s.join_code" [timer]="timer()" [role]="role(s)" [stateLabel]="s.state" [calculating]="hidingCalculating()"
-                    [canEndGame]="canEndGame(s)" (endGame)="confirmEnd.set(true)" />
+                    [weakGps]="weakGps()" [canEndGame]="canEndGame(s)" (endGame)="confirmEnd.set(true)" />
     }
 
     <!-- End-game confirmation (host) — a single control lives in the HUD, not on every panel. -->

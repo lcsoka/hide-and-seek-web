@@ -19,6 +19,7 @@ export class GameHud {
   readonly role = input<string | null>(null);
   readonly stateLabel = input('');
   readonly calculating = input(false); // hiding-zone (stations + carve) being fetched
+  readonly weakGps = input(false); // fix too rough for the server to act on — tell the player why
   readonly canEndGame = input(false); // host, mid-game — show the End-game control
   readonly endGame = output<void>();
   readonly copied = signal(false);

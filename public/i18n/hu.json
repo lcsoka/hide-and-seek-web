@@ -260,6 +260,8 @@
   },
   "hud": {
     "calculating": "Búvóhely-zóna számítása…",
+    "weakGps": "Gyenge GPS-jel",
+    "weakGpsHint": "A helyzeted túl pontatlan ahhoz, hogy a játék döntsön belőle. Amíg nem javul, a kérdésekre a bújó válaszol kézzel, és az elkapás sem működik. Menj ki a szabadba vagy várj pár másodpercet.",
     "hide": "Elbújás",
     "questions": "Kérdések",
     "hand": "Kéz",

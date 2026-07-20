@@ -69,6 +69,9 @@ export class SessionView {
   private readonly wakeLock = inject(ScreenWakeLock);
   readonly geoPermission = inject(GeolocationPermission);
 
+  /** GPS too rough for the server to act on — the HUD says so, since it silently gates actions. */
+  readonly weakGps = this.location.weakFix;
+
   // Signal form of activePlay(s) for the wake-lock effect (hiding/seeking/endgame = live play).
   private readonly activePlayNow = computed(() => {
     const st = this.store.state()?.state;

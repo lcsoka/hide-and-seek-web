@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { distanceMeters } from '../geo/geo';
 import { Position } from '../models';
@@ -13,6 +13,13 @@ const MIN_INTERVAL_MS = 1000;
 const MIN_DISTANCE_M = 10;
 /** …but still post at least this often when stationary, to stay "active" and self-correct. */
 const HEARTBEAT_MS = 45_000;
+/**
+ * Kept in step with the server's `game.location.max_accuracy_m`. Above this the server still
+ * records the position but will not act on it — questions fall back to a manual answer, the
+ * catch and the endgame trigger stay shut — so the player is told rather than left guessing why
+ * a button does nothing.
+ */
+const WEAK_ACCURACY_M = 50;
 
 /**
  * Pure decision for whether a new fix is worth sending to the server. Mobile GPS emits a steady
@@ -46,16 +53,28 @@ export class LocationTracker {
   private lastSent: Position | null = null;
   private lastSentAt = 0;
 
+  /** Accuracy of the latest fix in metres; null before the first one, or if the device omits it. */
+  readonly accuracy = signal<number | null>(null);
+
+  /** The current fix is too rough for the server to decide anything on it — surfaced in the HUD. */
+  readonly weakFix = computed(() => {
+    const metres = this.accuracy();
+
+    return metres !== null && metres > WEAK_ACCURACY_M;
+  });
+
   start(sessionId: string, playerId: string | null): void {
     if (this.subscription) {
       return;
     }
     this.lastSent = null;
     this.lastSentAt = 0;
+    this.accuracy.set(null);
 
     this.subscription = this.source.positions().subscribe({
       next: (pos) => {
         this.perm.markGranted(); // a real fix arrived → permission is granted (reliable on iOS too)
+        this.accuracy.set(pos.accuracy ?? null);
         // Move the player's OWN marker instantly (no server round-trip / broadcast echo wait).
         if (playerId) {
           this.store.setLivePosition(playerId, pos.lat, pos.lng);
@@ -63,7 +82,7 @@ export class LocationTracker {
         if (shouldSendLocation(this.lastSent, this.lastSentAt, pos, Date.now())) {
           this.lastSent = pos;
           this.lastSentAt = Date.now();
-          void this.api.reportLocation(sessionId, pos.lat, pos.lng);
+          void this.api.reportLocation(sessionId, pos.lat, pos.lng, pos.accuracy);
         }
       },
       // Denied / unavailable — stop quietly; the game still works without GPS. A hard denial
@@ -80,6 +99,7 @@ export class LocationTracker {
   stop(): void {
     this.subscription?.unsubscribe();
     this.subscription = null;
+    this.accuracy.set(null);
     this.source.stop();
   }
 }

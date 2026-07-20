@@ -260,6 +260,8 @@
   },
   "hud": {
     "calculating": "Calculating hiding zone…",
+    "weakGps": "Weak GPS signal",
+    "weakGpsHint": "Your position is too imprecise for the game to decide anything from it. Until it improves, questions fall back to a manual answer and the catch stays unavailable. Step outside or wait a few seconds.",
     "hide": "Hide",
     "questions": "Questions",
     "hand": "Hand",

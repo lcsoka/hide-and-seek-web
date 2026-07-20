@@ -139,8 +139,10 @@ export class ApiClient {
     return firstValueFrom(this.http.post<GameState>(`${this.base}/sessions/${id}/actions`, { type, payload }));
   }
 
-  reportLocation(id: string, lat: number, lng: number): Promise<unknown> {
-    return firstValueFrom(this.http.post(`${this.base}/sessions/${id}/location`, { lat, lng }));
+  reportLocation(id: string, lat: number, lng: number, accuracy?: number): Promise<unknown> {
+    const body = accuracy === undefined ? { lat, lng } : { lat, lng, accuracy };
+
+    return firstValueFrom(this.http.post(`${this.base}/sessions/${id}/location`, body));
   }
 
   /** Upload an in-game image (photo answer, curse proof); returns its public URL. */
